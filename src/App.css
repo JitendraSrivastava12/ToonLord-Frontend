@@ -1,0 +1,41 @@
+/* index.css */
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+}
+/* index.css */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevents horizontal shifts in Chrome */
+  width: 100%;
+}
+
+/* Fix for Chrome's high-density display margin calculation */
+* {
+  box-sizing: border-box;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.15; transform: rotate(12deg) scale(1.5); }
+  50% { opacity: 0.25; transform: rotate(11deg) scale(1.55); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 10s ease-in-out infinite;
+}
