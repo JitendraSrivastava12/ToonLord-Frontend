@@ -1,20 +1,19 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Camera, Trophy, Zap, Heart, ShieldCheck, 
-  MapPin, Phone, Globe, History, Check, X, Loader2
+  Camera, Trophy, ShieldCheck, MapPin, Phone, 
+  Globe, History, Check, Loader2 
 } from 'lucide-react';
 import axios from 'axios';
 import { AppContext } from "../UserContext";
 
 const ProfilePage = () => {
-  const { isRedMode, points, user, setUser } = useContext(AppContext);
+  const { isRedMode, user, setUser } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const fileInputRef = useRef(null);
 
-  // Dynamic Theme Mapping
   const theme = {
     primary: isRedMode ? 'from-red-600 to-rose-900' : 'from-emerald-400 to-cyan-600',
     border: isRedMode ? 'border-red-500/30' : 'border-emerald-500/30',
@@ -22,44 +21,29 @@ const ProfilePage = () => {
   };
 
   const [form, setForm] = useState({
-    username: '',
-    bio: '',
-    location: '',
-    mobile: '',
-    preview: '', 
-    file: null   
+    username: '', bio: '', location: '', mobile: '', preview: '', file: null   
   });
 
-  // 1. FETCH FRESH DATA FROM DB ON MOUNT
+  // 1. FETCH FRESH DATA ON MOUNT
   useEffect(() => {
     const fetchLatestUser = async () => {
       const token = localStorage.getItem('token');
-      if (!token) {
-        setFetching(false);
-        return;
-      }
-
+      if (!token) { setFetching(false); return; }
       try {
         const res = await axios.get('http://localhost:5000/api/users/getMe', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        
         if (res.data.success) {
-          setUser(res.data.user); 
-          console.log("Fetched latest user data:", res.data.user);
+          setUser(res.data.user);
           localStorage.setItem('user', JSON.stringify(res.data.user)); 
         }
-      } catch (err) {
-        console.error("Initial fetch failed:", err);
-      } finally {
-        setFetching(false);
-      }
+      } catch (err) { console.error("Initial fetch failed:", err); } 
+      finally { setFetching(false); }
     };
-
     fetchLatestUser();
-  }, [setUser]); 
+  }, [setUser]);
 
-  // 2. Sync local form state whenever the global user context updates
+  // 2. SYNC FORM STATE WITH CONTEXT
   useEffect(() => {
     if (user) {
       setForm({
@@ -73,52 +57,35 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  // Handle local image selection
   const handleFile = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setForm({ 
-        ...form, 
-        file: file, 
-        preview: URL.createObjectURL(file) 
-      });
+      setForm({ ...form, file: file, preview: URL.createObjectURL(file) });
     }
   };
 
-  // Sync all data to Backend via FormData
   const syncDatabase = async () => {
     setLoading(true);
     const token = localStorage.getItem('token');
-    
     const data = new FormData();
     data.append('username', form.username);
     data.append('bio', form.bio);
     data.append('location', form.location);
     data.append('mobile', form.mobile);
-    
-    if (form.file) {
-      data.append('profilePicture', form.file);
-    }
+    if (form.file) data.append('profilePicture', form.file);
 
     try {
       const res = await axios.patch('http://localhost:5000/api/users/update-profile', data, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data' 
-        }
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       });
-
       if (res.data.success) {
-        setUser(res.data.user); // Update Global Context
+        setUser(res.data.user);
         localStorage.setItem("user", JSON.stringify(res.data.user));
         setIsEditing(false);
       }
     } catch (err) {
-      console.error("Sync Error:", err.response?.data || err.message);
       alert(err.response?.data?.message || "Sync Interrupted");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   if (fetching) return (
@@ -148,6 +115,7 @@ const ProfilePage = () => {
                 <div className={`w-32 h-32 rounded-full p-1 bg-gradient-to-tr ${theme.primary} shadow-2xl`}>
                   <img 
                     src={form.preview || 'https://via.placeholder.com/150'} 
+                    crossOrigin="anonymous"
                     className="w-full h-full object-cover rounded-full border-4 border-[#05060b]" 
                     alt="Avatar" 
                   />
@@ -178,7 +146,10 @@ const ProfilePage = () => {
               </div>
 
               <button 
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={() => {
+                  if(isEditing) setForm({...form, preview: user?.profilePicture, file: null});
+                  setIsEditing(!isEditing);
+                }}
                 className="w-full mt-6 py-4 rounded-2xl bg-white text-black font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
               >
                 {isEditing ? "Discard Changes" : "Edit Profile"}
@@ -186,7 +157,7 @@ const ProfilePage = () => {
             </div>
           </motion.div>
 
-          {/* CONTACT INFO CARD */}
+          {/* CONTACT INFO CARD - RESTORED */}
           <div className="p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl space-y-4">
              <div className="flex items-center gap-4 text-sm font-bold"><MapPin size={18} className={theme.text}/> {user?.location || "Unknown"}</div>
              <div className="flex items-center gap-4 text-sm font-bold"><Phone size={18} className={theme.text}/> {user?.mobile || "No Number"}</div>
@@ -230,7 +201,7 @@ const ProfilePage = () => {
             ) : (
               <motion.div key="stats" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {/* BIO BOX */}
+                {/* BIO BOX - RESTORED */}
                 <div className="md:col-span-2 p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 backdrop-blur-md">
                    <h3 className="text-xs font-black uppercase text-slate-500 mb-4 tracking-widest">Dossier</h3>
                    <p className="text-xl font-medium text-slate-300 leading-relaxed italic">
@@ -238,7 +209,7 @@ const ProfilePage = () => {
                    </p>
                 </div>
 
-                {/* STAT CARDS */}
+                {/* STAT CARDS - RESTORED */}
                 <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all">
                   <div>
                     <p className="text-4xl font-black text-white">1.2K</p>
@@ -249,8 +220,8 @@ const ProfilePage = () => {
 
                 <div className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:bg-white/5 transition-all">
                   <div>
-                    <p className="text-4xl font-black text-white">84</p>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Badges Earned</p>
+                    <p className="text-4xl font-black text-white">{user?.points || 0}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Total Points</p>
                   </div>
                   <Trophy size={40} className="opacity-10 group-hover:opacity-30 transition-opacity" />
                 </div>

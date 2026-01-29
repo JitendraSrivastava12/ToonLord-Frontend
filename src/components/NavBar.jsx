@@ -65,7 +65,7 @@ function PointsCard() {
 
 function NavBar({ isSidebarOpen, setIsSidebarOpen }) {
   const navigate = useNavigate();
-  const { isLoggedIn, logout, isRedMode, toggleTheme } = useContext(AppContext);
+  const { isLoggedIn, logout, isRedMode, toggleTheme, toggleThemeAndRefetch } = useContext(AppContext);
   const { showAlert } = useAlert();
 
   const [isVisible, setIsVisible] = useState(true);
@@ -112,7 +112,9 @@ function NavBar({ isSidebarOpen, setIsSidebarOpen }) {
 
   // Aesthetic Alert for Theme Toggle
   const handleThemeChange = () => {
-    toggleTheme();
+    // Use the variant that also invalidates queries so lists update
+    if (typeof toggleThemeAndRefetch === 'function') toggleThemeAndRefetch();
+    else toggleTheme();
     const themeName = !isRedMode ? "RED MODE" : "FAMILY MODE";
     showAlert(`${themeName} Activated`, "success", 2500);
   };

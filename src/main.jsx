@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     {/* 3. Wrap everything in the Provider */}
- < QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <AppProvider>
         {/* Wrap the app here */}
         <AlertProvider> 

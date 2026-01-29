@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { useQueryClient } from '@tanstack/react-query';
 export const AppContext = createContext();
 
 export function AppProvider({ children }) {
@@ -6,6 +7,8 @@ export function AppProvider({ children }) {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [isRedMode, setIsRedMode] = useState(localStorage.getItem("theme") === "red");
+
+  const queryClient = useQueryClient();
 
   // Sync across tabs
   useEffect(() => {
@@ -38,8 +41,28 @@ export function AppProvider({ children }) {
     setIsRedMode(newMode);
   };
 
+  // Keeps only the color change (no data refetch)
+  const toggleThemeAndRefetch = () => {
+    const newMode = !isRedMode;
+    localStorage.setItem("theme", newMode ? "red" : "family");
+    setIsRedMode(newMode);
+    // Invalidate relevant queries so lists can refetch
+    try {
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          const k = query.queryKey;
+          if (!Array.isArray(k) || k.length === 0) return false;
+          const first = String(k[0]).toLowerCase();
+          return first.includes('manga') || first.includes('catalog') || first.includes('home');
+        }
+      });
+    } catch (e) {
+      console.warn('QueryClient not available to invalidate on theme toggle');
+    }
+  };
+
   return (
-    <AppContext.Provider value={{ isLoggedIn, user, setUser, login, logout, isRedMode, toggleTheme }}>
+    <AppContext.Provider value={{ isLoggedIn, user, setUser, login, logout, isRedMode, toggleTheme, toggleThemeAndRefetch }}>
       {children}
     </AppContext.Provider>
   );
