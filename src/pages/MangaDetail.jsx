@@ -27,8 +27,22 @@ const MangaDetail = () => {
     queryKey: ["mangaChapters", mangaId],
     queryFn: async () => {
       const res = await axios.get(`http://localhost:5000/api/chapters/${mangaId}`);
-      const rawData = Array.isArray(res.data) ? res.data : res.data.chapters || [];
-      return rawData.sort((a, b) => (b.chapterNumber || 0) - (a.chapterNumber || 0));
+      // API may return either an array (Cloudinary) or legacy MangaDex style data
+      let rawData = [];
+      if (Array.isArray(res.data)) rawData = res.data;
+      else if (Array.isArray(res.data.chapters)) rawData = res.data.chapters;
+      else if (Array.isArray(res.data.items)) rawData = res.data.items;
+      else rawData = [];
+
+      // Normalize pages: old chapters used `hash` and pages as filenames; new ones contain full URLs
+      const normalized = rawData.map(ch => {
+        if (ch.hash && Array.isArray(ch.pages)) {
+          return { ...ch, pages: ch.pages.map(p => `https://uploads.mangadex.org/data/${ch.hash}/${p}`) };
+        }
+        return ch;
+      });
+
+      return normalized.sort((a, b) => (b.chapterNumber || 0) - (a.chapterNumber || 0));
     },
     staleTime: 1000 * 60 * 5,
   });
