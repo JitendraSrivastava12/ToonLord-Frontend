@@ -7,9 +7,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const UploadPage = () => {
-  const { isRedMode } = useContext(AppContext);
+  const { isRedMode,currentTheme } = useContext(AppContext);
   const navigate = useNavigate();
-  
+  const accentColor = isRedMode ? '#ef4444' : 'var(--accent)';
+  const accentText = isRedMode ? 'text-red-500' : 'text-[var(--accent)]';
   // --- FORM STATE ---
   const [myMangas, setMyMangas] = useState([]);
   const [selectedManga, setSelectedManga] = useState('');
@@ -391,35 +392,38 @@ const UploadPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#05060b] text-white relative overflow-hidden">
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] relative overflow-hidden theme-${currentTheme} py-24`}>
       {/* Background Glow */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-20" style={{ backgroundColor: themeColor }} />
+      <div 
+        className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 pointer-events-none" 
+        style={{ backgroundColor: accentColor }} 
+      />
 
       <div className="relative z-10 p-4 md:p-10 max-w-7xl mx-auto">
-        <header className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 p-8 rounded-[2.5rem] bg-white/[0.03] backdrop-blur-2xl border border-white/10 shadow-2xl">
+        <header className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 p-8 rounded-[2.5rem] bg-[var(--bg-secondary)]/40 backdrop-blur-2xl border border-[var(--border)] shadow-2xl">
           <div className="space-y-1">
             <h1 className="text-4xl font-black uppercase tracking-tighter italic">
               Studio <span style={{ color: themeColor }}>Upload</span>
             </h1>
-            <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Cloudinary Intelligence Terminal</p>
+            <p className="text-[var(--text-dim)] text-[10px] font-black uppercase tracking-[0.4em]">Cloudinary Intelligence Terminal</p>
           </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* LEFT: PARAMETERS */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="p-8 rounded-[3rem] bg-white/[0.02] border border-white/10 shadow-2xl">
-              <h2 className="text-[11px] font-black uppercase text-gray-400 mb-8 flex items-center gap-2">
-                <LayoutDashboard size={14} style={{ color: themeColor }} /> Core Parameters
+            <div className="p-8 rounded-[3rem] bg-[var(--bg-secondary)]/20 border border-border-[var(--border)] shadow-2xl">
+              <h2 className="text-[11px] font-black uppercase text-[var(--text-dim)] mb-8 flex items-center gap-2">
+               <LayoutDashboard size={14} style={{ color: accentColor }} />  Core Parameters
               </h2>
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Series Selection</label>
+                  <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Series Selection</label>
                   <select 
                     value={selectedManga}
                     onChange={(e) => setSelectedManga(e.target.value)}
-                    className="w-full bg-[#0a0b10] border border-white/10 rounded-2xl px-5 py-4 text-xs font-bold appearance-none cursor-pointer outline-none"
+                    className="w-full bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-main)] rounded-2xl px-5 py-4 text-xs font-bold appearance-none cursor-pointer outline-none"
                   >
                     {myMangas.length > 0 ? (
                       myMangas.map(m => <option key={m._id} value={m._id}>{m.title}</option>)
@@ -431,22 +435,22 @@ const UploadPage = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Chapter</label>
-                    <input type="number" value={chapterNum} onChange={(e) => setChapterNum(e.target.value)} placeholder="01" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs outline-none" />
+                    <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Chapter</label>
+                    <input type="number" value={chapterNum} onChange={(e) => setChapterNum(e.target.value)} placeholder="01" className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-5 py-4 text-xs outline-none" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Volume</label>
-                    <input type="text" value={volumeNum} onChange={(e) => setVolumeNum(e.target.value)} placeholder="--" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs outline-none" />
+                    <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Volume</label>
+                    <input type="text" value={volumeNum} onChange={(e) => setVolumeNum(e.target.value)} placeholder="--" className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)]rounded-2xl px-5 py-4 text-xs outline-none" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Chapter Title</label>
-                  <input type="text" value={chapterTitle} onChange={(e) => setChapterTitle(e.target.value)} placeholder="The Awakening" className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs outline-none" />
+                  <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Chapter Title</label>
+                  <input type="text" value={chapterTitle} onChange={(e) => setChapterTitle(e.target.value)} placeholder="The Awakening" className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-5 py-4 text-xs outline-none" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-gray-500 ml-1">Upload Quality</label>
+                  <label className="text-[9px] font-black uppercase ttext-[var(--text-dim)] ml-1">Upload Quality</label>
                   <div className="flex gap-3 items-center">
                     <label className="inline-flex items-center gap-2 text-xs cursor-pointer">
                       <input type="radio" name="quality" value="high" checked={quality === 'high'} onChange={() => setQuality('high')} />
@@ -458,7 +462,7 @@ const UploadPage = () => {
                       <span className="font-black uppercase text-[10px] ml-1">Low MB (Compressed)</span>
                     </label>
                   </div>
-                  <p className="text-[10px] text-gray-500 italic">Choose <span className="font-black">Low MB</span> to compress images before upload (smaller size, faster uploads).</p>
+                  <p className="text-[10px] texttext-[var(--text-dim)] italic">Choose <span className="font-black">Low MB</span> to compress images before upload (smaller size, faster uploads).</p>
 
                   {quality === 'low' && (
                     <div className="mt-2 space-y-3">
@@ -471,13 +475,13 @@ const UploadPage = () => {
 
                       <div className="flex items-center gap-4">
                         <div className="w-1/2">
-                          <label className="text-[9px] font-black uppercase text-gray-500">JPEG Quality: <span className="font-bold">{jpegQuality}%</span></label>
+                          <label className="text-[9px] font-black uppercase text-text-[var(--text-dim)]">JPEG Quality: <span className="font-bold">{jpegQuality}%</span></label>
                           <input type="range" min={30} max={90} value={jpegQuality} onChange={(e) => setJpegQuality(Number(e.target.value))} className="w-full" />
                         </div>
 
                         <div className="w-1/2">
-                          <label className="text-[9px] font-black uppercase text-gray-500">Max Width</label>
-                          <select value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="w-full bg-[#0a0b10] border border-white/10 rounded-2xl px-3 py-2 text-xs font-bold appearance-none cursor-pointer outline-none">
+                          <label className="text-[9px] font-black uppercase text-text-[var(--text-dim)]">Max Width</label>
+                          <select value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="w-full bg-[var(--bg-secondary)]/20 border border-border-[var(--border)] rounded-2xl px-3 py-2 text-xs font-bold appearance-none cursor-pointer outline-none">
                             <option value={800}>800</option>
                             <option value={1200}>1200</option>
                             <option value={1400}>1400</option>
@@ -492,7 +496,7 @@ const UploadPage = () => {
               </div>
             </div>
 
-            <div className="p-6 rounded-[2.5rem] bg-white/[0.02] border border-white/10 space-y-3">
+            <div className="p-6 rounded-[2.5rem] bg-[var(--bg-secondary)]/20 border border-[var(--border)] space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-[12px] font-black">
                   <div>Total: <span className="font-bold">
@@ -506,14 +510,14 @@ const UploadPage = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button onClick={() => setAllCompressed(true)} className="px-3 py-2 rounded-xl bg-white/5 font-black text-[11px]">Use Compressed</button>
-                  <button onClick={() => setAllCompressed(false)} className="px-3 py-2 rounded-xl bg-white/5 font-black text-[11px]">Use Original</button>
+                  <button onClick={() => setAllCompressed(true)} className="px-3 py-2 rounded-xl bg-[var(--bg-secondary)]/20 font-black text-[11px]">Use Compressed</button>
+                  <button onClick={() => setAllCompressed(false)} className="px-3 py-2 rounded-xl [var(--bg-secondary)]/20 font-black text-[11px]">Use Original</button>
                 </div>
               </div>
 
               {uploading && (
                 <div className="mt-3 space-y-2">
-                  <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden">
+                  <div className="w-full bg-[var(--bg-secondary)]/20 rounded-full h-3 overflow-hidden">
                     <div style={{ width: `${uploadProgress}%` }} className="h-3 bg-green-500 transition-all" />
                   </div>
 

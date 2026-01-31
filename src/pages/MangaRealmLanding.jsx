@@ -1,142 +1,176 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { 
   Glasses, 
   ShieldCheck, 
   ArrowRight, 
-  Lock 
+  Lock,
+  Globe,
+  Zap,
+  Activity,
+  Cpu,
+  Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { AppContext } from "../UserContext";
 
 const MangaRealmLanding = () => {
-  return (
-    <div className="relative min-h-screen bg-gradient-to-b from-[#05060b] via-[#070814] to-black text-white font-sans selection:bg-rose-500/30 overflow-x-hidden">
+  const { currentTheme, isRedMode } = useContext(AppContext);
 
-      {/* BACKGROUND GLOWS */}
-      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[150px]" />
-      <div className="absolute top-1/3 -right-40 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[150px]" />
-      <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[200px]" />
+  const accentColor = isRedMode ? '#f43f5e' : 'var(--accent)'; 
+  
+  return (
+    <div className={`relative min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] font-sans selection:bg-rose-500/30 overflow-x-hidden theme-${currentTheme} py-28` }>
+      
+      {/* BACKGROUND AMBIENCE */}
+      <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.08] pointer-events-none" style={{ backgroundColor: accentColor }} />
+      <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       {/* --- HERO SECTION --- */}
-      <main className="relative max-w-7xl mx-auto px-6 pt-10 pb-20 text-center">
+      <main className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-12 text-center z-10">
 
-        <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[11px] font-extrabold uppercase tracking-widest mb-12 shadow-lg shadow-rose-500/10 backdrop-blur">
-          ⚡ v2.0 Now Available
-        </div>
-        
-        {/* MAIN TEXT UNCHANGED */}
-        <h1 className="text-4xl md:text-6xl font-black mb-10 leading-[1.05] tracking-tight max-w-4xl mx-auto">
-          The Ultimate Platform for{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
-            Manga Enthusiasts & Creators
+        {/* Protocol Badge */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] text-[9px] font-black uppercase tracking-[0.3em] mb-8 shadow-md backdrop-blur-lg"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
           </span>
-        </h1>
+          Protocol v2.0 Live
+        </motion.div>
         
-        <p className="text-gray-400 max-w-1xl mx-auto text-lg leading-relaxed mb-20">
-          Experience friendly reading modes, unlock premium content with points, or join as a creator to publish and earn. Choose your path below.
-        </p>
+        {/* Hero Title */}
+        <motion.h1 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-snug tracking-tighter max-w-3xl mx-auto italic uppercase"
+        >
+          The Nexus for <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--text-main)] via-[var(--text-dim)] to-transparent opacity-80">
+            Creators & Readers
+          </span>
+        </motion.h1>
+        
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-[var(--text-dim)] max-w-xl mx-auto text-sm md:text-base font-medium leading-relaxed mb-12 italic"
+        >
+          Deploy reading protocols, unlock premium archives with points, or initialize your own creator uplink to monetize your craft.
+        </motion.p>
 
-        {/* --- SPLIT LOGIN CARDS --- */}
-        <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        {/* --- DUAL PORTAL CARDS --- */}
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
           
-          {/* USER PORTAL */}
-          <div className="group relative bg-gradient-to-b from-[#0b0d16]/90 to-[#07080f]/90 backdrop-blur-xl border border-rose-500/20 p-10 rounded-3xl transition-all hover:border-rose-500/50 hover:shadow-[0_0_80px_rgba(244,63,94,0.25)]">
+          <PortalCard 
+            title="User Portal"
+            icon={<Glasses size={24} />}
+            desc="Access the manga archive, synchronize points, and engage with creator content."
+            features={[
+              "Adaptive Theme Sync",
+              "Point-Based Archive Unlock",
+              "Creator Uplink & Revenue"
+            ]}
+            link="/Userlogin"
+            btnText="Initialize Session"
+            accent={accentColor}
+            isPrimary
+          />
 
-            {/* glow overlay */}
-            <div className="absolute inset-0 rounded-3xl bg-rose-500/5 opacity-0 group-hover:opacity-100 blur-xl transition" />
-
-            <div className="relative">
-              <div className="w-16 h-16 bg-rose-500/10 rounded-2xl flex items-center justify-center mb-8 border border-rose-500/30 group-hover:scale-110 transition-transform">
-                <Glasses className="text-rose-400" size={28} />
-              </div>
-
-              <h2 className="text-2xl md:text-4xl font-black mb-4 text-left">User Portal</h2>
-
-              <p className="text-gray-400 text-left text-sm leading-relaxed mb-8">
-                For readers and creators. Read manga, earn points, unlock premium chapters, or publish and monetize your own series.
-              </p>
-
-              <ul className="space-y-4 mb-10 text-left text-sm text-gray-300">
-                <li className="flex items-center gap-3">
-                  <ArrowRight size={14} className="text-rose-400" />
-                  Unlimited Friendly Mode Reading
-                </li>
-                <li className="flex items-center gap-3">
-                  <ArrowRight size={14} className="text-rose-400" />
-                  Earn Points & Unlock Premium
-                </li>
-                <li className="flex items-center gap-3">
-                  <ArrowRight size={14} className="text-rose-400" />
-                  Creator Upload & Revenue Tools
-                </li>
-              </ul>
-
-              <Link to="/Userlogin" className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:to-rose-700 text-white font-black py-4 rounded-xl flex items-center  justify-center gap-2 transition-all active:scale-95 shadow-xl shadow-rose-500/30">
-                User Login / Sign Up <ArrowRight size={18} />
-              </Link> 
-            </div>
-          </div>
-
-          {/* ADMIN PORTAL */}
-          <div className="group relative bg-gradient-to-b from-[#0b0d16]/90 to-[#07080f]/90 backdrop-blur-xl border border-blue-500/20 p-10 rounded-3xl transition-all hover:border-blue-500/50 hover:shadow-[0_0_80px_rgba(59,130,246,0.25)]">
-
-            <div className="absolute inset-0 rounded-3xl bg-blue-500/5 opacity-0 group-hover:opacity-100 blur-xl transition" />
-
-            <div className="relative">
-              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-8 border border-blue-500/30 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="text-blue-400" size={28} />
-              </div>
-
-              <h2 className="text-2xl md:text-4xl font-black mb-4 text-left">Admin Console</h2>
-
-              <p className="text-gray-400 text-left text-sm leading-relaxed mb-8">
-                Restricted access for administrators only. Manage users, content moderation, platform analytics, and revenue systems.
-              </p>
-
-              <ul className="space-y-4 mb-10 text-left text-sm text-gray-300">
-                <li className="flex items-center gap-3">
-                  <ArrowRight size={14} className="text-blue-400" />
-                  Platform & User Management
-                </li>
-                <li className="flex items-center gap-3">
-                  <ArrowRight size={14} className="text-blue-400" />
-                  Content Moderation System
-                </li>
-                <li className="flex items-center gap-3">
-                  <ArrowRight size={14} className="text-blue-400" />
-                  Financial & System Analytics
-                </li>
-              </ul>
-
-              <button className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-black py-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95">
-                Admin Login <Lock size={16} />
-              </button>
-            </div>
-          </div>
+          <PortalCard 
+            title="Admin Console"
+            icon={<ShieldCheck size={24} />}
+            desc="System-level access only. Oversee moderation and platform metrics."
+            features={[
+              "Platform Management",
+              "Moderation Oversight",
+              "Analytics & Reports"
+            ]}
+            link="/admin"
+            btnText="Command Login"
+            accent="#3b82f6"
+          />
         </div>
       </main>
 
-      {/* --- STATS BAR --- */}
-      <section className="relative bg-[#0b0d16]/80 backdrop-blur border-y border-white/5 py-10">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10">
-          {[
-            { label: 'Active Series', value: '12k+' },
-            { label: 'Daily Readers', value: '850k' },
-            { label: 'Chapters Uploaded', value: '2.4M' },
-            { label: 'Creator Revenue', value: '$140k+' },
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-2xl md:text-4xl font-black mb-2 bg-gradient-to-r from-white to-gray-400 text-transparent bg-clip-text">
-                {stat.value}
-              </div>
-              <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                {stat.label}
-              </div>
-            </div>
-          ))}
+      {/* --- REAL-TIME STATS --- */}
+      <section className="relative bg-[var(--bg-secondary)]/30 backdrop-blur-2xl py-12 md:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 relative z-10">
+          <StatItem label="Global Series" value="12k+" icon={<Globe size={14}/>} />
+          <StatItem label="Active Uplinks" value="850k" icon={<Activity size={14}/>}/>
+          <StatItem label="Data Archives" value="2.4M" icon={<Zap size={14}/>}/>
+          <StatItem label="Creator Flow" value="$140k+" icon={<Lock size={14}/>}/>
         </div>
       </section>
+
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          display: inline-flex;
+          animation: marquee 30s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
+
+// --- HELPER COMPONENTS ---
+const PortalCard = ({ title, icon, desc, features, link, btnText, accent, isPrimary }) => (
+  <motion.div 
+    whileHover={{ y: -4, scale: 1.02 }}
+    transition={{ type: "spring", stiffness: 300 }}
+    className={`relative group bg-[var(--bg-secondary)]/50 backdrop-blur-xl border border-[var(--border)] p-6 md:p-8 rounded-2xl text-left transition-all hover:border-[var(--accent)]/30 overflow-hidden shadow-md`}
+  >
+    <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full blur-2xl opacity-10 transition-opacity" style={{ backgroundColor: accent }} />
+    
+    <div className="relative space-y-4 md:space-y-6">
+      <motion.div 
+        whileHover={{ rotate: 8, scale: 1.05 }}
+        className={`w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center border border-white/5 bg-[var(--bg-primary)] shadow-lg`} 
+        style={{ color: accent }}
+      >
+        {icon}
+      </motion.div>
+
+      <div>
+        <h2 className="text-xl md:text-2xl font-black tracking-tight italic uppercase text-[var(--text-main)] mb-1 md:mb-2">{title}</h2>
+        <p className="text-[var(--text-dim)] text-sm md:text-sm font-medium leading-relaxed italic">{desc}</p>
+      </div>
+
+      <ul className="space-y-1.5 md:space-y-2">
+        {features.map((f, i) => (
+          <li key={i} className="flex items-center gap-2 text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)]">
+            <ArrowRight size={12} style={{ color: accent }} /> {f}
+          </li>
+        ))}
+      </ul>
+
+      <Link to={link} className={`w-full py-2.5 md:py-3 rounded-xl font-black uppercase tracking-widest text-xs md:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm ${isPrimary ? 'text-white' : 'bg-[var(--bg-primary)] text-[var(--text-dim)] border border-[var(--border)] hover:text-white'}`} 
+        style={isPrimary ? { backgroundColor: accent, boxShadow: `0 8px 20px -6px ${accent}40` } : {}}
+      >
+        {btnText} <ArrowRight size={14} />
+      </Link> 
+    </div>
+  </motion.div>
+);
+
+const StatItem = ({ label, value, icon }) => (
+  <div className="text-center group">
+    <div className="flex items-center justify-center gap-1 text-[var(--text-dim)] mb-1">
+      {icon} <span className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.3em]">{label}</span>
+    </div>
+    <div className="text-2xl md:text-3xl font-black italic tracking-tighter text-[var(--text-main)] group-hover:scale-105 transition-transform">
+      {value}
+    </div>
+  </div>
+);
 
 export default MangaRealmLanding;

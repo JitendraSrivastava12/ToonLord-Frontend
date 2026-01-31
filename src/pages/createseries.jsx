@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { 
   Upload, X, Tag, Plus, BookOpen, ArrowLeft, RefreshCw, Loader2, ShieldAlert 
 } from "lucide-react";
@@ -11,21 +12,22 @@ const CreateSeries = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showAlert } = useAlert();
-  const { isRedMode } = useContext(AppContext);
+  const { isRedMode, currentTheme } = useContext(AppContext);
   const fileInputRef = useRef(null);
   
   const isEditMode = Boolean(id);
-  const themeColor = isRedMode ? '#ef4444' : '#22c55e';
-  const themeGlow = isRedMode ? 'shadow-red-500/20' : 'shadow-green-500/20';
+  
+  // Theme Aware Logic
+  const accentColor = isRedMode ? '#ef4444' : 'var(--accent)';
+  const glowClass = isRedMode ? 'shadow-red-500/20' : 'shadow-[var(--accent-glow)]';
 
-  // --- STATE PROTOCOLS ---
   const [loading, setLoading] = useState(isEditMode);
   const [submitting, setSubmitting] = useState(false);
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
   const [preview, setPreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [isAdult, setIsAdult] = useState(false); // New Feature: Adult classification
+  const [isAdult, setIsAdult] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -34,7 +36,6 @@ const CreateSeries = () => {
     synopsis: ""
   });
 
-  // --- DATA HYDRATION (FETCH REAL DATA) ---
   useEffect(() => {
     if (isEditMode) {
       const fetchSeriesData = async () => {
@@ -58,7 +59,6 @@ const CreateSeries = () => {
       };
       fetchSeriesData();
     } else {
-        // If creating new, default isAdult to match current site mode
         setIsAdult(isRedMode);
     }
   }, [id, isEditMode, isRedMode]);
@@ -69,7 +69,7 @@ const CreateSeries = () => {
       if (file.size > 5 * 1024 * 1024) return showAlert("File exceeds 5MB limit", "error");
       setImageFile(file);
       setPreview(URL.createObjectURL(file));
-      showAlert("Cover Buffer Updated", "success");
+      showAlert("Visual Cache Updated", "success");
     }
   };
 
@@ -80,7 +80,6 @@ const CreateSeries = () => {
     }
   };
 
-  // --- SUBMIT PROTOCOL ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -91,12 +90,10 @@ const CreateSeries = () => {
     data.append('author', formData.author);
     data.append('artist', formData.artist);
     data.append('description', formData.synopsis);
-    data.append('isAdult', isAdult); // Sending the adult classification
+    data.append('isAdult', isAdult);
     data.append('tags', JSON.stringify(tags));
     
-    if (imageFile) {
-      data.append('coverImage', imageFile);
-    }
+    if (imageFile) data.append('coverImage', imageFile);
 
     try {
       const url = isEditMode 
@@ -112,173 +109,205 @@ const CreateSeries = () => {
         }
       });
 
-      showAlert(`Series ${isEditMode ? 'Updated' : 'Created'} Successfully`, "success");
+      showAlert(`Series ${isEditMode ? 'Synced' : 'Deployed'} Successfully`, "success");
       setTimeout(() => navigate("/my-series"), 1500);
     } catch (err) {
-      showAlert(err.response?.data?.message || "Protocol Interrupted", "error");
+      showAlert("Protocol Interrupted", "error");
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#05060b] flex flex-col items-center justify-center gap-4">
-      <RefreshCw className="animate-spin" size={40} style={{ color: themeColor }} />
-      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500">Decrypting Series Data...</p>
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4">
+      <RefreshCw className="animate-spin text-[var(--accent)]" size={48} />
+      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--text-dim)] animate-pulse">Establishing Secure Uplink</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#05060b] text-zinc-100 relative overflow-hidden font-sans">
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme} py-28`}>
       
-      {/* GLOW ACCENT */}
-      <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full blur-[150px] opacity-10" style={{ backgroundColor: themeColor }} />
+      {/* BACKGROUND AMBIENCE */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-[-10%] left-[-5%] w-[50%] h-[50%] rounded-full blur-[160px] opacity-[0.08]" style={{ backgroundColor: accentColor }} />
+      </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto p-6 lg:p-12">
+      <div className="relative z-10 max-w-6xl mx-auto p-6 lg:p-12 pb-32">
         
-        {/* HEADER & BACK */}
-        <div className="flex items-center gap-6 mb-12">
-           <button onClick={() => navigate(-1)} className="p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group">
+        {/* HEADER */}
+        <header className="flex items-center gap-8 mb-16">
+           <button onClick={() => navigate(-1)} className="p-5 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[2rem] hover:border-[var(--accent)]/50 transition-all group">
               <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
            </button>
-           <div className="space-y-1">
-              <h1 className="text-5xl font-black uppercase tracking-tighter italic leading-none">
-                {isEditMode ? "Edit" : "Initialize"} <span style={{ color: themeColor }}>Series</span>
+           <div className="space-y-2">
+              <h1 className="text-6xl font-black uppercase tracking-tighter italic leading-none">
+                {isEditMode ? "Sync" : "Deploy"} <span style={{ color: accentColor }}>Series</span>
               </h1>
-              <p className="text-zinc-500 text-[9px] font-black uppercase tracking-[0.4em]">
-                {isEditMode ? `UUID: ${id}` : "Protocol: Storyline Initialization"}
-              </p>
+              <div className="flex items-center gap-3">
+                <span className="h-[1px] w-8 bg-[var(--accent)]" />
+                <p className="text-[var(--text-dim)] text-[10px] font-black uppercase tracking-[0.4em]">
+                  {isEditMode ? `OBJECT_ID: ${id}` : "INIT_SEQUENCE: CREATOR_UPLINK"}
+                </p>
+              </div>
            </div>
-        </div>
+        </header>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* LEFT COLUMN: VISUALS & SAFETY */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className={`group relative aspect-[3/4] bg-white/[0.02] border border-white/10 rounded-[2.5rem] overflow-hidden hover:border-white/20 transition-all duration-500 shadow-2xl ${themeGlow}`}>
+          {/* LEFT: VISUAL DATA */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="lg:col-span-4 space-y-8"
+          >
+            <div className={`group relative aspect-[3/4] bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[3rem] overflow-hidden hover:border-[var(--accent)]/40 transition-all duration-500 shadow-2xl ${glowClass}`}>
               {preview ? (
                 <>
-                  <img src={preview} className="absolute inset-0 w-full h-full object-cover" alt="Cover" />
-                  <button type="button" onClick={() => {setPreview(null); setImageFile(null);}} className="absolute top-6 right-6 p-3 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full hover:bg-red-500 transition-all z-20">
-                    <X size={20} />
-                  </button>
+                  <img src={preview} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button type="button" onClick={() => {setPreview(null); setImageFile(null);}} className="p-4 bg-red-500 text-white rounded-full shadow-xl hover:scale-110 transition-all">
+                        <X size={24} />
+                    </button>
+                  </div>
                 </>
               ) : (
-                <label className="cursor-pointer h-full flex flex-col items-center justify-center p-10 text-center">
+                <label className="cursor-pointer h-full flex flex-col items-center justify-center p-12 text-center group">
                   <input type="file" ref={fileInputRef} className="hidden" onChange={handleImageChange} accept="image/*" />
-                  <div className="p-6 bg-white/5 rounded-3xl border border-white/10 mb-6" style={{ boxShadow: `0 0 40px -10px ${themeColor}20` }}>
-                    <Upload size={32} style={{ color: themeColor }} />
+                  <div className="p-8 bg-[var(--bg-primary)] rounded-[2.5rem] border border-[var(--border)] mb-6 transition-all group-hover:border-[var(--accent)]/50 group-hover:shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]">
+                    <Upload size={40} style={{ color: accentColor }} />
                   </div>
-                  <span className="block font-black text-xs uppercase tracking-widest text-zinc-300">Inject Cover Art</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)] group-hover:text-[var(--text-main)] transition-colors">Inject Cover Data</span>
                 </label>
               )}
             </div>
 
-            {/* ADULT CLASSIFICATION TOGGLE */}
-            <div className={`p-6 rounded-[2rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl flex items-center justify-between group hover:bg-white/[0.04] transition-all`}>
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl bg-white/5 ${isAdult ? 'text-red-500' : 'text-zinc-500'}`}>
-                    <ShieldAlert size={20} />
+            {/* ADULT TOGGLE: Glass Card */}
+            <div className="p-8 rounded-[2.5rem] bg-[var(--bg-secondary)]/50 backdrop-blur-3xl border border-[var(--border)] flex items-center justify-between group">
+                <div className="flex items-center gap-5">
+                  <div className={`p-4 rounded-2xl bg-[var(--bg-primary)] ${isAdult ? 'text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'text-[var(--text-dim)]'}`}>
+                    <ShieldAlert size={22} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase text-white tracking-widest">Adult Content</p>
-                    <p className="text-[8px] text-zinc-500 uppercase">Classify as 18+ Restricted</p>
+                    <p className="text-[11px] font-black uppercase text-[var(--text-main)] tracking-widest">Adult Protocol</p>
+                    <p className="text-[9px] text-[var(--text-dim)] uppercase font-bold tracking-tighter mt-1">{isAdult ? "Restricted 18+" : "Unrestricted Access"}</p>
                   </div>
                 </div>
                 <button 
                   type="button"
                   onClick={() => setIsAdult(!isAdult)}
-                  className={`w-12 h-6 rounded-full relative transition-all duration-300 ${isAdult ? 'bg-red-600 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-zinc-800'}`}
+                  className={`w-14 h-7 rounded-full relative transition-all duration-500 ${isAdult ? 'bg-red-500 shadow-lg shadow-red-500/30' : 'bg-[var(--bg-primary)] border border-[var(--border)]'}`}
                 >
-                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 ${isAdult ? 'left-7' : 'left-1'}`} />
+                  <motion.div 
+                    animate={{ x: isAdult ? 28 : 4 }}
+                    className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-md" 
+                  />
                 </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* RIGHT COLUMN: DATA TERMINAL */}
-          <div className="lg:col-span-8 space-y-8 p-10 rounded-[3rem] bg-white/[0.02] backdrop-blur-3xl border border-white/10 shadow-2xl">
+          {/* RIGHT: METADATA TERMINAL */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-8 space-y-10 p-10 lg:p-14 rounded-[3.5rem] bg-[var(--bg-secondary)]/40 backdrop-blur-3xl border border-[var(--border)] shadow-2xl"
+          >
             
-            <section className="space-y-6">
-              <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">
-                <BookOpen size={16} style={{ color: themeColor }} /> Core Identification
+            <div className="space-y-8">
+              <div className="flex items-center gap-3 text-[var(--text-dim)] text-[11px] font-black uppercase tracking-[0.4em]">
+                <BookOpen size={16} style={{ color: accentColor }} /> Data Integrity
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-2">Series Title</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Series Title</label>
                 <input 
                   required
                   type="text" 
                   value={formData.title}
                   onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  className="w-full bg-[#0a0b10] border border-white/5 rounded-2xl px-8 py-5 text-sm font-bold focus:border-white/20 outline-none transition-all"
-                  placeholder="Enter Title..."
+                  className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-8 py-5 text-sm font-bold focus:border-[var(--accent)] outline-none transition-all placeholder:opacity-20"
+                  placeholder="INPUT_TITLE..."
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-2">Author</label>
-                  <input type="text" value={formData.author} onChange={(e) => setFormData({...formData, author: e.target.value})} className="w-full bg-[#0a0b10] border border-white/5 rounded-2xl px-8 py-5 text-sm font-bold outline-none" placeholder="Primary Author" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Architect (Author)</label>
+                  <input type="text" value={formData.author} onChange={(e) => setFormData({...formData, author: e.target.value})} className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-8 py-5 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" placeholder="AUTHOR_NAME" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-2">Artist</label>
-                  <input type="text" value={formData.artist} onChange={(e) => setFormData({...formData, artist: e.target.value})} className="w-full bg-[#0a0b10] border border-white/5 rounded-2xl px-8 py-5 text-sm font-bold outline-none" placeholder="Illustrator" />
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Illustrator (Artist)</label>
+                  <input type="text" value={formData.artist} onChange={(e) => setFormData({...formData, artist: e.target.value})} className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-8 py-5 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" placeholder="ARTIST_NAME" />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-2">Synopsis</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Story Dossier (Synopsis)</label>
                 <textarea 
                   required
-                  rows="4"
+                  rows="5"
                   value={formData.synopsis}
                   onChange={(e) => setFormData({...formData, synopsis: e.target.value})}
-                  className="w-full bg-[#0a0b10] border border-white/5 rounded-3xl px-8 py-6 text-sm font-bold leading-relaxed resize-none outline-none focus:border-white/10"
-                  placeholder="Dossier details..."
+                  className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-[2rem] px-8 py-6 text-sm font-bold leading-relaxed resize-none outline-none focus:border-[var(--accent)] transition-all"
+                  placeholder="TRANSMIT_DATA_HERE..."
                 />
               </div>
-            </section>
+            </div>
 
-            {/* TAGS CLASSIFICATION */}
-            <section className="space-y-6 pt-8 border-t border-white/5">
-              <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">
-                <Tag size={16} style={{ color: themeColor }} /> Classification
+            {/* TAGS */}
+            <div className="space-y-6 pt-10 border-t border-[var(--border)]">
+              <div className="flex items-center gap-3 text-[var(--text-dim)] text-[11px] font-black uppercase tracking-[0.4em]">
+                <Tag size={16} style={{ color: accentColor }} /> Sector Classification
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <input 
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  className="flex-1 bg-[#0a0b10] border border-white/5 rounded-2xl px-8 py-5 text-sm font-bold outline-none"
-                  placeholder="Add Tags (e.g. Action, Fantasy)..."
+                  className="flex-1 bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-8 py-5 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all"
+                  placeholder="NEW_TAG..."
                 />
-                <button type="button" onClick={addTag} className="w-16 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 flex items-center justify-center transition-all">
-                  <Plus size={24} />
+                <button type="button" onClick={addTag} className="w-20 bg-[var(--accent)]/10 hover:bg-[var(--accent)] text-[var(--accent)] hover:text-white rounded-2xl border border-[var(--accent)]/20 flex items-center justify-center transition-all shadow-lg">
+                  <Plus size={28} />
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {tags.map(tag => (
-                  <span key={tag} className="flex items-center gap-2 pl-4 pr-2 py-2 bg-white/[0.03] border border-white/10 text-[10px] font-black uppercase rounded-xl">
+                  <motion.span 
+                    layout
+                    key={tag} 
+                    className="flex items-center gap-3 pl-5 pr-3 py-2.5 bg-[var(--bg-primary)] border border-[var(--border)] text-[9px] font-black uppercase tracking-widest rounded-xl hover:border-[var(--accent)] transition-colors"
+                  >
                     {tag} <X size={14} className="cursor-pointer hover:text-red-500 transition-colors" onClick={() => setTags(tags.filter(t => t !== tag))} />
-                  </span>
+                  </motion.span>
                 ))}
               </div>
-            </section>
+            </div>
 
             <button 
               type="submit" 
               disabled={submitting}
-              className={`w-full py-6 rounded-2xl font-black uppercase tracking-[0.4em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98] ${themeGlow}`}
-              style={{ backgroundColor: themeColor, color: '#000' }}
+              className={`group w-full py-6 rounded-2xl font-black uppercase tracking-[0.5em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-4 disabled:opacity-50 active:scale-[0.98] ${glowClass}`}
+              style={{ backgroundColor: accentColor, color: '#fff' }}
             >
-              {submitting ? <Loader2 className="animate-spin" size={18} /> : null}
-              {submitting ? "Uploading Protocol..." : isEditMode ? "Commit Synchronization" : "Deploy Series Protocol"}
+              {submitting ? <Loader2 className="animate-spin" size={20} /> : <RocketIcon className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
+              {submitting ? "UPLOADING_PROTOCOL..." : isEditMode ? "COMMIT_SYNC" : "DEPLOY_SERIES_PROTOCOL"}
             </button>
-          </div>
+          </motion.div>
         </form>
       </div>
     </div>
   );
 };
+
+// Custom Aesthetic Icon for the button
+const RocketIcon = ({ className }) => (
+    <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+        <path d="M9 12H4s.5-1 1-4c2 1 3 2 4 4Z" />
+        <path d="M15 15v5s-1 .5-4 1c1-2 2-3 4-4Z" />
+    </svg>
+);
 
 export default CreateSeries;

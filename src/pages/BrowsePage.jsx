@@ -1,228 +1,206 @@
-import React, { useState, useMemo, useContext } from 'react';
+import React, { useState, useMemo, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Star, ChevronLeft, ChevronRight, 
-  SlidersHorizontal, RotateCcw, X, Loader2 
+  SlidersHorizontal, X, Activity, Terminal
 } from 'lucide-react';
-import { AppContext } from "../UserContext"; // Path to your Master Context
+import { AppContext } from "../UserContext"; 
 
 const BrowsePage = () => {
-  // 1. Master Context Integration
-  const { isRedMode } = useContext(AppContext);
-  
+  const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
   const [activeGenres, setActiveGenres] = useState([]); 
   const [sortBy, setSortBy] = useState('Newest');
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showFilterBtn, setShowFilterBtn] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
-  const itemsPerPage = 18;
-  
-  // Theme syncs instantly across tabs via Context
-  const themeColor = isRedMode ? '#ef4444' : '#22d3ee'; 
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < lastScrollY && currentScrollY > 80) setShowFilterBtn(true);
+      else if (currentScrollY > lastScrollY) setShowFilterBtn(false);
+      setLastScrollY(currentScrollY);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
-  const genres = [
-    'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 
-    'Horror', 'Isekai', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'Slice of Life'
-  ];
+  const itemsPerPage = 20;
+  const genres = ['Action','Adventure','Comedy','Drama','Fantasy','Horror','Isekai','Mystery','Romance','Sci-Fi','Thriller','Slice of Life'];
+  const sortOptions = ['Newest','Highest Rated','Most Chapters','Most Views'];
 
-  const sortOptions = ['Newest', 'Highest Rated', 'Most Chapters', 'Most Views'];
-
-  // 2. TanStack Query with isRedMode Dependency
-  const { data: mangaList = [], isLoading } = useQuery({
-    queryKey: ['catalog', isRedMode],
+  const { data: mangaList = [] } = useQuery({
+    queryKey: ['catalog', isRedMode, familyMode],
     queryFn: async () => {
       const endpoint = isRedMode ? 'adult' : 'general';
-      const response = await axios.get(`http://localhost:5000/api/mangas/${endpoint}`);
-      return response.data;
-    },
-    staleTime: 1000 * 60 * 30, // 30 minutes cache
+      const res = await axios.get(`http://localhost:5000/api/mangas/${endpoint}`);
+      return res.data;
+    }
   });
 
-  // 3. Filtering & Sorting
   const filteredList = useMemo(() => {
     let list = mangaList.filter(manga => {
-      const mangaTags = manga.tags || manga.genres || [];
-      const matchesAllGenres = activeGenres.length === 0 || 
-        activeGenres.every(genre => mangaTags.includes(genre));
-      
-      const searchLower = searchQuery.toLowerCase();
-      const matchesSearch = 
-        manga.title.toLowerCase().includes(searchLower) || 
-        (manga.author && manga.author.toLowerCase().includes(searchLower));
-
-      return matchesAllGenres && matchesSearch;
+      if (familyMode && manga.rating_type === '18+') return false;
+      const tags = manga.tags || manga.genres || [];
+      const matchesGenres = activeGenres.length === 0 || activeGenres.every(g => tags.includes(g));
+      const q = searchQuery.toLowerCase();
+      return matchesGenres && (
+        manga.title.toLowerCase().includes(q) ||
+        manga.author?.toLowerCase().includes(q)
+      );
     });
 
-    if (sortBy === 'Highest Rated') {
-      list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    } else if (sortBy === 'Newest') {
-      list.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
-    } else if (sortBy === 'Most Chapters') {
-      list.sort((a, b) => (b.TotalChapter || 0) - (a.TotalChapter || 0));
-    } else if (sortBy === 'Most Views') {
-      list.sort((a, b) => (b.views || 0) - (a.views || 0));
-    }
-    return list;
-  }, [mangaList, activeGenres, searchQuery, sortBy]);
-
-  const handleGenreToggle = (genre) => {
-    setCurrentPage(1);
-    setActiveGenres(prev => 
-      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
-    );
-  };
+    const sorters = {
+      'Highest Rated': (a,b) => (b.rating||0)-(a.rating||0),
+      'Newest': (a,b) => new Date(b.createdAt)-new Date(a.createdAt),
+      'Most Chapters': (a,b) => (b.TotalChapter||0)-(a.TotalChapter||0),
+      'Most Views': (a,b) => (b.views||0)-(a.views||0),
+    };
+    return list.sort(sorters[sortBy]);
+  }, [mangaList, activeGenres, searchQuery, sortBy, familyMode]);
 
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
-  const currentItems = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  if (isLoading) return (
-    <div className="min-h-screen bg-[#05060b] flex flex-col items-center justify-center">
-      <Loader2 className="animate-spin mb-4" size={40} style={{ color: themeColor }} />
-      <p className="text-[10px] font-black uppercase tracking-widest text-gray-500">Decrypting Registry...</p>
-    </div>
-  );
+  const currentItems = filteredList.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
 
   return (
-    <div className={`flex flex-col lg:flex-row min-h-screen bg-[#05060b] text-white transition-colors duration-500`}>
-      
-      {/* --- SIDEBAR FILTERS --- */}
-      <aside className="w-full lg:w-80 bg-[#0a0b10] border-r border-white/5 p-6 lg:sticky lg:top-0 lg:h-screen flex flex-col shadow-2xl z-20">
-        <div className="flex items-center gap-3 mb-8">
-          <SlidersHorizontal size={18} style={{ color: themeColor }} />
-          <h2 className="text-sm font-black uppercase tracking-[0.2em]">Filter Protocol</h2>
-        </div>
+    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] theme-${currentTheme} py-28`}>
 
-        <div className="flex-1 overflow-y-auto space-y-10 pr-2 no-scrollbar">
+      {/* MOBILE FILTER BUTTON */}
+      <AnimatePresence>
+        {showFilterBtn && (
+          <motion.button
+            onClick={() => setFiltersOpen(true)}
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="lg:hidden fixed top-30 right-4 z-50 p-3 rounded-2xl bg-[var(--accent)] text-white shadow-xl"
+          >
+            <SlidersHorizontal size={18}/>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* OVERLAY */}
+      {filtersOpen && (
+        <div onClick={() => setFiltersOpen(false)} className="fixed inset-0 bg-black/60 z-40 lg:hidden" />
+      )}
+
+      {/* SIDEBAR */}
+      <aside className={`
+        fixed lg:relative z-50 top-0 left-0 h-full lg:h-auto w-72
+        bg-[var(--bg-secondary)]/80 backdrop-blur-xl border-r border-white/10
+        p-6 transition-transform duration-300
+        ${filtersOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+      `}>
+        <header className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Query Search</p>
+            <p className="text-xs tracking-widest text-[var(--accent)] flex items-center gap-2">
+              <Terminal size={14}/> FILTER SYSTEM
+            </p>
+            <h2 className="text-xl font-black uppercase">Parameters</h2>
+          </div>
+          <button onClick={() => setFiltersOpen(false)} className="lg:hidden">
+            <X size={18}/>
+          </button>
+        </header>
+
+        <div className="space-y-8">
+          {/* SEARCH */}
+          <div>
+            <p className="text-xs opacity-50 mb-1.5">Search</p>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 h-3 w-3" />
-              <input 
-                type="text" 
-                placeholder="Find a title..."
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 opacity-40" size={14}/>
+              <input
                 value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-3 text-[11px] focus:outline-none focus:border-white/20 transition-all"
+                onChange={e => {setSearchQuery(e.target.value); setCurrentPage(1);}}
+                placeholder="Search title or author"
+                className="w-full pl-8 pr-2 py-2.5 rounded-lg bg-black/20 border border-white/10 text-sm"
               />
             </div>
           </div>
 
+          {/* SORT */}
           <div>
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Sort Hierarchy</p>
-            <div className="grid grid-cols-2 gap-2">
-              {sortOptions.map(option => (
-                <button
-                  key={option}
-                  onClick={() => setSortBy(option)}
-                  className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-tighter transition-all border ${
-                    sortBy === option ? 'border-transparent text-white' : 'bg-white/5 border-white/5 text-gray-500 hover:text-white'
-                  }`}
-                  style={sortBy === option ? { backgroundColor: themeColor } : {}}
-                >
-                  {option}
+            <p className="text-xs opacity-50 mb-1.5">Sort</p>
+            <div className="space-y-1.5">
+              {sortOptions.map(opt => (
+                <button key={opt}
+                  onClick={()=>setSortBy(opt)}
+                  className={`w-full py-2 rounded-lg text-sm ${sortBy===opt ? "bg-[var(--accent)] text-white" : "bg-black/20"}`}>
+                  {opt}
                 </button>
               ))}
             </div>
           </div>
 
+          {/* GENRES */}
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Genre Intersection</p>
-              {activeGenres.length > 0 && (
-                <button onClick={() => setActiveGenres([])} className="text-[9px] text-gray-400 hover:text-white flex items-center gap-1">
-                  Reset <X size={10} />
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {genres.map(genre => (
-                <button
-                  key={genre}
-                  onClick={() => handleGenreToggle(genre)}
-                  className={`px-3 py-2 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-all ${
-                    activeGenres.includes(genre) 
-                    ? 'text-black border-transparent' 
-                    : 'bg-white/5 border-white/5 text-gray-500 hover:text-white'
-                  }`}
-                  style={activeGenres.includes(genre) ? { backgroundColor: themeColor } : {}}
-                >
-                  {genre}
+            <p className="text-xs opacity-50 mb-1.5">Genres</p>
+            <div className="flex flex-wrap gap-1.5">
+              {genres.map(g => (
+                <button key={g}
+                  onClick={()=>{setActiveGenres(prev=>prev.includes(g)?prev.filter(x=>x!==g):[...prev,g]); setCurrentPage(1);}}
+                  className={`px-2.5 py-1 rounded-full text-xs ${activeGenres.includes(g) ? "bg-[var(--accent)] text-white" : "bg-black/20"}`}>
+                  {g}
                 </button>
               ))}
             </div>
           </div>
         </div>
-
-        <button 
-          onClick={() => { setActiveGenres([]); setSearchQuery(""); setSortBy('Newest'); }}
-          className="mt-6 w-full py-4 flex items-center justify-center gap-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all"
-        >
-          <RotateCcw size={14} /> Clear Registry
-        </button>
       </aside>
 
-      {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 p-6 lg:p-12">
-        <div className="mb-10">
-          <h1 className="text-4xl font-black uppercase italic tracking-tighter mb-2">
-            Catalog <span className="text-gray-800 mx-2">/</span> 
-            <span style={{ color: themeColor }}>
-              {activeGenres.length === 0 ? 'All Series' : activeGenres.join(' + ')}
-            </span>
+      {/* MAIN */}
+      <main className="flex-1 px-4 sm:px-6 lg:px-12 py-10">
+
+        <header className="mb-12 sm:mb-16">
+          <div className="flex items-center gap-2 text-[var(--accent)] mb-1">
+            <Activity size={16}/> <span className="text-xs tracking-widest">CATALOG STREAM</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase">
+            Data <span className="text-[var(--accent)]">Grid</span>
           </h1>
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">
-            {filteredList.length} Files Match Current Protocol
-          </p>
-        </div>
+          <p className="text-sm opacity-50 mt-1">{filteredList.length} results</p>
+        </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-x-4 gap-y-10">
-          {currentItems.map(manga => (
-            <Link to={`/manga/${manga._id}`} key={manga._id} className="group">
-              <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/5 bg-[#0a0b10] transition-all duration-500 group-hover:-translate-y-2 group-hover:border-white/20 shadow-2xl">
-                <img 
-                   src={manga.coverImage} 
-                   loading="lazy"
-                   className="w-full h-full object-cover opacity-70 group-hover:opacity-100" 
-                   alt={manga.title}
-                />
-                
-                <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 text-[9px] font-black text-yellow-400">
-                  <Star size={10} fill="currentColor" /> {manga.rating || '0.0'}
+        {/* GRID */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+          {currentItems.map((manga, index) => (
+            <motion.div key={manga._id} initial={{opacity:0,y:15}} animate={{opacity:1,y:0}}>
+              <Link to={`/manga/${manga._id}`} className="group block">
+                <div className="relative aspect-[3/4.2] rounded-2xl overflow-hidden border border-white/10 bg-black transition-transform group-hover:-translate-y-1">
+                  <img src={manga.coverImage} alt={manga.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform"/>
+                  <div className="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded-full text-xs text-yellow-400 flex gap-1">
+                    <Star size={12} fill="currentColor"/>{manga.rating||"5.0"}
+                  </div>
                 </div>
-              </div>
-
-              <div className="mt-4">
-                <h3 className={`text-[11px] font-black truncate uppercase tracking-tight text-gray-200 transition-colors group-hover:text-cyan-400`}>
-                  {manga.title}
-                </h3>
-                <div className="flex items-center justify-between mt-1 text-[9px] font-bold text-gray-600 uppercase">
-                  <span>{manga.status}</span>
-                  <span style={{ color: themeColor }}>{manga.TotalChapter || 0} Ch.</span>
+                <div className="mt-2">
+                  <h3 className="text-sm font-bold line-clamp-2 group-hover:text-[var(--accent)]">
+                    {manga.title}
+                  </h3>
+                  <div className="text-xs opacity-50 flex justify-between">
+                    <span>{manga.status}</span>
+                    <span>{manga.TotalChapter||0} ch</span>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-8 mt-20 pt-10 border-t border-white/5">
-            <button 
-              disabled={currentPage === 1}
-              onClick={() => { setCurrentPage(p => p - 1); window.scrollTo(0,0); }}
-              className="text-gray-500 hover:text-white disabled:opacity-20 transition-all"
-            >
-              <ChevronLeft size={24} />
+        {/* PAGINATION */}
+        {totalPages>1 && (
+          <div className="flex justify-center items-center gap-6 mt-12 sm:mt-16">
+            <button disabled={currentPage===1} onClick={()=>setCurrentPage(p=>p-1)} className="p-2.5 rounded-full bg-black/30">
+              <ChevronLeft size={16}/>
             </button>
-            <span className="text-[10px] font-black tracking-[0.5em] text-gray-700">{currentPage} / {totalPages}</span>
-            <button 
-              disabled={currentPage === totalPages}
-              onClick={() => { setCurrentPage(p => p + 1); window.scrollTo(0,0); }}
-              className="text-gray-500 hover:text-white disabled:opacity-20 transition-all"
-            >
-              <ChevronRight size={24} />
+            <span className="font-bold">{currentPage}/{totalPages}</span>
+            <button disabled={currentPage===totalPages} onClick={()=>setCurrentPage(p=>p+1)} className="p-2.5 rounded-full bg-black/30">
+              <ChevronRight size={16}/>
             </button>
           </div>
         )}

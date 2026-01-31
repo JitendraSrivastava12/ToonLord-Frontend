@@ -1,139 +1,133 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Zap, Play, ChevronRight, Flame } from 'lucide-react';
-import { AppContext } from "../UserContext"; // Path to your Master Context
+import { Zap, Play, ChevronRight, Flame, ShieldAlert } from 'lucide-react';
+import { AppContext } from "../UserContext"; 
 import { Link } from "react-router-dom";
-// Load all images from folders
-const mangaImages = Object.values(
-  import.meta.glob('../assets/mangas/*.{jpg,jpeg,png,webp}', { eager: true })
-).map(mod => mod.default);
+import { motion, AnimatePresence } from "framer-motion";
 
-const pornwahImages = Object.values(
-  import.meta.glob('../assets/pornwahs/*.{jpg,jpeg,png,webp}', { eager: true })
-).map(mod => mod.default);
+/**
+ * ASSET SYNC PROTOCOL
+ */
+const getAssetsByFolder = (folderName) => {
+  try {
+    const allAssets = import.meta.glob('../assets/**/*.{jpg,jpeg,png,webp,avif,jfif}', { eager: true });
+    return Object.keys(allAssets)
+      .filter(path => path.includes(`/${folderName}/`))
+      .map(path => allAssets[path].default || allAssets[path]);
+  } catch (error) {
+    console.error(`Dossier Error: Failed to sync ${folderName} archive.`, error);
+    return [];
+  }
+};
+
+const mangaImages = getAssetsByFolder('Mangas');
+const pornwahImages = getAssetsByFolder('Pornwahs');
 
 const ToonLordHero = () => {
-  // 1. Consume the master context
-  const { isRedMode } = useContext(AppContext);
+  const { isRedMode, currentTheme } = useContext(AppContext);
   const [displayGrid, setDisplayGrid] = useState([]);
 
-  // 2. Content Sync Logic
   useEffect(() => {
-    const pool = isRedMode ? pornwahImages : mangaImages;
-    // Safety check in case folders are empty
+    let pool = isRedMode ? pornwahImages : mangaImages;
+    if (!pool || pool.length === 0) pool = isRedMode ? mangaImages : pornwahImages;
     if (pool.length > 0) {
       const shuffled = [...pool].sort(() => 0.5 - Math.random());
       setDisplayGrid(shuffled.slice(0, 6));
     }
   }, [isRedMode]);
 
-  const accentColor = isRedMode ? 'text-red-500' : 'text-green-400';
-  const buttonBg = isRedMode
-    ? 'bg-red-600 hover:bg-red-700 shadow-red-500/50'
-    : 'bg-green-500 hover:bg-green-600 shadow-green-500/50';
+  // Dynamic accent and glow for theme support
+  const accent = isRedMode ? '#ef4444' : 'var(--accent)';
+  const glow = isRedMode ? 'rgba(239,68,68,0.4)' : 'var(--accent-glow)';
 
   return (
-    <section className="relative py-20 overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#0f111a] to-[#1a1b2c] animate-gradient-bg -z-10"></div>
+    <section className={`relative pt-12 pb-8 overflow-hidden transition-all duration-1000 theme-${currentTheme}`}>
+      {/* Background layers */}
+      <div className="absolute inset-0 bg-[var(--bg-primary)] -z-20 transition-colors duration-1000" />
       <div 
-        className="absolute -inset-20 blur-[150px] opacity-20 rounded-full mix-blend-color-dodge animate-pulse-slow transition-colors duration-1000"
-        style={{ backgroundColor: isRedMode ? '#ef4444' : '#22c55e' }}
-      ></div>
+        className="absolute -top-40 -left-40 w-[600px] h-[600px] blur-[140px] opacity-20 rounded-full animate-pulse-slow transition-colors duration-1000 -z-10"
+        style={{ backgroundColor: accent }}
+      />
 
-      <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center gap-16 relative z-10">
-
-        {/* LEFT CONTENT */}
-        <div className="flex-1 text-center lg:text-left z-20">
-          <div className="inline-flex items-center gap-3 px-4 py-1 rounded-full bg-white/10 border border-white/20 mb-6 animate-fadeIn">
-            {isRedMode ? <Flame size={16} className={accentColor} /> : <Zap size={16} className={accentColor} />}
-            <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400">
-              {isRedMode ? "Premium Adult Catalog" : "Evolution of Manga Reading"}
+      <div className="container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16 relative z-10">
+        {/* Left Column: Operational Terminal */}
+        <div className="flex-1 text-center lg:text-left">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] mb-8 shadow-xl"
+          >
+            {isRedMode 
+              ? <ShieldAlert size={14} className="text-red-500" /> 
+              : <Zap size={14} className="text-[var(--accent)]" />
+            }
+            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[var(--text-dim)]">
+              {isRedMode ? "Restricted Access Protocol" : "The Future of Manga Reading"}
             </span>
-          </div>
+          </motion.div>
 
-          <h1 className="text-5xl lg:text-7xl font-black tracking-tighter italic leading-[0.85] mb-8 animate-slideIn">
-            READ <span className={`${accentColor} transition-colors duration-500`}>{isRedMode ? "EROTICA." : "MANGA."}</span><br />
-            EARN <span className="text-white">POINTS.</span><br />
-            UNLOCK <span className="text-gray-600">PREMIUM.</span>
+          <h1 className="text-4xl lg:text-6xl font-black tracking-tighter italic leading-[0.8] mb-10 text-[var(--text-main)]">
+            READ <span className="transition-colors duration-700" style={{ color: accent }}>{isRedMode ? "UNCENSORED." : "MANGA."}</span><br />
+            EARN <span className="opacity-90">POINTS.</span><br />
+            UNLOCK <span className="opacity-40">PREMIUM.</span>
           </h1>
 
-          <p className="hidden md:block text-gray-400 text-lg max-w-xl mb-10 leading-relaxed animate-fadeIn delay-200">
+          <p className="text-[var(--text-dim)] text-lg lg:text-xl max-w-xl mb-6 font-medium leading-relaxed italic opacity-80">
             {isRedMode
-              ? "Access the world's most exclusive adult manhwa. High-definition art, uncensored stories, and daily updates."
-              : "Dive into thousands of chapters. Read for free to earn points, then use them to unlock exclusive releases."}
+              ? "Access the realm's most exclusive adult manhwa. High-definition art, uncensored story arcs, and instant decryption."
+              : "Dive into a massive archive of legendary titles. Read to accumulate points, then bypass paywalls for new releases."}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-5 justify-center lg:justify-start animate-fadeIn delay-400">
-            <Link to="/home" className={`flex items-center gap-3 px-10 py-4 rounded-2xl text-black font-black uppercase tracking-tighter transition-all transform hover:scale-105 hover:-translate-y-1 active:scale-95 shadow-lg ${buttonBg}`}>
-              <Play size={20} fill="black" />
-              Start Reading
+          <div className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start mb-12">
+            <Link 
+              to="/home" 
+              className="group flex items-center gap-4 px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs transition-all hover:scale-105 active:scale-95 shadow-2xl text-white"
+              style={{ backgroundColor: accent, boxShadow: `0 15px 30px -10px ${glow}` }}
+            >
+              <Play size={18} fill="currentColor" />
+              Start The Uplink
             </Link>
-            <Link to="/browse" className="flex items-center gap-2 px-10 py-4 rounded-2xl bg-white/5 border border-white/20 hover:bg-white/10 transition-all font-bold text-gray-300">
-              Browse All
-              <ChevronRight size={20} />
+            
+            <Link 
+              to="/browse" 
+              className="flex items-center gap-2 px-10 py-5 rounded-[2rem] bg-[var(--bg-secondary)] border border-[var(--border)] hover:border-[var(--accent)]/50 transition-all font-black text-xs uppercase tracking-widest text-[var(--text-dim)] hover:text-[var(--text-main)] shadow-xl"
+            >
+              Browse Catalog
+              <ChevronRight size={18} />
             </Link>
           </div>
         </div>
 
-        {/* RIGHT GRID */}
-        <div className="flex-1 w-full relative">
-          <div className="relative grid grid-cols-2 sm:grid-cols-3 gap-5 transform scale-95 transition-transform duration-700 hover:scale-100">
-            {displayGrid.map((src, i) => (
-              <div
-                key={`${isRedMode}-${i}`}
-                className="aspect-[3/4] rounded-2xl overflow-hidden border border-white/20 shadow-2xl transition-all duration-700 hover:scale-110 hover:rotate-2 hover:z-20"
-                style={{ transitionDelay: `${i * 50}ms` }}
-              >
-                <img
-                  src={src}
-                  alt="Cover"
-                  className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700"
-                />
-              </div>
-            ))}
+        {/* Right Column: Visual Archive Grid */}
+        <div className="flex-1 w-full relative perspective-[2000px]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 rotate-2 hover:rotate-0 transition-transform duration-1000 ease-out">
+            <AnimatePresence mode="popLayout">
+              {displayGrid.length > 0 ? displayGrid.map((src, i) => (
+                <motion.div
+                  key={`${src}-${i}`}
+                  initial={{ opacity: 0, scale: 0.8, rotateY: 20 }}
+                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  transition={{ delay: i * 0.1, duration: 0.8 }}
+                  className="aspect-[3/4] rounded-3xl overflow-hidden border border-[var(--border)] shadow-2xl hover:border-[var(--accent)]/50 hover:scale-110 hover:-translate-y-4 hover:z-30 transition-all duration-500 bg-[var(--bg-secondary)]"
+                >
+                  <img src={src} alt="Archive Data" className="w-full h-full object-cover transition-transform duration-700 grayscale-[0.3] hover:grayscale-0" />
+                </motion.div>
+              )) : (
+                [...Array(6)].map((_, i) => (
+                  <div key={i} className="aspect-[3/4] rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] animate-pulse" />
+                ))
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Daily Bonus */}
-          <div className="absolute -bottom-6 -left-6 bg-[#0f111a] border border-white/10 p-5 rounded-3xl shadow-2xl animate-float">
-            <div className="flex items-center gap-3">
-              <Zap size={22} className={accentColor} fill="currentColor" />
-              <div>
-                <p className="text-[10px] font-bold text-gray-500 uppercase">Daily Bonus</p>
-                <p className="font-black text-lg">+50 Points</p>
-              </div>
-            </div>
-          </div>
+          {/* Points Bonus HUD */}
+          
         </div>
-
       </div>
 
       <style>{`
-        @keyframes gradient-bg {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient-bg {
-          background-size: 200% 200%;
-          animation: gradient-bg 20s ease infinite;
-        }
-        .animate-pulse-slow {
-          animation: pulse 8s ease-in-out infinite;
-        }
-        .animate-fadeIn {
-          animation: fadeIn 1s ease forwards;
-          opacity: 0;
-        }
-        .animate-slideIn {
-          animation: slideIn 1s ease forwards;
-          opacity: 0;
-        }
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .animate-pulse-slow { animation: pulse 10s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { transform: scale(1); opacity:0.1; } 50% { transform: scale(1.2); opacity:0.25; } }
       `}</style>
     </section>
   );

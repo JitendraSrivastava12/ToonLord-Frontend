@@ -1,59 +1,137 @@
 import React, { useContext } from 'react';
-import { CloudUpload, BarChart3, DollarSign, ChevronRight } from 'lucide-react';
-import { AppContext } from "../UserContext"; // Adjust path to your context file
+import { motion } from 'framer-motion';
+import { CloudUpload, BarChart3, DollarSign, ChevronRight, Rocket, Sparkles } from 'lucide-react';
+import { AppContext } from "../UserContext";
 
 const CreatorCTA = () => {
-  // 1. Consume global theme state from Context
-  const { isRedMode } = useContext(AppContext);
+  const { isRedMode, currentTheme } = useContext(AppContext);
 
-  // 2. Dynamic styling based on global context
-  const accentColor = isRedMode ? 'text-red-500' : 'text-green-400';
-  const buttonBg = isRedMode ? 'bg-red-600 hover:bg-red-700' : 'bg-green-500 hover:bg-green-600';
+  const accent = isRedMode ? '#ef4444' : 'var(--accent)';
+  const glow = isRedMode ? 'rgba(239, 68, 68, 0.4)' : 'var(--accent-glow)';
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
 
   return (
-    <section className="container mx-auto px-4 py-16">
-      <div className="bg-[#0f111a] border border-white/5 rounded-2xl p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl transition-all duration-500">
-        <div className="text-center lg:text-left">
-          <h2 className="text-4xl font-black italic mb-4">
-            Are you a <span className={`${accentColor} transition-colors duration-500`}>Creator?</span>
-          </h2>
-          <p className="text-gray-400 max-w-xl leading-relaxed mb-8">
-            Upload your own manga. Track your readership, stats in real-time, 
-            and monetize your content. Join our creator program today.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-            <button className={`flex items-center gap-3 px-8 py-4 rounded-xl text-black font-black uppercase tracking-tighter transition-all active:scale-95 shadow-lg ${buttonBg}`}>
-              Start Uploading
-              <CloudUpload size={18} fill="black" />
-            </button>
-            <button className="flex items-center gap-2 px-8 py-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-bold text-gray-300">
-              View Dashboard Demo
-              <ChevronRight size={18} />
-            </button>
+    // Reduced outer vertical padding from py-6 to py-2
+    <section className={`container mx-auto px-2 py-2 theme-${currentTheme}`}>
+      <motion.div 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVariants}
+        // Changed desktop padding from lg:p-12 to lg:py-8 (decreases height significantly)
+        className="relative overflow-hidden bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[3rem] p-6 lg:py-8 lg:px-12 shadow-1xl transition-all duration-700"
+      >
+        
+        {/* Background Mesh Gradient Glow */}
+        <div 
+          className="absolute -top-24 -right-24 w-[400px] h-[400px] blur-[120px] opacity-20 rounded-full transition-all duration-1000 animate-pulse"
+          style={{ backgroundColor: accent }}
+        />
+        
+        {/* Reduced gap from gap-20 to gap-12 */}
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10">
+          
+          {/* Left Content Column - Tightened space-y-8 to space-y-6 */}
+          <div className="text-center lg:text-left space-y-6 flex-1">
+            <div className="flex items-center justify-center lg:justify-start gap-3">
+               <span 
+                 className="px-4 py-1.5 rounded-full border border-[var(--border)] bg-[var(--bg-primary)] text-[9px] font-black uppercase tracking-[0.4em] flex items-center gap-2"
+                 style={{ color: accent }}
+               >
+                 <Sparkles size={10} /> Creator Studio
+               </span>
+            </div>
+            
+            {/* Slightly reduced text size on desktop for compact look */}
+            <h2 className="text-5xl lg:text-7xl font-black italic tracking-tighter text-[var(--text-main)] leading-[0.85] uppercase">
+              Deploy Your <br />
+              <span className="transition-colors duration-700" style={{ color: accent }}>Legacy.</span>
+            </h2>
+            
+            <p className="text-[var(--text-dim)] max-w-lg leading-relaxed text-sm font-medium italic opacity-80">
+              Transform your narrative into a global phenomenon. Access real-time analytical dossiers, 
+              direct monetization uplinks, and high-fidelity publishing tools.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+              <button 
+                className="group flex items-center gap-4 px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-2xl text-white"
+                style={{ backgroundColor: accent, boxShadow: `0 15px 30px -10px ${glow}` }}
+              >
+                Start Publishing
+                <Rocket size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </button>
+              
+              <button className="flex items-center gap-2 px-8 py-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--accent)]/50 transition-all font-black text-[10px] uppercase tracking-widest text-[var(--text-dim)] hover:text-[var(--text-main)] shadow-xl">
+                Command Center
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center lg:text-left">
-          <div className="p-6 bg-white/5 rounded-lg border border-white/10 group hover:border-white/20 transition-all">
-            <CloudUpload size={32} className={`${accentColor} mx-auto lg:mx-0 mb-3 transition-colors`} />
-            <p className="font-bold text-gray-200">Easy Upload</p>
-            <p className="text-xs text-gray-500 mt-1">Streamlined publishing tools.</p>
-          </div>
-          <div className="p-6 bg-white/5 rounded-lg border border-white/10 group hover:border-white/20 transition-all">
-            <BarChart3 size={32} className={`${accentColor} mx-auto lg:mx-0 mb-3 transition-colors`} />
-            <p className="font-bold text-gray-200">Detailed Stats</p>
-            <p className="text-xs text-gray-500 mt-1">Track views, reads, and earnings.</p>
-          </div>
-          <div className="p-6 bg-white/5 rounded-lg border border-white/10 group hover:border-white/20 transition-all">
-            <DollarSign size={32} className={`${accentColor} mx-auto lg:mx-0 mb-3 transition-colors`} />
-            <p className="font-bold text-gray-200">Monetize</p>
-            <p className="text-xs text-gray-500 mt-1">Earn points and direct payments.</p>
+          {/* Right Feature Grid - Reduced gaps */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto">
+            <FeatureCard 
+              variants={itemVariants}
+              icon={<CloudUpload size={24} />} 
+              title="Fast Sync" 
+              desc="Instant deployment."
+              accent={accent}
+            />
+            <FeatureCard 
+              variants={itemVariants}
+              icon={<BarChart3 size={24} />} 
+              title="Intelligence" 
+              desc="Behavior metrics."
+              accent={accent}
+            />
+            <FeatureCard 
+              variants={itemVariants}
+              icon={<DollarSign size={24} />} 
+              title="Revenue" 
+              desc="Credit conversion."
+              accent={accent}
+            />
+            <motion.div 
+              variants={itemVariants}
+              className="hidden sm:flex p-6 rounded-[2rem] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-glow)] items-center justify-center text-white italic font-black text-xl shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500"
+            >
+              10K+ ARCHITECTS
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
+
+// Reusable Feature Card - Reduced padding from p-10 to p-6
+const FeatureCard = ({ icon, title, desc, accent, variants }) => (
+  <motion.div 
+    variants={variants}
+    className="p-6 bg-[var(--bg-primary)]/40 backdrop-blur-3xl rounded-[2rem] border border-[var(--border)] group hover:border-[var(--accent)]/40 transition-all duration-500 shadow-xl"
+  >
+    <div 
+      className="mb-4 transition-all duration-500 group-hover:scale-110 group-hover:-rotate-12"
+      style={{ color: accent }}
+    >
+      {icon}
+    </div>
+    <p className="font-black text-xs uppercase tracking-[0.2em] text-[var(--text-main)] mb-1">{title}</p>
+    <p className="text-[10px] text-[var(--text-dim)] font-bold uppercase opacity-60 leading-tight">{desc}</p>
+  </motion.div>
+);
 
 export default CreatorCTA;

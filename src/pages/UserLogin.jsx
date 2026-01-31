@@ -67,7 +67,7 @@ const AuthScreen = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050505] text-white flex flex-col items-center md:items-end justify-center overflow-hidden font-sans md:pr-12 lg:pr-32">
+    <div className="relative min-h-screen bg-[#050505] text-white flex flex-col items-center md:items-end justify-center overflow-hidden font-sans md:pr-12 lg:pr-32 py-28">
       {/* BACKGROUND ELEMENTS */}
       <div className="absolute inset-0 z-0">
         <div 

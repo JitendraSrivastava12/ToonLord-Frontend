@@ -1,41 +1,41 @@
 import React, { useState, useMemo, useContext } from 'react';
-import { Filter, Grid, List, ArrowUpDown, Search, Check, Play, Clock, Star, MoreVertical } from 'lucide-react';
-import { AppContext } from "../UserContext"; // Path to your Master Context
-
-const libraryData = {
-  'Reading': [
-    { id: 1, title: 'Demon Slayer: Kimetsu', genre: 'Action', lastUpdated: 1706000000, tag: '2 NEW', cover: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=400', progress: 125, total: 205, rating: 4.8 },
-    { id: 2, title: 'Jujutsu Kaisen', genre: 'Action', lastUpdated: 1705824000, tag: null, cover: 'https://images.unsplash.com/photo-1620336655055-088d06e76600?q=80&w=400', progress: 210, total: 240, rating: 4.9 },
-    { id: 3, title: 'Chainsaw Man', genre: 'Horror', lastUpdated: 1706100000, tag: 'NEW', cover: 'https://images.unsplash.com/photo-1614728263952-84ea256f9679?q=80&w=400', progress: 98, total: 145, rating: 4.7 },
-    { id: 10, title: 'Oshi no Ko', genre: 'Drama', lastUpdated: 1706200000, tag: 'NEW', cover: 'https://images.unsplash.com/photo-1601850494422-3cf14624b0b3?q=80&w=400', progress: 45, total: 120, rating: 4.8 },
-    { id: 11, title: 'Blue Lock', genre: 'Sports', lastUpdated: 1705900000, tag: 'NEW', cover: 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?q=80&w=400', progress: 180, total: 240, rating: 4.6 }
-  ],
-  'Plan to Read': [
-    { id: 4, title: 'Solo Leveling', genre: 'Fantasy', lastUpdated: 1705000000, tag: null, cover: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=400', progress: 0, total: 179, rating: 4.9 },
-    { id: 5, title: 'Vagabond', genre: 'Action', lastUpdated: 1704000000, tag: null, cover: 'https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=400', progress: 0, total: 327, rating: 4.9 },
-    { id: 12, title: 'Berserk', genre: 'Fantasy', lastUpdated: 1703000000, tag: 'Masterpiece', cover: 'https://images.unsplash.com/photo-1515516089376-88db1e26e9c0?q=80&w=400', progress: 0, total: 373, rating: 5.0 }
-  ],
-  'Completed': [
-    { id: 6, title: 'Attack on Titan', genre: 'Fantasy', lastUpdated: 1600000000, tag: 'END', cover: 'https://images.unsplash.com/photo-1578632738908-4521c726f989?q=80&w=400', progress: 139, total: 139, rating: 4.8 },
-    { id: 13, title: 'Haikyuu!!', genre: 'Sports', lastUpdated: 1650000000, tag: 'END', cover: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400', progress: 402, total: 402, rating: 4.9 }
-  ]
-};
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Filter, Grid, List, ArrowUpDown, Search, Check, Play, 
+  Star, ShieldAlert, Baby, Orbit, MoreVertical, BookOpen 
+} from 'lucide-react';
+import { AppContext } from "../UserContext";
 
 const LibraryPage = () => {
-  // 1. Consume the master context
-  const { isRedMode } = useContext(AppContext);
+  const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
   
   const [activeTab, setActiveTab] = useState('Reading');
   const [sortBy, setSortBy] = useState('updated'); 
   const [filterGenre, setFilterGenre] = useState('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
   const tabs = ['Reading', 'Plan to Read', 'Completed', 'Dropped', 'On Hold'];
   const genres = ['All', 'Action', 'Romance', 'Fantasy', 'Sports', 'Drama', 'Horror'];
 
+  const libraryData = {
+    'Reading': [
+      { id: 1, title: "SOLO LEVELING", progress: 170, total: 200, rating: 9.8, cover: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop", lastUpdated: Date.now(), genre: 'Action', tag: 'HOT' },
+      { id: 2, title: "TOWER OF GOD", progress: 450, total: 550, rating: 9.2, cover: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1968&auto=format&fit=crop", lastUpdated: Date.now() - 10000, genre: 'Fantasy' }
+    ],
+    'Completed': [],
+    'Plan to Read': [],
+    'Dropped': [],
+    'On Hold': []
+  };
+
+  const isLight = currentTheme === 'light';
+  const activeAccent = isRedMode ? '#ef4444' : (isLight ? '#2563eb' : '#3b82f6');
+
   const processedList = useMemo(() => {
     let list = [...(libraryData[activeTab] || [])];
+    if (familyMode) list = list.filter(m => m.rating_type !== '18+');
     if (searchQuery) list = list.filter(m => m.title.toLowerCase().includes(searchQuery.toLowerCase()));
     if (filterGenre !== 'All') list = list.filter(item => item.genre === filterGenre);
     
@@ -45,146 +45,233 @@ const LibraryPage = () => {
       return b.lastUpdated - a.lastUpdated;
     });
     return list;
-  }, [activeTab, sortBy, filterGenre, searchQuery]);
-
-  // Use dynamic colors from Context
-  const activeColor = isRedMode ? '#ef4444' : '#22c55e'; // Red vs Green (Synced)
+  }, [activeTab, sortBy, filterGenre, searchQuery, familyMode]);
 
   return (
-    <div className="p-6 lg:p-10 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className={`min-h-screen transition-all duration-500 pt-40 pb-20 px-4 sm:px-8 lg:px-12 max-w-[1600px] mx-auto ${isLight ? 'bg-slate-50' : 'bg-[#050505]'}`}>
       
-      {/* --- HEADER --- */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div className="space-y-1">
-          <h1 className="text-4xl font-black tracking-tighter uppercase italic bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent">
-            My Library
-          </h1>
-          <div className="flex items-center gap-2 text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">
-            <span>Collection</span>
-            <span className="w-1 h-1 bg-gray-700 rounded-full" />
-            <span>{processedList.length} Titles Total</span>
+      {/* 1. HERO HEADER */}
+      <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-[2px]" style={{ backgroundColor: activeAccent }} />
+             <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Personal Collection</span>
           </div>
+          <h1 className={`text-5xl sm:text-7xl font-black tracking-tighter uppercase italic leading-none ${isLight ? 'text-slate-900' : 'text-white'}`}>
+            Library
+          </h1>
+          <p className="text-[11px] font-bold uppercase tracking-widest opacity-40">
+            {processedList.length} Items found in database
+          </p>
         </div>
 
-        <div className="relative group w-full md:w-80">
-          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 transition-colors h-4 w-4 ${isRedMode ? 'group-focus-within:text-red-500' : 'group-focus-within:text-green-400'}`} />
+        {/* Dynamic Search Bar */}
+        <div className="relative w-full md:w-96 group">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-100 transition-opacity" size={18} />
           <input 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            type="text" 
-            placeholder="Find a series..." 
-            className={`bg-[#0f111a]/50 backdrop-blur-xl text-sm text-gray-300 pl-11 pr-4 py-3 rounded-2xl border border-white/5 w-full focus:outline-none transition-all ${isRedMode ? 'focus:border-red-500/30' : 'focus:border-green-400/30'}`}
+            placeholder="Search your collection..."
+            className={`w-full py-4 pl-14 pr-6 rounded-2xl border text-sm font-bold transition-all outline-none
+              ${isLight ? 'bg-white border-slate-200 focus:ring-4 focus:ring-blue-500/10' : 'bg-white/5 border-white/10 focus:bg-white/10'}`}
           />
         </div>
+      </header>
+
+      {/* 2. NAVIGATION & TABS */}
+      <div className="mb-10 overflow-x-auto no-scrollbar pb-2">
+        <div className="flex items-center gap-2 min-w-max">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all
+                ${activeTab === tab 
+                  ? 'text-white shadow-xl' 
+                  : `${isLight ? 'text-slate-400 hover:bg-slate-200' : 'text-white/40 hover:bg-white/5'}`}`}
+              style={activeTab === tab ? { backgroundColor: activeAccent, boxShadow: `0 10px 25px ${activeAccent}44` } : {}}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* --- NAVIGATION TABS --- */}
-      <div className="flex items-center gap-4 mb-10 overflow-x-auto no-scrollbar pb-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all cursor-pointer whitespace-nowrap border ${
-              activeTab === tab 
-              ? 'bg-white/5 border-white/20 text-white shadow-xl' 
-              : 'border-transparent text-gray-500 hover:text-gray-300'
-            }`}
-            style={activeTab === tab ? { boxShadow: `0 0 20px ${activeColor}20`, borderColor: activeColor } : {}}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* --- FILTER & SORT CONTROLS --- */}
-      <div className="flex items-center justify-between mb-8">
+      {/* 3. TOOLBAR (Filters & View Toggles) */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 pb-6 border-b border-white/5">
         <div className="flex items-center gap-2">
-          <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-gray-400 hover:text-white transition-all"><Grid size={18} /></button>
-          <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-gray-400 hover:text-white transition-all"><List size={18} /></button>
+           <ViewToggle icon={<Grid size={18} />} active={viewMode === 'grid'} onClick={() => setViewMode('grid')} isLight={isLight} />
+           <ViewToggle icon={<List size={18} />} active={viewMode === 'list'} onClick={() => setViewMode('list')} isLight={isLight} />
         </div>
 
-        <div className="flex items-center gap-3">
-          <button 
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <FilterPill 
+            label={`Sort: ${sortBy}`} 
             onClick={() => setSortBy(sortBy === 'updated' ? 'title' : 'updated')} 
-            className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/5 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition-all cursor-pointer"
-          >
-            <ArrowUpDown size={14} /> Sort
-          </button>
-          
+            isLight={isLight} 
+          />
           <div className="relative">
-            <button 
+            <FilterPill 
+              label={`Genre: ${filterGenre}`} 
               onClick={() => setShowFilterDropdown(!showFilterDropdown)} 
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/5 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition-all cursor-pointer"
-            >
-              <Filter size={14} /> {filterGenre}
-            </button>
-
-            {showFilterDropdown && (
-              <div className="absolute top-12 right-0 w-48 bg-[#0a0b10] border border-white/10 rounded-2xl shadow-2xl z-50 p-2 backdrop-blur-3xl">
-                {genres.map(g => (
-                  <button key={g} onClick={() => {setFilterGenre(g); setShowFilterDropdown(false);}} className="flex items-center justify-between w-full px-4 py-2 text-xs font-bold rounded-xl hover:bg-white/5 transition-colors cursor-pointer">
-                    {g} {filterGenre === g && <Check size={14} style={{color: activeColor}} />}
-                  </button>
-                ))}
-              </div>
-            )}
+              isLight={isLight} 
+            />
+            <AnimatePresence>
+              {showFilterDropdown && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                  className={`absolute right-0 top-full mt-2 w-48 rounded-2xl border z-50 p-2 shadow-2xl backdrop-blur-xl ${isLight ? 'bg-white border-slate-200' : 'bg-[#121212] border-white/10'}`}
+                >
+                  {genres.map(g => (
+                    <button 
+                      key={g} 
+                      onClick={() => {setFilterGenre(g); setShowFilterDropdown(false);}}
+                      className={`w-full text-left px-4 py-2 text-[10px] font-bold uppercase rounded-lg transition-colors ${isLight ? 'hover:bg-slate-100' : 'hover:bg-white/5'}`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
 
-      {/* --- MANGA GRID --- */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-10">
-        {processedList.map((manga) => {
-          const percent = Math.round((manga.progress / manga.total) * 100);
-          return (
-            <div key={manga.id} className="group relative">
-              <div className="relative aspect-[2/3] rounded-2xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 group-hover:-translate-y-2 group-hover:border-white/20">
-                <img src={manga.cover} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={manga.title} />
-                
-                {manga.tag && (
-                  <div className={`absolute top-3 left-3 px-2 py-1 ${isRedMode ? 'bg-red-600' : 'bg-green-600'} text-[8px] font-black rounded-md shadow-xl uppercase italic tracking-tighter`}>
-                    {manga.tag}
-                  </div>
-                )}
-
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px] flex items-center justify-center">
-                   <button className="bg-white text-black p-4 rounded-full scale-50 group-hover:scale-100 transition-all duration-500 hover:scale-110 shadow-2xl cursor-pointer">
-                      <Play size={20} fill="black" />
-                   </button>
-                </div>
-
-                <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/80 to-transparent">
-                   <div className="flex justify-between items-center mb-1.5">
-                      <div className="flex items-center gap-1 text-[9px] font-black text-white/70">
-                         <Star size={8} fill="#fbbf24" className="text-yellow-400" /> {manga.rating}
-                      </div>
-                      <span className="text-[9px] font-black text-white/70 tracking-tighter">{percent}%</span>
-                   </div>
-                   <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full transition-all duration-1000 ease-out" style={{ width: `${percent}%`, backgroundColor: activeColor }} />
-                   </div>
-                </div>
-              </div>
-
-              <div className="mt-4 px-1">
-                <div className="flex justify-between items-start gap-2">
-                  <h3 className={`text-sm font-black truncate text-gray-200 transition-colors uppercase leading-tight tracking-tight ${isRedMode ? 'group-hover:text-red-500' : 'group-hover:text-green-400'}`}>
-                    {manga.title}
-                  </h3>
-                  <MoreVertical size={14} className="text-gray-700 hover:text-white cursor-pointer" />
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Clock size={10} className="text-gray-600" />
-                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">
-                    Ch. {manga.progress} <span className="text-gray-800 mx-1">/</span> {manga.total}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* 4. CONTENT GRID */}
+      {processedList.length > 0 ? (
+        <div className={viewMode === 'grid' 
+          ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 sm:gap-8" 
+          : "flex flex-col gap-4"}>
+          
+          {processedList.map((item, index) => (
+            <LibraryCard 
+              key={item.id} 
+              item={item} 
+              index={index} 
+              isLight={isLight} 
+              activeAccent={activeAccent} 
+              viewMode={viewMode}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className={`py-32 flex flex-col items-center justify-center text-center rounded-[3rem] border-2 border-dashed ${isLight ? 'bg-white border-slate-200' : 'bg-white/[0.02] border-white/5'}`}>
+          <div className="p-8 rounded-full bg-white/5 mb-6"><BookOpen size={48} className="opacity-20" /></div>
+          <h2 className="text-2xl font-black uppercase tracking-widest opacity-80 mb-2">No Records Found</h2>
+          <p className="text-xs opacity-40 font-bold mb-8">Your {activeTab} archive is currently empty.</p>
+          <button className="px-8 py-3 rounded-xl text-white font-black text-[10px] uppercase tracking-[0.2em]" style={{ backgroundColor: activeAccent }}>Browse Content</button>
+        </div>
+      )}
     </div>
+  );
+};
+
+/* --- SUB-COMPONENTS --- */
+
+const ViewToggle = ({ icon, active, onClick, isLight }) => (
+  <button 
+    onClick={onClick}
+    className={`p-3 rounded-xl border transition-all ${active 
+      ? (isLight ? 'bg-white border-slate-300 shadow-md' : 'bg-white/10 border-white/20 text-white') 
+      : (isLight ? 'border-transparent text-slate-400' : 'border-transparent text-white/20')}`}
+  >
+    {icon}
+  </button>
+);
+
+const FilterPill = ({ label, onClick, isLight }) => (
+  <button 
+    onClick={onClick}
+    className={`flex-1 sm:flex-none px-6 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all
+      ${isLight ? 'bg-white border-slate-200 text-slate-600 hover:border-slate-400' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
+  >
+    {label}
+  </button>
+);
+
+const LibraryCard = ({ item, index, isLight, activeAccent, viewMode }) => {
+  const percent = Math.round((item.progress / item.total) * 100);
+
+  if (viewMode === 'list') {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }}
+        className={`flex items-center gap-6 p-4 rounded-2xl border ${isLight ? 'bg-white border-slate-200 hover:shadow-lg' : 'bg-white/5 border-white/5 hover:bg-white/[0.08]'} transition-all group`}
+      >
+        <div className="w-16 h-20 rounded-xl overflow-hidden shrink-0">
+          <img src={item.cover} className="w-full h-full object-cover" alt="" />
+        </div>
+        <div className="flex-1 min-w-0">
+           <h3 className="font-black text-sm uppercase truncate mb-1">{item.title}</h3>
+           <div className="flex items-center gap-4 text-[10px] font-bold opacity-40 uppercase">
+             <span>Ch. {item.progress} / {item.total}</span>
+             <span className="hidden sm:inline">•</span>
+             <span className="hidden sm:inline">{item.genre}</span>
+           </div>
+        </div>
+        <div className="hidden md:flex flex-col items-end gap-1">
+           <span className="text-[10px] font-black opacity-40">{percent}% Complete</span>
+           <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
+             <div className="h-full" style={{ width: `${percent}%`, backgroundColor: activeAccent }} />
+           </div>
+        </div>
+        <button className="p-3 opacity-20 group-hover:opacity-100 transition-opacity"><Play size={18} fill="currentColor" /></button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
+      className="group cursor-pointer"
+    >
+      <div className={`relative aspect-[3/4.5] rounded-[2rem] overflow-hidden border transition-all duration-500 group-hover:-translate-y-3
+        ${isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-white/5 border-white/10 shadow-2xl'}`}
+      >
+        <img src={item.cover} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={item.title} />
+        
+        {/* Overlay HUD */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+        
+        {/* Rating Badge */}
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 backdrop-blur-md border border-white/10">
+          <Star size={10} fill="#fbbf24" className="text-yellow-400" />
+          <span className="text-[10px] font-black text-white">{item.rating}</span>
+        </div>
+
+        {/* Action Button */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm">
+           <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-black shadow-2xl scale-50 group-hover:scale-100 transition-all duration-500">
+              <Play size={24} fill="black" />
+           </div>
+        </div>
+
+        {/* Progress Bar HUD */}
+        <div className="absolute bottom-5 left-5 right-5">
+          <div className="flex justify-between items-end mb-2">
+            <span className="text-[9px] font-black text-white uppercase tracking-widest">{percent}% SYNC</span>
+          </div>
+          <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
+            <motion.div 
+              initial={{ width: 0 }} animate={{ width: `${percent}%` }}
+              className="h-full shadow-[0_0_15px_rgba(255,255,255,0.5)]" 
+              style={{ backgroundColor: activeAccent }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 px-1">
+        <h3 className="text-xs font-black uppercase truncate tracking-tight mb-1 group-hover:text-blue-500 transition-colors">
+          {item.title}
+        </h3>
+        <div className="flex justify-between items-center opacity-40">
+           <span className="text-[10px] font-bold uppercase tracking-widest">Chapter {item.progress}</span>
+           <MoreVertical size={14} className="hover:opacity-100 transition-opacity" />
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

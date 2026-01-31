@@ -1,18 +1,34 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useState, useContext, useMemo } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import MangaDetailMap from "../components/MangaDetailMap"; // <-- import your new component
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Play, Heart, BookOpen, Layers, Eye, Star, 
+  ChevronDown, ChevronUp, Share2, ShieldAlert, ArrowLeft
+} from "lucide-react";
+import MangaDetailMap from "../components/MangaDetailMap";
+import { AppContext } from "../UserContext";
 
 const CHAPTERS_PER_PAGE = 50;
 
 const MangaDetail = () => {
   const { mangaId } = useParams();
+  const navigate = useNavigate();
+  const { currentTheme, isRedMode, familyMode } = useContext(AppContext);
+  
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("about");
   const [tocPage, setTocPage] = useState(1);
 
-  // Fetch Manga Details
+  const themeStyles = useMemo(() => ({
+    accent: isRedMode ? '#ef4444' : 'var(--accent)',
+    text: isRedMode ? 'text-red-500' : 'text-[var(--accent)]',
+    button: isRedMode 
+      ? 'bg-red-600 hover:bg-red-700 shadow-red-500/30' 
+      : 'bg-[var(--accent)] hover:bg-[var(--accent)]/80 shadow-[var(--accent-glow)]'
+  }), [isRedMode]);
+
   const { data: manga, isLoading: mangaLoading } = useQuery({
     queryKey: ["mangaDetail", mangaId],
     queryFn: async () => {
@@ -22,207 +38,185 @@ const MangaDetail = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Fetch Chapters
-  const { data: chapters = [], isLoading: chaptersLoading } = useQuery({
+  const { data: chapters = [] } = useQuery({
     queryKey: ["mangaChapters", mangaId],
     queryFn: async () => {
       const res = await axios.get(`http://localhost:5000/api/chapters/${mangaId}`);
-      // API may return either an array (Cloudinary) or legacy MangaDex style data
-      let rawData = [];
-      if (Array.isArray(res.data)) rawData = res.data;
-      else if (Array.isArray(res.data.chapters)) rawData = res.data.chapters;
-      else if (Array.isArray(res.data.items)) rawData = res.data.items;
-      else rawData = [];
-
-      // Normalize pages: old chapters used `hash` and pages as filenames; new ones contain full URLs
-      const normalized = rawData.map(ch => {
-        if (ch.hash && Array.isArray(ch.pages)) {
-          return { ...ch, pages: ch.pages.map(p => `https://uploads.mangadex.org/data/${ch.hash}/${p}`) };
-        }
-        return ch;
-      });
-
-      return normalized.sort((a, b) => (b.chapterNumber || 0) - (a.chapterNumber || 0));
+      let rawData = Array.isArray(res.data) ? res.data : (res.data.chapters || res.data.items || []);
+      return rawData.sort((a, b) => (b.chapterNumber || 0) - (a.chapterNumber || 0));
     },
     staleTime: 1000 * 60 * 5,
   });
 
   const totalChapters = chapters.length;
   const totalPages = Math.ceil(totalChapters / CHAPTERS_PER_PAGE);
-  const startIdx = (tocPage - 1) * CHAPTERS_PER_PAGE;
-  const visibleChapters = chapters.slice(startIdx, startIdx + CHAPTERS_PER_PAGE);
+  const visibleChapters = chapters.slice((tocPage - 1) * CHAPTERS_PER_PAGE, tocPage * CHAPTERS_PER_PAGE);
 
   if (mangaLoading) return (
-    <div className="min-h-screen flex items-center justify-center text-indigo-400 bg-[#050505]">
-      <div className="animate-pulse">Loading Mangas...</div>
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4">
+      <div className="w-12 h-12 border-4 border-[var(--accent)]/20 border-t-[var(--accent)] rounded-full animate-spin" />
+      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)]">Establishing Uplink</p>
     </div>
   );
 
+  if (familyMode && manga.rating_type === '18+') {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4 transition-all duration-700">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md text-center space-y-6">
+          <div className="p-6 rounded-full bg-red-500/10 border border-red-500/20 inline-block">
+            <ShieldAlert size={50} className="text-red-500 animate-pulse" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Protocol Restricted</h2>
+            <p className="text-[var(--text-dim)] text-sm font-medium italic">This archive is locked by Family Mode safety standards.</p>
+          </div>
+          <Link to="/home" className="inline-block px-8 py-3 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[9px] hover:scale-105 transition-transform">Back to Nexus</Link>
+        </motion.div>
+      </div>
+    );
+  }
 
   const shortDesc = manga?.description?.length > 280 && !expanded
     ? manga.description.slice(0, 280) + "..."
     : manga?.description;
 
-  // Black frosted/glow panel
-   const glassStyle = "bg-white/[0.03] backdrop-blur-[20px] border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.8)]";
-  const innerRefraction = "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-white/[0.05] before:to-transparent before:pointer-events-none";
-
   return (
-    <div className="min-h-screen bg-[#050505] text-gray-200 relative overflow-hidden">
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme} py-28`}>
+      
+      {/* DYNAMIC BACKGROUND */}
+      <div className="fixed inset-0 pointer-events-none -z-10">
+         <div className="absolute top-0 right-0 w-[60%] h-[45%] blur-[150px] opacity-[0.07] rounded-full transition-colors duration-1000" style={{ backgroundColor: themeStyles.accent }} />
+         <div className="absolute bottom-0 left-0 w-full h-[35%] bg-gradient-to-t from-[var(--bg-primary)] to-transparent" />
+      </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-10 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 py-8 lg:py-10 relative z-10">
+        
 
-        {/* HERO */}
-        <div className={`relative rounded-3xl p-5 md:p-8 ${glassStyle} ${innerRefraction}`}>
-          <div className="flex flex-col md:flex-row gap-8">
+        {/* HERO CARD */}
+        <section className="relative rounded-3xl p-6 lg:p-12 bg-[var(--bg-secondary)]/20 backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
-            <div className="mx-auto md:mx-0 shrink-0">
-              <img
-                src={manga.coverImage}
-                alt={manga.title}
-                className="w-56 h-84 object-cover rounded-2xl shadow-2xl border border-white/10"
-              />
-            </div>
+            {/* COVER */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto lg:mx-0 shrink-0">
+              <div className="relative group">
+                <img src={manga.coverImage} alt={manga.title} className="w-60 h-[380px] object-cover rounded-2xl shadow-2xl border border-white/10" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </motion.div>
 
-            <div className="flex-1">
-
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                {manga.title}
-              </h1>
-
-              <p className="text-sm text-indigo-300/80 mt-3 font-medium tracking-widest uppercase">
-            Story by <span className="text-white border-b border-indigo-500/50 pb-1">{manga.author || "Unknown"}</span>
-              </p>
-
-              <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <StatBox label="Status" value={manga.status || "Ongoing"} color="text-green-400" />
-                <StatBox label="Chapters" value={totalChapters} />
-                <StatBox label="Views" value={manga.views?.toLocaleString() || "—"} />
-                <StatBox label="Rating" value={`★ ${manga.rating || "4.8"}`} color="text-yellow-400" />
+            {/* HEADER TEXT */}
+            <div className="flex-1 flex flex-col justify-center space-y-6">
+              <div className="space-y-2">
+                <h1 className="text-3xl lg:text-5xl font-black tracking-tight leading-[1.0] uppercase italic text-[var(--text-main)]">{manga.title}</h1>
+                <div className="flex items-center gap-2">
+                   <div className="w-8 h-[1px] bg-[var(--accent)] opacity-50" />
+                   <p className={`text-[10px] font-black uppercase tracking-[0.3em] ${themeStyles.text}`}>
+                      Architect: <span className="text-[var(--text-main)]">{manga.author || "UNKNOWN_ID"}</span>
+                   </p>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mt-8">
+              {/* STAT GRID */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <StatBox icon={<Layers size={12}/>} label="Status" value={manga.status || "Ongoing"} accent={themeStyles.text} />
+                <StatBox icon={<BookOpen size={12}/>} label="Archives" value={totalChapters} />
+                <StatBox icon={<Eye size={12}/>} label="Uplinks" value={manga.views?.toLocaleString() || "0"} />
+                <StatBox icon={<Star size={12}/>} label="Rating" value={manga.rating || "5.0"} color="text-yellow-400" />
+              </div>
+
+              {/* GENRES */}
+              <div className="flex flex-wrap gap-2">
                 {manga.genres?.map((g, i) => (
-                  <span key={i} className="px-4 py-1.5 text-xs font-bold uppercase rounded-full bg-white/[0.05] border border-white/[0.1] text-indigo-200">
-                    {g}
-                  </span>
+                  <span key={i} className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-lg bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text-main)] hover:border-[var(--accent)]/30 transition-all cursor-default">{g}</span>
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 mt-10">
-                <Link
-                  to={`/manga/${mangaId}/${chapters[0]?.chapterNumber}`}
-                  className="bg-indigo-600 hover:bg-white/30 px-8 py-3 rounded-xl font-bold uppercase text-white   shadow-lg flex items-center justify-center"
-                >
-                  Start Reading
+              {/* ACTION BUTTONS */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Link to={`/manga/${mangaId}/${chapters[chapters.length - 1]?.chapterNumber}`} 
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button}`}>
+                  <Play size={18} fill="currentColor" /> Initialize Uplink
                 </Link>
-                <button className="px-8 py-3 rounded-xl font-semibold text-indigo-300 uppercase  border border-indigo-500/30 flex items-center justify-center hover:bg-indigo-500/10 transition  ">
-                  Add to Favorites
+                <button className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] font-black uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-[var(--text-main)] hover:border-[var(--accent)]/40 transition-all shadow">
+                  <Heart size={16} /> Collection
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Manga Detailed Info Map */}
-        
-
-        {/* TABS */}
-        <div className={`mt-10 rounded-3xl overflow-hidden ${glassStyle} ${innerRefraction}`}>
-          <div className="flex flex-wrap border-b border-white/5 bg-white/[0.02] ">
+        {/* TAB MODULE */}
+        <div className="mt-10 bg-[var(--bg-secondary)]/15 backdrop-blur-2xl border border-[var(--border)] rounded-3xl overflow-hidden shadow-xl">
+          <nav className="flex border-b border-[var(--border)]">
             {["about", "toc", "recommend"].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-4 text-xs font-black uppercase tracking-widest transition-all
-                  ${activeTab === tab ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:text-white hover:bg-white/[0.03]'}
-                `}
-              >
-                {tab === "toc" ? "Chapters" : tab === "recommend" ? "Similar" : tab}
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-3 rounded-t-2xl text-[9px] font-black uppercase tracking-[0.3em] transition-all
+                  ${activeTab === tab ? 'bg-[var(--accent)] text-white shadow' : 'text-[var(--text-dim)] hover:text-[var(--text-main)] hover:bg-white/5'}`}>
+                {tab === "toc" ? "Registry" : tab === "recommend" ? "Sync Similar" : "Dossier"}
               </button>
             ))}
-          </div>
+          </nav>
 
-          <div className="p-8">
-            {activeTab === "about" && (
-              <div>
-                <h2 className="text-xl font-bold mb-4 text-white">The Synopsis</h2>
-                <p className="text-gray-400 leading-relaxed text-lg font-light tracking-wide">
-                  {shortDesc}
-                </p>
-                {manga.description?.length > 280 && (
-                  <button onClick={() => setExpanded(!expanded)} className="mt-4 text-indigo-400 font-bold hover:underline">
-                    {expanded ? 'SHOW LESS' : 'READ FULL SUMMARY'}
-                  </button>
-                )}
-              </div>
-            )}
+          <div className="p-6">
+            <AnimatePresence mode="wait">
+              {activeTab === "about" && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-3xl space-y-4">
+                  <h2 className="text-xl font-black uppercase tracking-tight italic text-[var(--text-main)]">Operational Summary</h2>
+                  <p className="text-[var(--text-dim)] leading-relaxed text-sm font-medium italic tracking-tight opacity-90">{shortDesc}</p>
+                  {manga.description?.length > 280 && (
+                    <button onClick={() => setExpanded(!expanded)} className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${themeStyles.text}`}>
+                      {expanded ? <><ChevronUp size={14}/> Collapse Dossier</> : <><ChevronDown size={14}/> Decrypt Full Entry</>}
+                    </button>
+                  )}
+                </motion.div>
+              )}
 
-            {activeTab === 'toc' && (
-              <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                  <h2 className="text-xl font-bold text-white">Chapters</h2>
-                  <span className="text-xs bg-white/10 px-3 py-1 rounded-full">
-                    {totalChapters} Available
-                  </span>
-                </div>
-
-                {/* PAGE TABS */}
-                {totalPages > 1 && (
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2">
-                    {Array.from({ length: totalPages }).map((_, i) => {
-                      const pageNum = i + 1;
-                      const from = totalChapters - (pageNum - 1) * CHAPTERS_PER_PAGE ;
-                      const to = Math.max(totalChapters - (pageNum ) * CHAPTERS_PER_PAGE, 0);
-
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setTocPage(pageNum)}
-                          className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold border transition-all
-                            ${tocPage === pageNum
-                              ? 'bg-indigo-600 border-indigo-400 text-white'
-                              : 'bg-white/[0.05] border-white/[0.1] text-gray-400 hover:text-white'}
-                          `}
-                        >
-                          {from}–{to}
-                        </button>
-                      );
-                    })}
+              {activeTab === 'toc' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+                    <h2 className="text-xl font-black uppercase tracking-tight italic text-[var(--text-main)]">Index Logs</h2>
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)] opacity-40">{totalChapters} Files</span>
                   </div>
-                )}
 
-                {/* CHAPTER LIST */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {visibleChapters.map((ch, idx) => (
-                    <Link
-                      key={ch._id}
-                      to={`/manga/${mangaId}/${ch.chapterNumber}`}
-                      className="group flex items-center p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all"
-                    >
-                      <span className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 font-mono text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                        {totalChapters - (startIdx + idx)}
-                      </span>
-                      <span className="ml-4 text-gray-300 group-hover:text-white font-medium truncate">
-                       Chapter {ch.chapterNumber}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+                  {/* PAGINATION HUD */}
+                  {totalPages > 1 && (
+                    <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2">
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <button key={i} onClick={() => setTocPage(i + 1)}
+                          className={`shrink-0 px-3 py-1.5 rounded-lg text-[9px] font-black border transition-all
+                            ${tocPage === i + 1 ? 'bg-[var(--accent)] border-transparent text-white shadow' : 'bg-[var(--bg-primary)] border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--accent)]/30'}`}>
+                          SEC_{i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-            {activeTab === "recommend" && (
-              <div className="py-12 text-center text-gray-600 text-xs">
-                Personalized recommendations coming soon…
-              </div>
-            )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {visibleChapters.map((ch) => (
+                      <Link key={ch._id} to={`/manga/${mangaId}/${ch.chapterNumber}`}
+                        className="group flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-primary)]/50 border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-[var(--bg-primary)] transition-all shadow">
+                        <div className="flex items-center gap-3">
+                          <span className={`text-[10px] font-mono ${themeStyles.text} opacity-40 group-hover:opacity-100`}>#{ch.chapterNumber}</span>
+                          <span className="text-[var(--text-main)] font-black text-sm uppercase tracking-tight">Chapter {ch.chapterNumber}</span>
+                        </div>
+                        <span className="text-[8px] font-black uppercase tracking-widest text-[var(--text-dim)] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">Decrypt Data →</span>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </div><div className="mt-12">
-          <div className={` p-8 rounded-3xl ${glassStyle} ${innerRefraction}`}>
-            <h2 className="text-xl font-bold mb-6 text-white  border-l-4 border-indigo-600 pl-4">
-          MetaData & Details </h2>
-          <MangaDetailMap manga={manga} />
+        </div>
+
+        {/* INFRASTRUCTURE MODULE */}
+        <div className="mt-10">
+          <div className="p-8 lg:p-10 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--shadow-aesthetic)]">
+             <div className="flex items-center gap-2 mb-6">
+               <div className="w-1.5 h-10 bg-[var(--accent)] rounded-full shadow-[0_0_10px_var(--accent)]" />
+               <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-main)]">System <span className={themeStyles.text}>Infrastructure</span></h2>
+             </div>
+             <MangaDetailMap manga={manga} />
           </div>
         </div>
       </div>
@@ -230,12 +224,13 @@ const MangaDetail = () => {
   );
 };
 
-const StatBox = ({ label, value, color = 'text-white' }) => (
-  <div className="bg-white/[0.02] border border-white/[0.05] p-3 rounded-2xl">
-    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">{label}</p>
-    <p className={`text-lg font-bold ${color}`}>{value}</p>
+const StatBox = ({ icon, label, value, color = 'text-[var(--text-main)]', accent = 'text-[var(--text-dim)]' }) => (
+  <div className="bg-[var(--bg-primary)]/30 border border-[var(--border)] p-3 rounded-2xl group hover:border-[var(--accent)]/30 transition-all shadow">
+    <div className={`flex items-center gap-2 mb-2 ${accent} uppercase font-black text-[8px] tracking-[0.2em] opacity-60`}>
+      {icon} {label}
+    </div>
+    <p className={`text-sm font-black italic tracking-tight ${color}`}>{value}</p>
   </div>
 );
-
 
 export default MangaDetail;
