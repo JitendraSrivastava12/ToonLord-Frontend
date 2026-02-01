@@ -97,7 +97,7 @@ const CreateSeries = () => {
 
     try {
       const url = isEditMode 
-        ? `http://localhost:5000/api/mangas/${id}` 
+        ? `http://localhost:5000/api/users/my-mangas/update/${id}` 
         : `http://localhost:5000/api/mangas`;
       
       const method = isEditMode ? 'put' : 'post';

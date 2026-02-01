@@ -5,7 +5,7 @@ import {
 import { AppContext } from "../UserContext";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { useAlert } from "../context/AlertContext";
 const UploadPage = () => {
   const { isRedMode,currentTheme } = useContext(AppContext);
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const UploadPage = () => {
   const [convertPngToJpeg, setConvertPngToJpeg] = useState(true);
   const [jpegQuality, setJpegQuality] = useState(65); // 30-90
   const [maxWidth, setMaxWidth] = useState(1400);
+  const {showAlert}=useAlert();
 
   // Upload progress & ETA
   const [uploading, setUploading] = useState(false);
@@ -316,7 +317,7 @@ const UploadPage = () => {
   // --- DEPLOY LOGIC ---
   const handleDeploy = async () => {
     if (!selectedManga || !chapterNum || selectedFiles.length === 0) {
-      return alert("Please select a series, chapter number, and upload pages.");
+      return showAlert("Please select a series, chapter number, and upload pages.","error");
     }
 
     setIsDeploying(true);
@@ -377,11 +378,11 @@ const UploadPage = () => {
       });
 
       if (res.data.success) {
-        alert("Chapter Deployed to Cloudinary Successfully!");
+        showAlert("Chapter Deployed to Cloudinary Successfully!","success");
         navigate('/my-series');
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Upload failed");
+      showAlert(err.response?.data?.message || "Upload failed","error");
     } finally {
       setIsDeploying(false);
       setUploading(false);
