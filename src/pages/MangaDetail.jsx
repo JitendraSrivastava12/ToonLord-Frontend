@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import MangaDetailMap from "../components/MangaDetailMap";
 import { AppContext } from "../UserContext";
+import CommentSection from "../components/Comment";
 
 const CHAPTERS_PER_PAGE = 50;
 
@@ -55,7 +56,9 @@ const MangaDetail = () => {
   if (mangaLoading) return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4">
       <div className="w-12 h-12 border-4 border-[var(--accent)]/20 border-t-[var(--accent)] rounded-full animate-spin" />
-      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)]">Establishing Uplink</p>
+      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)]">
+        Loading...
+      </p>
     </div>
   );
 
@@ -67,10 +70,14 @@ const MangaDetail = () => {
             <ShieldAlert size={50} className="text-red-500 animate-pulse" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Protocol Restricted</h2>
-            <p className="text-[var(--text-dim)] text-sm font-medium italic">This archive is locked by Family Mode safety standards.</p>
+            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Content Restricted</h2>
+            <p className="text-[var(--text-dim)] text-sm font-medium italic">
+              This content is blocked by Family Mode.
+            </p>
           </div>
-          <Link to="/home" className="inline-block px-8 py-3 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[9px] hover:scale-105 transition-transform">Back to Nexus</Link>
+          <Link to="/home" className="inline-block px-8 py-3 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[9px] hover:scale-105 transition-transform">
+            Back to Home
+          </Link>
         </motion.div>
       </div>
     );
@@ -83,15 +90,8 @@ const MangaDetail = () => {
   return (
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme} py-28`}>
       
-      {/* DYNAMIC BACKGROUND */}
-      <div className="fixed inset-0 pointer-events-none -z-10">
-         <div className="absolute top-0 right-0 w-[60%] h-[45%] blur-[150px] opacity-[0.07] rounded-full transition-colors duration-1000" style={{ backgroundColor: themeStyles.accent }} />
-         <div className="absolute bottom-0 left-0 w-full h-[35%] bg-gradient-to-t from-[var(--bg-primary)] to-transparent" />
-      </div>
-
       <div className="max-w-5xl mx-auto px-4 py-8 lg:py-10 relative z-10">
         
-
         {/* HERO CARD */}
         <section className="relative rounded-3xl p-6 lg:p-12 bg-[var(--bg-secondary)]/20 backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
@@ -107,27 +107,31 @@ const MangaDetail = () => {
             {/* HEADER TEXT */}
             <div className="flex-1 flex flex-col justify-center space-y-6">
               <div className="space-y-2">
-                <h1 className="text-3xl lg:text-5xl font-black tracking-tight leading-[1.0] uppercase italic text-[var(--text-main)]">{manga.title}</h1>
+                <h1 className="text-3xl lg:text-5xl font-black tracking-tight leading-[1.0] uppercase italic text-[var(--text-main)] line-clamp-3">
+                  {manga.title}
+                </h1>
                 <div className="flex items-center gap-2">
-                   <div className="w-8 h-[1px] bg-[var(--accent)] opacity-50" />
-                   <p className={`text-[10px] font-black uppercase tracking-[0.3em] ${themeStyles.text}`}>
-                      Architect: <span className="text-[var(--text-main)]">{manga.author || "UNKNOWN_ID"}</span>
-                   </p>
+                  <div className="w-8 h-[1px] bg-[var(--accent)] opacity-50" />
+                  <p className={`text-[10px] font-black uppercase tracking-[0.3em] ${themeStyles.text}`}>
+                    Author: <span className="text-[var(--text-main)]">{manga.author || "Unknown"}</span>
+                  </p>
                 </div>
               </div>
 
               {/* STAT GRID */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <StatBox icon={<Layers size={12}/>} label="Status" value={manga.status || "Ongoing"} accent={themeStyles.text} />
-                <StatBox icon={<BookOpen size={12}/>} label="Archives" value={totalChapters} />
-                <StatBox icon={<Eye size={12}/>} label="Uplinks" value={manga.views?.toLocaleString() || "0"} />
+                <StatBox icon={<BookOpen size={12}/>} label="Chapters" value={totalChapters} />
+                <StatBox icon={<Eye size={12}/>} label="Views" value={manga.views?.toLocaleString() || "0"} />
                 <StatBox icon={<Star size={12}/>} label="Rating" value={manga.rating || "5.0"} color="text-yellow-400" />
               </div>
 
               {/* GENRES */}
               <div className="flex flex-wrap gap-2">
                 {manga.genres?.map((g, i) => (
-                  <span key={i} className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-lg bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text-main)] hover:border-[var(--accent)]/30 transition-all cursor-default">{g}</span>
+                  <span key={i} className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-lg bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text-main)] hover:border-[var(--accent)]/30 transition-all cursor-default">
+                    {g}
+                  </span>
                 ))}
               </div>
 
@@ -135,10 +139,10 @@ const MangaDetail = () => {
               <div className="flex flex-wrap gap-3 pt-2">
                 <Link to={`/manga/${mangaId}/${chapters[chapters.length - 1]?.chapterNumber}`} 
                   className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button}`}>
-                  <Play size={18} fill="currentColor" /> Initialize Uplink
+                  <Play size={18} fill="currentColor" /> Read Now
                 </Link>
                 <button className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] font-black uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-[var(--text-main)] hover:border-[var(--accent)]/40 transition-all shadow">
-                  <Heart size={16} /> Collection
+                  <Heart size={16} /> Add to Favorites
                 </button>
               </div>
             </div>
@@ -148,11 +152,11 @@ const MangaDetail = () => {
         {/* TAB MODULE */}
         <div className="mt-10 bg-[var(--bg-secondary)]/15 backdrop-blur-2xl border border-[var(--border)] rounded-3xl overflow-hidden shadow-xl">
           <nav className="flex border-b border-[var(--border)]">
-            {["about", "toc", "recommend"].map(tab => (
+            {["about", "toc", "review", "recommend"].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-3 rounded-t-2xl text-[9px] font-black uppercase tracking-[0.3em] transition-all
                   ${activeTab === tab ? 'bg-[var(--accent)] text-white shadow' : 'text-[var(--text-dim)] hover:text-[var(--text-main)] hover:bg-white/5'}`}>
-                {tab === "toc" ? "Registry" : tab === "recommend" ? "Sync Similar" : "Dossier"}
+                {tab === "toc" ? "Chapters" : tab === "recommend" ? "Recommended" : tab === "review" ? "Comments" : "Details"}
               </button>
             ))}
           </nav>
@@ -161,11 +165,11 @@ const MangaDetail = () => {
             <AnimatePresence mode="wait">
               {activeTab === "about" && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-3xl space-y-4">
-                  <h2 className="text-xl font-black uppercase tracking-tight italic text-[var(--text-main)]">Operational Summary</h2>
+                  <h2 className="text-xl font-black uppercase tracking-tight italic text-[var(--text-main)]">Description</h2>
                   <p className="text-[var(--text-dim)] leading-relaxed text-sm font-medium italic tracking-tight opacity-90">{shortDesc}</p>
                   {manga.description?.length > 280 && (
                     <button onClick={() => setExpanded(!expanded)} className={`text-[9px] font-black uppercase tracking-[0.3em] flex items-center gap-2 ${themeStyles.text}`}>
-                      {expanded ? <><ChevronUp size={14}/> Collapse Dossier</> : <><ChevronDown size={14}/> Decrypt Full Entry</>}
+                      {expanded ? <><ChevronUp size={14}/> Show Less</> : <><ChevronDown size={14}/> Read More</>}
                     </button>
                   )}
                 </motion.div>
@@ -174,18 +178,19 @@ const MangaDetail = () => {
               {activeTab === 'toc' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-                    <h2 className="text-xl font-black uppercase tracking-tight italic text-[var(--text-main)]">Index Logs</h2>
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)] opacity-40">{totalChapters} Files</span>
+                    <h2 className="text-xl font-black uppercase tracking-tight italic text-[var(--text-main)]">Chapter List</h2>
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)] opacity-40">
+                      {totalChapters} Chapters
+                    </span>
                   </div>
 
-                  {/* PAGINATION HUD */}
                   {totalPages > 1 && (
                     <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2">
                       {Array.from({ length: totalPages }).map((_, i) => (
                         <button key={i} onClick={() => setTocPage(i + 1)}
                           className={`shrink-0 px-3 py-1.5 rounded-lg text-[9px] font-black border transition-all
                             ${tocPage === i + 1 ? 'bg-[var(--accent)] border-transparent text-white shadow' : 'bg-[var(--bg-primary)] border-[var(--border)] text-[var(--text-dim)] hover:border-[var(--accent)]/30'}`}>
-                          SEC_{i + 1}
+                          Page {i + 1}
                         </button>
                       ))}
                     </div>
@@ -196,25 +201,38 @@ const MangaDetail = () => {
                       <Link key={ch._id} to={`/manga/${mangaId}/${ch.chapterNumber}`}
                         className="group flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-primary)]/50 border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-[var(--bg-primary)] transition-all shadow">
                         <div className="flex items-center gap-3">
-                          <span className={`text-[10px] font-mono ${themeStyles.text} opacity-40 group-hover:opacity-100`}>#{ch.chapterNumber}</span>
-                          <span className="text-[var(--text-main)] font-black text-sm uppercase tracking-tight">Chapter {ch.chapterNumber}</span>
+                          <span className={`text-[10px] font-mono ${themeStyles.text} opacity-40 group-hover:opacity-100`}>
+                            #{ch.chapterNumber}
+                          </span>
+                          <span className="text-[var(--text-main)] font-black text-sm uppercase tracking-tight">
+                            Chapter {ch.chapterNumber}
+                          </span>
                         </div>
-                        <span className="text-[8px] font-black uppercase tracking-widest text-[var(--text-dim)] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">Decrypt Data →</span>
+                        <span className="text-[8px] font-black uppercase tracking-widest text-[var(--text-dim)] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                          Read Chapter →
+                        </span>
                       </Link>
                     ))}
                   </div>
                 </motion.div>
               )}
+
+              {activeTab === "review" && (
+                <CommentSection targetId={manga._id} targetType="manga" />
+              )}
+            
             </AnimatePresence>
           </div>
         </div>
 
-        {/* INFRASTRUCTURE MODULE */}
+        {/* INFO MODULE */}
         <div className="mt-10">
           <div className="p-8 lg:p-10 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--shadow-aesthetic)]">
              <div className="flex items-center gap-2 mb-6">
                <div className="w-1.5 h-10 bg-[var(--accent)] rounded-full shadow-[0_0_10px_var(--accent)]" />
-               <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-main)]">System <span className={themeStyles.text}>Infrastructure</span></h2>
+               <h2 className="text-2xl font-black uppercase italic tracking-tight text-[var(--text-main)]">
+                 Manga <span className={themeStyles.text}>Information</span>
+               </h2>
              </div>
              <MangaDetailMap manga={manga} />
           </div>

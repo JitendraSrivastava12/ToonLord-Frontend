@@ -1,14 +1,27 @@
-// Layout.jsx
 import React, { useState, useContext } from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Home, Compass, Library, LayoutDashboard, User, FileUp,
-  BarChart3, Settings as SettingsIcon, Cpu
+  BarChart3, Settings as SettingsIcon, Cpu, Twitter, Facebook, Youtube, Github
 } from "lucide-react";
 import NavBar from "./NavBar";
 import { AppContext } from "../UserContext";
 import { useAlert } from "../context/AlertContext";
+import ToonLordLogo from "./ToonLordLogo";
+
+// Fixed: Added the missing SocialIcon component helper
+const SocialIcon = ({ icon, accent }) => (
+  <a 
+    href="#" 
+    className="p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/20 transition-all"
+    style={{ '--hover-accent': accent }}
+    onMouseEnter={(e) => e.currentTarget.style.color = accent}
+    onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
+  >
+    {icon}
+  </a>
+);
 
 function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -189,10 +202,77 @@ function Layout() {
       <div className="flex flex-col min-h-screen">
         <NavBar setIsSidebarOpen={setIsSidebarOpen} />
         <main className="flex-1 px-3 sm:px-6">
-          {/* Pass theme context to pages via Outlet */}
           <Outlet context={[isRedMode, familyMode, currentTheme]} key={location.pathname} />
         </main>
       </div>
+
+      {/* FOOTER SECTION */}
+      <footer className={`mt-20 border-t ${themeStyles.border} ${themeStyles.sidebarBg}`}>
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            
+            {/* Brand Section */}
+            <div className="col-span-1 md:col-span-1">
+              <div className="flex items-center gap-3 mb-6">
+                <Cpu size={35} color="blue" />
+                <span className="font-black tracking-tighter text-xl uppercase italic">
+                  Toon<span style={{ color: activeAccent }}>Lord</span>
+                </span>
+              </div>
+              <p className={`text-sm leading-relaxed font-medium ${themeStyles.dim}`}>
+                The ultimate destination for digital creators. 
+                Experience stories in a whole new dimension of interactivity.
+              </p>
+            </div>
+
+            {/* Platform Links */}
+            <div>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 opacity-30">Platform</h4>
+              <ul className="space-y-4 text-sm font-bold">
+                <li><Link to="/browse" className="hover:opacity-60 transition-opacity">Browse</Link></li>
+                <li><Link to="/library" className="hover:opacity-60 transition-opacity">Library</Link></li>
+                <li><Link to="/dashboard" className="hover:opacity-60 transition-opacity">Creator Studio</Link></li>
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 opacity-30">Security</h4>
+              <ul className="space-y-4 text-sm font-bold">
+                <li><Link to="/help" className="hover:opacity-60 transition-opacity">Neural Link Support</Link></li>
+                <li><Link to="/terms" className="hover:opacity-60 transition-opacity">User Protocols</Link></li>
+                <li><Link to="/privacy" className="hover:opacity-60 transition-opacity">Data Encryption</Link></li>
+              </ul>
+            </div>
+
+            {/* Connect Section */}
+            <div>
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 opacity-30">Neural Net</h4>
+              <div className="flex gap-3">
+                <SocialIcon icon={<Twitter size={18} />} accent={activeAccent} />
+                <SocialIcon icon={<Github size={18} />} accent={activeAccent} />
+                <SocialIcon icon={<Youtube size={18} />} accent={activeAccent} />
+              </div>
+            </div>
+          </div>
+
+          <div className={`mt-16 pt-8 border-t ${themeStyles.border} flex flex-col md:flex-row justify-between items-center gap-6`}>
+            <p className={`text-[10px] font-black uppercase tracking-widest ${themeStyles.dim}`}>
+              © 2026 ToonLord AI // All Rights Reserved. 
+            </p>
+            <p className={`text-[10px] font-black uppercase tracking-widest ${themeStyles.dim}`}>
+               Created By:- Jitendra Srivastava
+            </p>
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest bg-black/20 px-4 py-2 rounded-full border border-white/5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              Systems: Nominal
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* BACKDROP */}
       <AnimatePresence>
