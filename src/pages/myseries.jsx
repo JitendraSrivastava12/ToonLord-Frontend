@@ -74,7 +74,7 @@ const MySeries = () => {
   );
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 md:px-8 lg:px-12 py-35 transition-all duration-700 theme-${currentTheme}  `}>
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 md:px-8 lg:px-12 py-10 transition-all duration-700 theme-${currentTheme}  `}>
 
       {/* Background Ambience */}
       <div className="fixed top-0 right-0 w-[40%] h-[30%] blur-[120px] opacity-[0.05] rounded-full pointer-events-none" style={{ backgroundColor: accentColor }} />

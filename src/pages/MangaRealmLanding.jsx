@@ -20,10 +20,10 @@ const MangaRealmLanding = () => {
   const accentColor = isRedMode ? '#f43f5e' : 'var(--accent)'; 
   
   return (
-    <div className={`relative min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] font-sans selection:bg-rose-500/30 overflow-x-hidden theme-${currentTheme} py-28` }>
+    <div className={`relative min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] font-sans selection:bg-rose-500/30 overflow-x-hidden theme-${currentTheme}` }>
       
       {/* BACKGROUND AMBIENCE */}
-      <div className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.08] pointer-events-none" style={{ backgroundColor: accentColor }} />
+      <div className="absolute top-32 left-32 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.08] pointer-events-none" style={{ backgroundColor: accentColor }} />
       <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       {/* --- HERO SECTION --- */}
@@ -91,7 +91,7 @@ const MangaRealmLanding = () => {
               "Moderation Oversight",
               "Analytics & Reports"
             ]}
-            link="/admin"
+            link="/adminlogin"
             btnText="Command Login"
             accent="#3b82f6"
           />

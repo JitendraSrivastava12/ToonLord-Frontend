@@ -28,7 +28,7 @@ export default function Settings() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pt-24 pb-16 px-6 transition-all duration-700 py-28">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pt-12 pb-16 px-6 transition-all duration-700 ">
       <div className="max-w-7xl mx-auto">
 
         {/* --- DYNAMIC HEADER --- */}

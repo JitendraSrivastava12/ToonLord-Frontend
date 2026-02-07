@@ -54,7 +54,7 @@ const ToonLordHome = () => {
 
   return (
     <div
-      className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pb-16 transition-all duration-700 theme-${currentTheme} py-28`}
+      className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pb-16 transition-all duration-700 theme-${currentTheme} py-8`}
     >
       {/* HERO SPOTLIGHT */}
       {processedData.spotlight && (

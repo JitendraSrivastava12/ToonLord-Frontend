@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios'; // Added axios for the heartbeat
 
 export const AppContext = createContext();
 
@@ -10,22 +11,55 @@ export function AppProvider({ children }) {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  // --- VISUAL THEME STATE (The Aesthetic DNA) ---
+  // --- VISUAL THEME STATE ---
   const [currentTheme, setCurrentTheme] = useState(localStorage.getItem("site-theme") || "default");
 
-  // --- SECURITY MODE STATE (The Functional Protocol) ---
+  // --- SECURITY MODE STATE ---
   const [isRedMode, setIsRedMode] = useState(localStorage.getItem("red-mode") === "true");
   const [familyMode, setFamilyMode] = useState(localStorage.getItem("family-mode") === "true");
 
-  // Initialize the DOM class on load
+  // --- 1. THE HEARTBEAT (Real-time Sync) ---
+  useEffect(() => {
+    let interval;
+
+    const syncIdentity = async () => {
+      const token = localStorage.getItem("token");
+      if (!token || !isLoggedIn) return;
+
+      try {
+        const res = await axios.get('http://localhost:5000/api/users/getMe', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Update both state and localStorage with fresh notification/user data
+        const updatedUser = res.data.user || res.data;
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Heartbeat sync failed:", err);
+        // If the token is invalid/expired, log them out
+        if (err.response?.status === 401) logout();
+      }
+    };
+
+    if (isLoggedIn) {
+      syncIdentity(); // Initial run
+      interval = setInterval(syncIdentity, 30000); // Sync every 30 seconds
+    }
+
+    return () => clearInterval(interval);
+  }, [isLoggedIn]);
+
+  // --- 2. THEME INITIALIZATION ---
   useEffect(() => {
     document.documentElement.className = `theme-${currentTheme}`;
   }, [currentTheme]);
 
-  // Sync across tabs
+  // --- 3. TAB SYNCING ---
   useEffect(() => {
     const syncStates = (e) => {
       if (e.key === "token") setIsLoggedIn(!!e.newValue);
+      if (e.key === "user") setUser(JSON.parse(e.newValue));
       if (e.key === "site-theme") setCurrentTheme(e.newValue || "default");
       if (e.key === "red-mode") setIsRedMode(e.newValue === "true");
       if (e.key === "family-mode") setFamilyMode(e.newValue === "true");
@@ -34,25 +68,24 @@ export function AppProvider({ children }) {
     return () => window.removeEventListener("storage", syncStates);
   }, []);
 
-  // --- THEME ACTIONS ---
+  // --- ACTIONS ---
   const updateTheme = (id) => {
     setCurrentTheme(id);
     localStorage.setItem("site-theme", id);
   };
 
-  // --- SECURITY ACTIONS ---
   const toggleRedMode = () => {
     const newStatus = !isRedMode;
     setIsRedMode(newStatus);
-    localStorage.setItem("red-mode", newStatus);
-    if (newStatus) setFamilyMode(false); // Mutually exclusive for clarity
+    localStorage.setItem("red-mode", String(newStatus));
+    if (newStatus) setFamilyMode(false);
     refreshData();
   };
 
   const toggleFamilyMode = () => {
     const newStatus = !familyMode;
     setFamilyMode(newStatus);
-    localStorage.setItem("family-mode", newStatus);
+    localStorage.setItem("family-mode", String(newStatus));
     if (newStatus) setIsRedMode(false);
     refreshData();
   };

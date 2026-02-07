@@ -393,7 +393,7 @@ const UploadPage = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] relative overflow-hidden theme-${currentTheme} py-24`}>
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] relative overflow-hidden theme-${currentTheme} `}>
       {/* Background Glow */}
       <div 
         className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 pointer-events-none" 

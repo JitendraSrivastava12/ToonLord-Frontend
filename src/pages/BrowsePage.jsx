@@ -68,7 +68,7 @@ const BrowsePage = () => {
   const currentItems = filteredList.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
 
   return (
-    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] theme-${currentTheme} py-28`}>
+    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] theme-${currentTheme} py-10`}>
 
       {/* MOBILE FILTER BUTTON */}
       <AnimatePresence>

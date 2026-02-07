@@ -10,7 +10,7 @@ const ToonLordLanding = () => {
   const { currentTheme } = useContext(AppContext);
 
   return (
-    <div className={`theme-${currentTheme} transition-all duration-700 space-y-12 px-4 sm:px-8 md:px-16 lg:px-24 pb-32 py-28`}>
+    <div className={`theme-${currentTheme} transition-all duration-700 space-y-12 px-4 sm:px-8 md:px-16 lg:px-24 pb-32 py-8`}>
 
       {/* HERO SECTION */}
       <ToonLordHero />
