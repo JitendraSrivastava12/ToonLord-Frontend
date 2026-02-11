@@ -156,7 +156,7 @@ export default function MangaDashboard() {
   );
 
   return (
-    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] relative transition-all duration-700 theme-${currentTheme} mt-10`}>
+    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] relative transition-all duration-700 theme-${currentTheme} `}>
       
       {/* SIDEBAR */}
       <aside className={`

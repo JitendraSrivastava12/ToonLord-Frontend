@@ -27,20 +27,7 @@ const MangaRealmLanding = () => {
       <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       {/* --- HERO SECTION --- */}
-      <main className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-12 text-center z-10">
-
-        {/* Protocol Badge */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] text-[9px] font-black uppercase tracking-[0.3em] mb-8 shadow-md backdrop-blur-lg"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-          </span>
-          Protocol v2.0 Live
-        </motion.div>
+      <main className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-12 text-center z-10">
         
         {/* Hero Title */}
         <motion.h1 

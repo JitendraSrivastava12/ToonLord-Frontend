@@ -4,10 +4,12 @@ import ReactMarkdown from 'react-markdown';
 import { 
     ThumbsUp, Trash2, X, 
     AlertTriangle, ChevronDown, ChevronUp, 
-    Bold, Italic, Smile, Reply, Edit3 
+    Bold, Italic, Smile, Reply, Edit3,
+    Flag 
 } from 'lucide-react';
 import { AppContext } from "../UserContext";
 import { useAlert } from '../context/AlertContext';
+import ReportModal from './ReportModal'; 
 
 const MAX_CHARS = 1000;
 
@@ -38,11 +40,10 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, isRedMode, loading }) => {
 };
 
 // --- COMMENT CARD ---
-const CommentNode = ({ comment, user, isRedMode, onReply, onVote, onDelete, handleInsertText, isReply = false }) => {
+const CommentNode = ({ comment, user, isRedMode, onReply, onVote, onDelete, onReport, isReply = false }) => {
     const [showReplies, setShowReplies] = useState(false);
     const accentClass = isRedMode ? 'text-red-500' : 'text-[var(--accent)]';
     
-    // Check if user is in likes array
     const hasLiked = useMemo(() => {
         return comment.likes?.some(id => (id._id || id) === user?._id);
     }, [comment.likes, user?._id]);
@@ -67,14 +68,25 @@ const CommentNode = ({ comment, user, isRedMode, onReply, onVote, onDelete, hand
                             <span className="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate">{comment.userId?.username}</span>
                             <span className="text-[9px] text-[var(--text-dim)]">{new Date(comment.createdAt).toLocaleDateString()}</span>
                         </div>
-                        {isOwner && (
-                            <button onClick={() => onDelete(comment._id)} className="text-[var(--text-dim)] hover:text-red-500 p-1 transition-colors">
-                                <Trash2 size={13} />
-                            </button>
-                        )}
+                        <div className="flex items-center gap-2">
+                            {!isOwner && (
+                                <button 
+                                    onClick={() => onReport(comment)} 
+                                    className="text-[var(--text-dim)] hover:text-orange-500 p-1 transition-colors group"
+                                    title="Report Comment"
+                                >
+                                    <Flag size={12} className="group-hover:fill-orange-500/20" />
+                                </button>
+                            )}
+                            {isOwner && (
+                                <button onClick={() => onDelete(comment._id)} className="text-[var(--text-dim)] hover:text-red-500 p-1 transition-colors">
+                                    <Trash2 size={13} />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="text-[13px] sm:text-[14px] text-[var(--text-main)]/80 leading-relaxed mb-3 prose prose-invert">
+                    <div className="text-[13px] sm:text-[14px] text-[var(--text-main)]/80 leading-relaxed mb-3 prose prose-invert max-w-none">
                         <ReactMarkdown>{comment.content}</ReactMarkdown>
                     </div>
 
@@ -92,16 +104,27 @@ const CommentNode = ({ comment, user, isRedMode, onReply, onVote, onDelete, hand
                         </button>
 
                         {comment.replies && comment.replies.length > 0 && (
-                            <button onClick={() => setShowReplies(!showReplies)} className="text-[11px] font-bold text-blue-500">
+                            <button onClick={() => setShowReplies(!showReplies)} className="text-[11px] font-bold text-blue-500 flex items-center gap-1">
+                                {showReplies ? <ChevronUp size={12}/> : <ChevronDown size={12}/>}
                                 {showReplies ? "Hide" : `Replies (${comment.replies.length})`}
                             </button>
                         )}
                     </div>
 
                     {showReplies && comment.replies && (
-                        <div className="animate-in slide-in-from-top-2">
+                        <div className="animate-in slide-in-from-top-2 duration-200">
                             {comment.replies.map(reply => (
-                                <CommentNode key={reply._id} comment={reply} user={user} isRedMode={isRedMode} onReply={onReply} onVote={onVote} onDelete={onDelete} handleInsertText={handleInsertText} isReply={true} />
+                                <CommentNode 
+                                    key={reply._id} 
+                                    comment={reply} 
+                                    user={user} 
+                                    isRedMode={isRedMode} 
+                                    onReply={onReply} 
+                                    onVote={onVote} 
+                                    onDelete={onDelete} 
+                                    onReport={onReport} 
+                                    isReply={true} 
+                                />
                             ))}
                         </div>
                     )}
@@ -122,6 +145,10 @@ const CommentSection = ({ targetId, targetType }) => {
     const [isFocused, setIsFocused] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [pendingDeleteId, setPendingDeleteId] = useState(null);
+    
+    // Reporting States
+    const [reportModalOpen, setReportModalOpen] = useState(false);
+    const [selectedComment, setSelectedComment] = useState(null);
 
     useEffect(() => { if (targetId) fetchComments(); }, [targetId]);
 
@@ -138,12 +165,10 @@ const CommentSection = ({ targetId, targetType }) => {
         } catch (err) { console.error("Fetch error", err); }
     };
 
-    // --- FIX FOR YOUR BACKEND ---
     const handleVote = async (commentId) => {
         const token = localStorage.getItem('token');
         if (!token) return showAlert("Please log in to like.", "error");
 
-        // 1. Find the comment to see if user has already liked it
         const findInTree = (list) => {
             for (let c of list) {
                 if (c._id === commentId) return c;
@@ -159,11 +184,8 @@ const CommentSection = ({ targetId, targetType }) => {
         if (!target) return;
 
         const alreadyLiked = target.likes.some(id => (id._id || id) === user._id);
-        
-        // If alreadyLiked is true, we send "unlike" to bypass the backend 'push' logic
         const voteTypeToSend = alreadyLiked ? "unlike" : "like";
 
-        // 2. Optimistic Update
         setComments(prev => {
             const update = (list) => list.map(c => {
                 if (c._id === commentId) {
@@ -178,15 +200,12 @@ const CommentSection = ({ targetId, targetType }) => {
             return update(prev);
         });
 
-        // 3. Backend Call
         try {
             await axios.patch(`http://localhost:5000/api/comments/vote/${commentId}`, 
                 { voteType: voteTypeToSend }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-        } catch (err) {
-            fetchComments(); // Revert on error
-        }
+        } catch (err) { fetchComments(); }
     };
 
     const handleSubmit = async (e) => {
@@ -201,8 +220,17 @@ const CommentSection = ({ targetId, targetType }) => {
         } catch (err) { showAlert("Error", "error"); } finally { setIsLoading(false); }
     };
 
+    const triggerReport = (comment) => {
+        const token = localStorage.getItem('token');
+        if (!token) return showAlert("Please log in to report content.", "error");
+        
+        setSelectedComment(comment);
+        setReportModalOpen(true);
+    };
+
     return (
         <section className="w-full max-w-4xl mx-auto mt-4 p-4 sm:p-8 bg-[var(--bg-primary)] rounded-3xl">
+            {/* DELETE CONFIRMATION */}
             <ConfirmModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={async () => {
                 setIsLoading(true);
                 await axios.delete(`http://localhost:5000/api/comments/${pendingDeleteId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -213,6 +241,7 @@ const CommentSection = ({ targetId, targetType }) => {
                 Discussion ({comments.length})
             </h3>
 
+            {/* INPUT AREA */}
             {localStorage.getItem('token') ? (
                 <div className={`transition-all border rounded-2xl mb-12 overflow-hidden bg-[var(--bg-secondary)]/30 ${isFocused ? 'border-[var(--accent)]' : 'border-[var(--border)]'}`}>
                     <form onSubmit={handleSubmit} className="p-4">
@@ -246,13 +275,38 @@ const CommentSection = ({ targetId, targetType }) => {
                 </div>
             )}
 
+            {/* COMMENTS LIST */}
             <div className="space-y-2">
                 {comments.length > 0 ? comments.map(c => (
-                    <CommentNode key={c._id} comment={c} user={user} isRedMode={isRedMode} onReply={setReplyTo} onVote={handleVote} onDelete={(id) => {setPendingDeleteId(id); setIsModalOpen(true);}} handleInsertText={() => {}} />
+                    <CommentNode 
+                        key={c._id} 
+                        comment={c} 
+                        user={user} 
+                        isRedMode={isRedMode} 
+                        onReply={setReplyTo} 
+                        onVote={handleVote} 
+                        onDelete={(id) => {setPendingDeleteId(id); setIsModalOpen(true);}} 
+                        onReport={triggerReport}
+                    />
                 )) : (
-                    <p className="text-center text-[var(--text-dim)] py-10 italic">No comments yet.</p>
+                    <p className="text-center text-[var(--text-dim)] py-10 italic">No comments yet. Start the conversation!</p>
                 )}
             </div>
+
+            {/* REPORT MODAL */}
+            {selectedComment && (
+                <ReportModal 
+                    isOpen={reportModalOpen}
+                    onClose={() => {setReportModalOpen(false); setSelectedComment(null);}}
+                    targetId={selectedComment._id}
+                    targetType="comment"
+                    targetUser={selectedComment.userId?._id || selectedComment.userId}
+                    extraData={{
+                        contentSnippet: selectedComment.content?.substring(0, 50),
+                        authorName: selectedComment.userId?.username
+                    }}
+                />
+            )}
         </section>
     );
 };

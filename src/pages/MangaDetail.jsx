@@ -11,6 +11,7 @@ import MangaDetailMap from "../components/MangaDetailMap";
 import { AppContext } from "../UserContext";
 import CommentSection from "../components/Comment";
 import { useAlert } from "../context/AlertContext";
+import ReportModal from "../components/ReportModal";
 
 const CHAPTERS_PER_PAGE = 50;
 
@@ -27,6 +28,7 @@ const MangaDetail = () => {
   const [activeTab, setActiveTab] = useState("about");
   const [tocPage, setTocPage] = useState(1);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
   
   // Tracks multiple statuses (e.g., ['Reading', 'Favorite', 'Subscribe'])
   const [activeStatuses, setActiveStatuses] = useState([]); 
@@ -76,13 +78,14 @@ const MangaDetail = () => {
   useEffect(() => {
     if (userLibrary) {
       const currentEntries = userLibrary
-        .filter(item => item.manga._id === mangaId)
+        .filter(item => item.manga?._id === mangaId)
         .map(item => item.status);
       setActiveStatuses(currentEntries);
     }
   }, [userLibrary, mangaId]);
 
   const totalChapters = chapters.length;
+  const totalPages = Math.ceil(totalChapters / CHAPTERS_PER_PAGE);
   const visibleChapters = chapters.slice((tocPage - 1) * CHAPTERS_PER_PAGE, tocPage * CHAPTERS_PER_PAGE);
 
   // 4. Library Sync Handler
@@ -148,7 +151,7 @@ const MangaDetail = () => {
     : manga?.description;
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700  theme-${currentTheme}`}>
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme}`}>
       <div className="max-w-5xl mx-auto px-4 py-8 lg:py-10 relative z-10">
         
         {/* HERO CARD */}
@@ -183,9 +186,9 @@ const MangaDetail = () => {
               <div className="flex flex-wrap gap-3 pt-2">
                 {/* READ NOW */}
                 <Link 
-                  to={`/manga/${mangaId}/${chapters[chapters.length - 1]?.chapterNumber}`} 
-                  onClick={() => syncLibrary('Reading')}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button}`}
+                  to={chapters.length > 0 ? `/manga/${mangaId}/${chapters[chapters.length - 1]?.chapterNumber}` : "#"} 
+                  onClick={() => chapters.length > 0 && syncLibrary('Reading')}
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button} ${chapters.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                 >
                   <Play size={18} fill="currentColor" /> 
                   {activeStatuses.includes('Reading') ? 'In Library' : 'Read Now'}
@@ -229,6 +232,15 @@ const MangaDetail = () => {
                   <Bell size={16} className={activeStatuses.includes('Subscribe') ? "animate-pulse" : ""} fill={activeStatuses.includes('Subscribe') ? "currentColor" : "none"} /> 
                   {activeStatuses.includes('Subscribe') ? 'Subscribed' : 'Subscribe'}
                 </button>
+
+                {/* REPORT BUTTON */}
+                <button 
+                  onClick={() => setReportModalOpen(true)}
+                  className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] transition-all shadow font-black uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-red-500 hover:border-red-500/40"
+                >
+                  <ShieldAlert size={16} /> 
+                  Report
+                </button>
               </div>
             </div>
           </div>
@@ -248,7 +260,7 @@ const MangaDetail = () => {
           <div className="p-8">
             <AnimatePresence mode="wait">
               {activeTab === "about" && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl space-y-4">
+                <motion.div key="about-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl space-y-4">
                   <h2 className="text-xl font-black uppercase italic">Description</h2>
                   <p className="text-[var(--text-dim)] leading-relaxed text-sm font-medium italic opacity-90">{shortDesc}</p>
                   {manga.description?.length > 280 && (
@@ -260,21 +272,44 @@ const MangaDetail = () => {
               )}
 
               {activeTab === 'toc' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                <motion.div key="toc-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {visibleChapters.map((ch) => (
+                    {visibleChapters.length > 0 ? visibleChapters.map((ch) => (
                       <Link key={ch._id} to={`/manga/${mangaId}/${ch.chapterNumber}`}
                         className="group flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-primary)]/50 border border-[var(--border)] hover:border-[var(--accent)]/50 transition-all shadow">
                         <span className="text-[var(--text-main)] font-black text-sm uppercase">Chapter {ch.chapterNumber}</span>
                         <span className="text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-all">Read →</span>
                       </Link>
-                    ))}
+                    )) : (
+                      <p className="text-gray-500 text-xs uppercase font-black tracking-widest p-4">No chapters available yet.</p>
+                    )}
                   </div>
+
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-center gap-2 mt-8">
+                      {Array.from({ length: totalPages }).map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setTocPage(i + 1)}
+                          className={`w-10 h-10 rounded-xl font-black text-[10px] transition-all ${
+                            tocPage === i + 1 
+                            ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' 
+                            : 'bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-dim)] hover:bg-white/5'
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
 
               {activeTab === "review" && (
-                <CommentSection targetId={manga._id} targetType="manga" />
+                <motion.div key="review-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <CommentSection targetId={manga._id} targetType="manga" />
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
@@ -286,6 +321,19 @@ const MangaDetail = () => {
         </div>
 
       </div>
+
+      {/* REPORT MODAL COMPONENT */}
+      <ReportModal 
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        targetId={mangaId}
+        targetType="manga"
+        targetUser={manga.uploader?._id || manga.uploader || manga.authorId} 
+        showAlert={showAlert}
+        extraData={{
+          parentManga: mangaId
+        }}
+      />
     </div>
   );
 };

@@ -30,6 +30,11 @@ import ReportsManagement from '../AdminPages/AdminReport'
 import ContractManagement from '../AdminPages/AdminContracts'
 import UserManagement from '../AdminPages/AdminUserManagement'
 import AdminLogin from '../AdminPages/AdminLogin'
+import MangaManagement from '../AdminPages/MangaList'
+import WalletPage from '../pages/Wallet'
+import CoinShopPage from '../pages/CoinShop'
+import PaymentSuccess from '../pages/PaymentSucess'
+import EditChapterPage from '../pages/EditChapter'
 function AppRoutes({ currentTheme, setTheme }) {
   return (
     <Routes>
@@ -47,15 +52,22 @@ function AppRoutes({ currentTheme, setTheme }) {
         <Route path='/manga/:mangaId' element={<AdvancedViewPage  />} />
         
         <Route path='/loginlanding' element={<MangaRealmLanding  />} />
+        <Route path='/wallet' element={<WalletPage  />} />
+        <Route path='/shop' element={<CoinShopPage  />} />
+        
         <Route path="/create-series" element={<CreateSeries  />} />
         <Route path="/edit-series/:id" element={<CreateSeries  />} />
         <Route path='/my-series' element={<MySeries  />} />
         <Route path='/settings' element={<Settings/>} />
           <Route path='/dashboard' element={<CreatorDashboard/>} />
+          <Route path="/edit-chapter/:mangaId/:chapterId" element={<EditChapterPage/>} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+        
+        {/* Optional: You can reuse CoinShopPage for cancels or make a custom one */}
+        <Route path="/payment-cancel" element={<CoinShopPage />} />
           
       <Route path='/notifications' element={<Notification/>}/>
               <Route path='/analytics' element={<Analytics/>}/>
-        {/* CRITICAL: Added the Settings route so you can actually change the theme */}
         
       </Route>
       <Route path='/manga/:id/:chapterNum' element={<MangaReader  />} />
@@ -72,6 +84,7 @@ function AppRoutes({ currentTheme, setTheme }) {
           <Route path='/admin/reports' element={<ReportsManagement/>}/>
           <Route path='/admin/contracts' element={<ContractManagement/>}/>
           <Route path='/admin/users' element={<UserManagement/>}/>
+          <Route path='/admin/manga' element={<MangaManagement/>}/>
         </Route>
     </Routes>
   )

@@ -5,10 +5,12 @@ import confetti from 'canvas-confetti';
 import { 
   Settings, Star, User, Eye, Layout, Cpu, 
   Twitter, Github, Youtube, ChevronLeft, ChevronRight, ArrowLeft,
-  RefreshCw, CheckCircle2, PartyPopper, Maximize2, Minimize2
+  RefreshCw, CheckCircle2, PartyPopper, Maximize2, Minimize2,
+  ShieldAlert 
 } from 'lucide-react';
 import { AppContext } from "../UserContext";
 import CommentSection from '../components/Comment';
+import ReportModal from '../components/ReportModal';
 
 const MangaReader = () => {
   const { id, chapterNum } = useParams();
@@ -22,9 +24,12 @@ const MangaReader = () => {
   const [isFullyCompleted, setIsFullyCompleted] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
 
+  // --- REPORT MODAL STATE ---
+  const [isReportOpen, setIsReportOpen] = useState(false);
+
   // --- REFS FOR STABILITY ---
   const startTimeRef = useRef(Date.now());
-  const hasSyncedRef = useRef(null); // Prevents the infinite "Activity Logged" loop
+  const hasSyncedRef = useRef(null); 
 
   const activeAccent = isRedMode ? "#ff003c" : "#6366f1"; 
   const accentText = isRedMode ? 'text-red-500' : 'text-indigo-400';
@@ -41,10 +46,9 @@ const MangaReader = () => {
     }());
   }, [activeAccent]);
 
-  // --- ANALYTICS LOGGING (FIXES MYSTATS ERROR) ---
+  // --- ANALYTICS LOGGING ---
   const logNeuralActivity = useCallback(async () => {
     const token = localStorage.getItem('token');
-    // We check for mangaData to ensure we aren't sending null genres/values
     if (!token || !mangaData) return;
 
     const durationMinutes = Math.max(1, Math.round((Date.now() - startTimeRef.current) / 60000));
@@ -61,12 +65,11 @@ const MangaReader = () => {
     }
   }, [id, chapterNum, mangaData]);
 
-  // --- LIBRARY UPDATE LOGIC (FIXES INFINITE LOOP) ---
+  // --- LIBRARY UPDATE LOGIC ---
   const syncLibraryProgress = useCallback(async (title, total) => {
     const token = localStorage.getItem('token');
     const syncKey = `${id}-${chapterNum}`;
 
-    // If we already synced this specific chapter load, STOP HERE.
     if (!token || hasSyncedRef.current === syncKey) return; 
 
     setIsSyncing(true);
@@ -83,7 +86,6 @@ const MangaReader = () => {
         status: finalStatus
       }, { headers: { Authorization: `Bearer ${token}` } });
 
-      // Mark as synced for this session
       hasSyncedRef.current = syncKey;
 
       if (isLastChapter) {
@@ -118,7 +120,7 @@ const MangaReader = () => {
         setMangaData(mangaRes.data);
         window.scrollTo(0, 0);
 
-        // Sync with library once data is fetched
+        // Call sync immediately after data is available
         syncLibraryProgress(mangaRes.data.title, mangaRes.data.TotalChapter);
         
       } catch (err) {
@@ -134,7 +136,7 @@ const MangaReader = () => {
     return () => { 
       logNeuralActivity(); 
     }; 
-  }, [id, chapterNum]);
+  }, []);
 
   if (loading || !mangaData) return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center">
@@ -148,7 +150,7 @@ const MangaReader = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-white/20 overflow-x-hidden">
       
-      {/* --- HEADER (Hidden in Reading Mode) --- */}
+      {/* --- HEADER --- */}
       {!readingMode && (
         <header className="relative bg-[#0a0a0c] pt-24 pb-16 px-4 border-b border-white/5 overflow-hidden">
             <div className={`absolute -top-24 -left-24 w-96 h-96 ${glowBg} blur-[120px] rounded-full pointer-events-none`} />
@@ -243,6 +245,14 @@ const MangaReader = () => {
 
           <div className="flex items-center gap-4 text-slate-500">
             <button 
+                onClick={() => setIsReportOpen(true)}
+                className="hover:text-red-500 transition-colors p-2"
+                title="Report Error"
+            >
+                <ShieldAlert size={20} />
+            </button>
+
+            <button 
                 onClick={() => setReadingMode(!readingMode)} 
                 className={`transition-colors p-2 rounded-lg ${readingMode ? 'bg-white/10 text-white' : 'hover:text-white'}`}
                 title="Toggle Reading Mode"
@@ -273,7 +283,7 @@ const MangaReader = () => {
       {/* --- INTERACTION SECTION --- */}
       {!readingMode && (
         <div className="max-w-4xl mx-auto py-20 px-6">
-            <div className="flex justify-center mb-24">
+            <div className="flex flex-col items-center gap-10 mb-24">
             {parseInt(chapterNum) < mangaData.TotalChapter ? (
                 <button 
                 onClick={() => navigate(`/manga/${id}/${parseInt(chapterNum) + 1}`)}
@@ -294,6 +304,14 @@ const MangaReader = () => {
                     </button>
                 </div>
             )}
+
+            <button 
+                onClick={() => setIsReportOpen(true)}
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 hover:text-red-500 transition-colors"
+            >
+                <ShieldAlert size={14} />
+                Report chapter issues
+            </button>
             </div>
             
             <div className="space-y-6">
@@ -363,6 +381,19 @@ const MangaReader = () => {
             </div>
         </footer>
       )}
+
+      {/* --- MODAL OVERLAY --- */}
+      <ReportModal 
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        targetId={chapterData?._id}
+        targetType="chapter"
+        targetUser={mangaData?.uploader?._id || mangaData?.uploader}
+        extraData={{
+           parentManga: mangaData._id,
+           chapterNumber: chapterNum
+        }}
+      />
     </div>
   );
 };
