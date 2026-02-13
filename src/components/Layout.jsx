@@ -29,7 +29,7 @@ function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // --- MOBILE SEARCH STATES (Mirroring NavBar) ---
+  // --- MOBILE SEARCH STATES ---
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -86,12 +86,39 @@ function Layout() {
         { icon: <LayoutDashboard size={18} />, to: "/dashboard", label: "Dashboard" },
         { icon: <Library size={18} />, to: "/my-series", label: "My Series" },
         { icon: <FileUp size={18} />, to: "/upload", label: "Upload" },
-      
       ]
     }
   ];
 
   const protectedRoutes = ["/profile", "/library", "/dashboard", "/my-series", "/upload", "/analytics"];
+
+  // --- ROLE-BASED ACCESS HANDLER ---
+  const handleNavigationAccess = (e, item, sectionTitle) => {
+    const isProtected = protectedRoutes.includes(item.to);
+    const isCreatorSection = sectionTitle === "Creator Studio";
+
+    // Check Login for protected routes
+    if (!isLoggedIn && isProtected) {
+      e.preventDefault();
+      showAlert("Access Denied: Login Required", "error");
+      setIsSidebarOpen(false);
+      return;
+    }
+
+    // Check Role for Creator Studio
+    if (isCreatorSection && user?.role === "reader") {
+      e.preventDefault();
+      showAlert(
+        "Only Creators can use this. Switch your role to Creator in Profile to use these tools.", 
+        "error"
+      );
+      // We keep the sidebar open so they can see the context, 
+      // or set to false if you prefer it closing immediately.
+      return;
+    }
+
+    setIsSidebarOpen(false);
+  };
 
   return (
     <div className={`min-h-screen ${themeStyles.mainBg} ${themeStyles.text} transition-colors duration-500`}>
@@ -106,11 +133,9 @@ function Layout() {
             transition={{ type: "spring", damping: 26, stiffness: 220 }}
             className={`fixed top-0 left-0 z-[1001] h-full w-[280px] sm:w-[300px] border-r ${themeStyles.border} ${themeStyles.sidebarBg} shadow-2xl flex flex-col`}
           >
-            {/* Top Glow bar */}
             <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, ${activeAccent}, transparent)` }} />
 
             <div className="flex flex-col h-full">
-              
               {/* HEADER */}
               <div className="p-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -124,10 +149,7 @@ function Layout() {
                     <span className={`text-[8px] font-bold uppercase tracking-[0.3em] ${themeStyles.dim}`}>Premium Mangas</span>
                   </div>
                 </div>
-                <button 
-                  onClick={() => setIsSidebarOpen(false)} 
-                  className={`p-2 rounded-xl ${themeStyles.itemHover} transition-all`}
-                >
+                <button onClick={() => setIsSidebarOpen(false)} className={`p-2 rounded-xl ${themeStyles.itemHover} transition-all`}>
                   <X size={20}/>
                 </button>
               </div>
@@ -149,7 +171,6 @@ function Layout() {
                   {searchQuery && <X size={14} className="mr-3 opacity-40" onClick={() => setSearchQuery("")} />}
                 </div>
 
-                {/* SEARCH RESULTS DROPDOWN (MOBILE) */}
                 <AnimatePresence>
                   {suggestions.length > 0 && (
                     <motion.div 
@@ -192,13 +213,7 @@ function Layout() {
                           <Link
                             key={idx}
                             to={isLoggedIn || !isProtected ? item.to : "/loginlanding"}
-                            onClick={(e) => {
-                              if (!isLoggedIn && isProtected) {
-                                e.preventDefault();
-                                showAlert("Access Denied: Login Required", "error");
-                              }
-                              setIsSidebarOpen(false);
-                            }}
+                            onClick={(e) => handleNavigationAccess(e, item, section.title)}
                             className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all group ${
                               isActive ? 'text-white' : `${themeStyles.dim} ${themeStyles.itemHover}`
                             }`}
@@ -253,7 +268,7 @@ function Layout() {
                     : 'bg-white text-black hover:bg-slate-200'
                   }`}
                 >
-                  {isLoggedIn ? <><LogOut size={16}/> Logout</> : <><Sparkles size={16}/> Login/Sinup</>}
+                  {isLoggedIn ? <><LogOut size={16}/> Logout</> : <><Sparkles size={16}/> Login/Signup</>}
                 </button>
               </div>
             </div>
@@ -269,7 +284,6 @@ function Layout() {
           <Outlet context={[isRedMode, familyMode, currentTheme]} key={location.pathname} />
         </main>
 
-        {/* FOOTER SECTION */}
         <footer className={`mt-auto border-t ${themeStyles.border} ${themeStyles.sidebarBg} backdrop-blur-3xl`}>
           <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
@@ -320,7 +334,6 @@ function Layout() {
         </footer>
       </div>
 
-      {/* BACKDROP */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div

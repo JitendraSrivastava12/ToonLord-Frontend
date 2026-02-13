@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 import { AppContext } from "../UserContext";
 
-const ProfilePage = () => {
+const Profiledummy = () => {
   const { isRedMode, currentTheme, user, setUser } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
@@ -838,4 +838,4 @@ const Input = ({ label, value, onChange, disabled }) => {
   );
 };
 
-export default ProfilePage;
+export default Profiledummy;

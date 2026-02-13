@@ -22,7 +22,7 @@ const BrowsePage = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY < lastScrollY && currentScrollY > 80) setShowFilterBtn(true);
+      if (currentScrollY < lastScrollY && currentScrollY > 100) setShowFilterBtn(true);
       else if (currentScrollY > lastScrollY) setShowFilterBtn(false);
       setLastScrollY(currentScrollY);
     };
@@ -68,19 +68,19 @@ const BrowsePage = () => {
   const currentItems = filteredList.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
 
   return (
-    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] theme-${currentTheme} py-10`}>
+    <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] theme-${currentTheme}`}>
 
       {/* MOBILE FILTER BUTTON */}
       <AnimatePresence>
         {showFilterBtn && (
           <motion.button
             onClick={() => setFiltersOpen(true)}
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="lg:hidden fixed top-30 right-4 z-50 p-3 rounded-2xl bg-[var(--accent)] text-white shadow-xl"
+            exit={{ y: 80, opacity: 0 }}
+            className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-[var(--accent)] text-white shadow-2xl"
           >
-            <SlidersHorizontal size={18}/>
+            <SlidersHorizontal size={20}/>
           </motion.button>
         )}
       </AnimatePresence>
@@ -92,8 +92,8 @@ const BrowsePage = () => {
 
       {/* SIDEBAR */}
       <aside className={`
-        fixed lg:relative z-50 top-0 left-0 h-full lg:h-auto w-72
-        bg-[var(--bg-secondary)]/80 backdrop-blur-xl border-r border-white/10
+        fixed lg:relative z-50 top-0 left-0 h-full w-72
+        bg-[var(--bg-secondary)]/90 backdrop-blur-xl border-r border-white/10
         p-6 transition-transform duration-300
         ${filtersOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
@@ -102,36 +102,41 @@ const BrowsePage = () => {
             <p className="text-xs tracking-widest text-[var(--accent)] flex items-center gap-2">
               <Terminal size={14}/> FILTER SYSTEM
             </p>
-            <h2 className="text-xl font-black uppercase">Parameters</h2>
+            <h2 className="text-lg font-black uppercase">Parameters</h2>
           </div>
           <button onClick={() => setFiltersOpen(false)} className="lg:hidden">
             <X size={18}/>
           </button>
         </header>
 
-        <div className="space-y-8">
+        <div className="space-y-7">
+
           {/* SEARCH */}
           <div>
-            <p className="text-xs opacity-50 mb-1.5">Search</p>
+            <p className="text-xs opacity-60 mb-2">Search</p>
             <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 opacity-40" size={14}/>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" size={14}/>
               <input
                 value={searchQuery}
                 onChange={e => {setSearchQuery(e.target.value); setCurrentPage(1);}}
                 placeholder="Search title or author"
-                className="w-full pl-8 pr-2 py-2.5 rounded-lg bg-black/20 border border-white/10 text-sm"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </div>
           </div>
 
           {/* SORT */}
           <div>
-            <p className="text-xs opacity-50 mb-1.5">Sort</p>
-            <div className="space-y-1.5">
+            <p className="text-xs opacity-60 mb-2">Sort</p>
+            <div className="space-y-2">
               {sortOptions.map(opt => (
                 <button key={opt}
                   onClick={()=>setSortBy(opt)}
-                  className={`w-full py-2 rounded-lg text-sm ${sortBy===opt ? "bg-[var(--accent)] text-white" : "bg-black/20"}`}>
+                  className={`w-full py-2 rounded-xl text-sm transition ${
+                    sortBy===opt 
+                      ? "bg-[var(--accent)] text-white shadow" 
+                      : "bg-black/20 hover:bg-black/30"
+                  }`}>
                   {opt}
                 </button>
               ))}
@@ -140,12 +145,16 @@ const BrowsePage = () => {
 
           {/* GENRES */}
           <div>
-            <p className="text-xs opacity-50 mb-1.5">Genres</p>
-            <div className="flex flex-wrap gap-1.5">
+            <p className="text-xs opacity-60 mb-2">Genres</p>
+            <div className="flex flex-wrap gap-2">
               {genres.map(g => (
                 <button key={g}
                   onClick={()=>{setActiveGenres(prev=>prev.includes(g)?prev.filter(x=>x!==g):[...prev,g]); setCurrentPage(1);}}
-                  className={`px-2.5 py-1 rounded-full text-xs ${activeGenres.includes(g) ? "bg-[var(--accent)] text-white" : "bg-black/20"}`}>
+                  className={`px-3 py-1.5 rounded-full text-xs transition ${
+                    activeGenres.includes(g) 
+                      ? "bg-[var(--accent)] text-white" 
+                      : "bg-black/20 hover:bg-black/30"
+                  }`}>
                   {g}
                 </button>
               ))}
@@ -157,14 +166,15 @@ const BrowsePage = () => {
       {/* MAIN */}
       <main className="flex-1 px-4 sm:px-6 lg:px-12 py-10">
 
-        <header className="mb-12 sm:mb-16">
-          <div className="flex items-center gap-2 text-[var(--accent)] mb-1">
-            <Activity size={16}/> <span className="text-xs tracking-widest">CATALOG STREAM</span>
+        <header className="mb-12">
+          <div className="flex items-center gap-2 text-[var(--accent)] mb-2">
+            <Activity size={16}/> 
+            <span className="text-xs tracking-widest uppercase">Catalog Stream</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase">
             Data <span className="text-[var(--accent)]">Grid</span>
           </h1>
-          <p className="text-sm opacity-50 mt-1">{filteredList.length} results</p>
+          <p className="text-sm opacity-60 mt-1">{filteredList.length} results</p>
         </header>
 
         {/* GRID */}
@@ -172,17 +182,21 @@ const BrowsePage = () => {
           {currentItems.map((manga, index) => (
             <motion.div key={manga._id} initial={{opacity:0,y:15}} animate={{opacity:1,y:0}}>
               <Link to={`/manga/${manga._id}`} className="group block">
-                <div className="relative aspect-[3/4.2] rounded-2xl overflow-hidden border border-white/10 bg-black transition-transform group-hover:-translate-y-1">
-                  <img src={manga.coverImage} alt={manga.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform"/>
-                  <div className="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded-full text-xs text-yellow-400 flex gap-1">
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-black/20 transition group-hover:-translate-y-1 group-hover:shadow-xl">
+                  <img 
+                    src={manga.coverImage} 
+                    alt={manga.title} 
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                  />
+                  <div className="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded-full text-xs text-yellow-400 flex items-center gap-1">
                     <Star size={12} fill="currentColor"/>{manga.rating||"5.0"}
                   </div>
                 </div>
-                <div className="mt-2">
-                  <h3 className="text-sm font-bold line-clamp-2 group-hover:text-[var(--accent)]">
+                <div className="mt-2 space-y-1">
+                  <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-[var(--accent)] transition">
                     {manga.title}
                   </h3>
-                  <div className="text-xs opacity-50 flex justify-between">
+                  <div className="text-xs opacity-60 flex justify-between">
                     <span>{manga.status}</span>
                     <span>{manga.TotalChapter||0} ch</span>
                   </div>
@@ -194,13 +208,25 @@ const BrowsePage = () => {
 
         {/* PAGINATION */}
         {totalPages>1 && (
-          <div className="flex justify-center items-center gap-6 mt-12 sm:mt-16">
-            <button disabled={currentPage===1} onClick={()=>setCurrentPage(p=>p-1)} className="p-2.5 rounded-full bg-black/30">
-              <ChevronLeft size={16}/>
+          <div className="flex justify-center items-center gap-6 mt-14">
+            <button 
+              disabled={currentPage===1} 
+              onClick={()=>setCurrentPage(p=>p-1)} 
+              className="p-3 rounded-full bg-black/30 disabled:opacity-30 hover:bg-black/40 transition"
+            >
+              <ChevronLeft size={18}/>
             </button>
-            <span className="font-bold">{currentPage}/{totalPages}</span>
-            <button disabled={currentPage===totalPages} onClick={()=>setCurrentPage(p=>p+1)} className="p-2.5 rounded-full bg-black/30">
-              <ChevronRight size={16}/>
+
+            <span className="font-semibold">
+              {currentPage} / {totalPages}
+            </span>
+
+            <button 
+              disabled={currentPage===totalPages} 
+              onClick={()=>setCurrentPage(p=>p+1)} 
+              className="p-3 rounded-full bg-black/30 disabled:opacity-30 hover:bg-black/40 transition"
+            >
+              <ChevronRight size={18}/>
             </button>
           </div>
         )}

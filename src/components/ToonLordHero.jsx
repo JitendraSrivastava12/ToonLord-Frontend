@@ -1,20 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Zap, Play, ChevronRight, Flame, ShieldAlert } from 'lucide-react';
+import { Zap, Play, ChevronRight, ShieldAlert } from 'lucide-react';
 import { AppContext } from "../UserContext"; 
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-/**
- * ASSET SYNC PROTOCOL
- */
+/* Asset loader */
 const getAssetsByFolder = (folderName) => {
   try {
     const allAssets = import.meta.glob('../assets/**/*.{jpg,jpeg,png,webp,avif,jfif}', { eager: true });
     return Object.keys(allAssets)
       .filter(path => path.includes(`/${folderName}/`))
       .map(path => allAssets[path].default || allAssets[path]);
-  } catch (error) {
-    console.error(`Dossier Error: Failed to sync ${folderName} archive.`, error);
+  } catch {
     return [];
   }
 };
@@ -28,107 +25,97 @@ const ToonLordHero = () => {
 
   useEffect(() => {
     let pool = isRedMode ? pornwahImages : mangaImages;
-    if (!pool || pool.length === 0) pool = isRedMode ? mangaImages : pornwahImages;
-    if (pool.length > 0) {
-      const shuffled = [...pool].sort(() => 0.5 - Math.random());
-      setDisplayGrid(shuffled.slice(0, 6));
-    }
+    if (!pool.length) pool = mangaImages;
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    setDisplayGrid(shuffled.slice(0, 6));
   }, [isRedMode]);
 
-  // Dynamic accent and glow for theme support
   const accent = isRedMode ? '#ef4444' : 'var(--accent)';
-  const glow = isRedMode ? 'rgba(239,68,68,0.4)' : 'var(--accent-glow)';
+  const glow = isRedMode ? 'rgba(239,68,68,0.35)' : 'var(--accent-glow)';
 
   return (
-    <section className={`relative pt-12 pb-8 overflow-hidden transition-all duration-1000 theme-${currentTheme}`}>
-      {/* Background layers */}
-      <div className="absolute inset-0 bg-[var(--bg-primary)] -z-20 transition-colors duration-1000" />
+    <section className={`relative overflow-hidden theme-${currentTheme}`}>
+      {/* Glow background */}
       <div 
-        className="absolute -top-40 -left-40 w-[600px] h-[600px] blur-[140px] opacity-20 rounded-full animate-pulse-slow transition-colors duration-1000 -z-10"
+        className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full blur-[140px] opacity-20"
         style={{ backgroundColor: accent }}
       />
 
-      <div className="container mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-16 relative z-10">
-        {/* Left Column: Operational Terminal */}
-        <div className="flex-1 text-center lg:text-left">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] mb-8 shadow-xl"
-          >
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-20 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+
+        {/* LEFT */}
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center lg:text-left"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] mb-6">
             {isRedMode 
               ? <ShieldAlert size={14} className="text-red-500" /> 
               : <Zap size={14} className="text-[var(--accent)]" />
             }
-            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-[var(--text-dim)]">
-              {isRedMode ? "Restricted Access Protocol" : "The Future of Manga Reading"}
+            <span className="text-[11px] tracking-widest uppercase text-[var(--text-dim)]">
+              {isRedMode ? "Restricted Mode" : "Next-Gen Manga Platform"}
             </span>
-          </motion.div>
+          </div>
 
-          <h1 className="text-4xl lg:text-6xl font-black tracking-tighter italic leading-[0.8] mb-10 text-[var(--text-main)]">
-            READ <span className="transition-colors duration-700" style={{ color: accent }}>{isRedMode ? "UNCENSORED." : "MANGA."}</span><br />
-            EARN <span className="opacity-90">POINTS.</span><br />
-            UNLOCK <span className="opacity-40">PREMIUM.</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-[var(--text-main)] mb-6">
+            Read <span style={{ color: accent }}>{isRedMode ? "Uncensored" : "Manga"}</span><br />
+            Earn Points<br />
+            Unlock Premium
           </h1>
 
-          <p className="text-[var(--text-dim)] text-lg lg:text-xl max-w-xl mb-6 font-medium leading-relaxed italic opacity-80">
+          <p className="text-base sm:text-lg text-[var(--text-dim)] max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
             {isRedMode
-              ? "Access the realm's most exclusive adult manhwa. High-definition art, uncensored story arcs, and instant decryption."
-              : "Dive into a massive archive of legendary titles. Read to accumulate points, then bypass paywalls for new releases."}
+              ? "Explore exclusive adult manhwa with uncensored chapters and premium unlocks."
+              : "Discover top manga titles, earn points while reading, and unlock premium releases."}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link 
               to="/home" 
-              className="group flex items-center gap-4 px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs transition-all hover:scale-105 active:scale-95 shadow-2xl text-white"
-              style={{ backgroundColor: accent, boxShadow: `0 15px 30px -10px ${glow}` }}
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-semibold text-white transition hover:scale-105"
+              style={{ backgroundColor: accent, boxShadow: `0 10px 25px -10px ${glow}` }}
             >
               <Play size={18} fill="currentColor" />
-              Start The Uplink
+              Start Reading
             </Link>
-            
+
             <Link 
               to="/browse" 
-              className="flex items-center gap-2 px-10 py-5 rounded-[2rem] bg-[var(--bg-secondary)] border border-[var(--border)] hover:border-[var(--accent)]/50 transition-all font-black text-xs uppercase tracking-widest text-[var(--text-dim)] hover:text-[var(--text-main)] shadow-xl"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-main)] hover:border-[var(--accent)]/50 transition"
             >
-              Browse Catalog
+              Browse Library
               <ChevronRight size={18} />
             </Link>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Right Column: Visual Archive Grid */}
-        <div className="flex-1 w-full relative perspective-[2000px]">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 rotate-2 hover:rotate-0 transition-transform duration-1000 ease-out">
-            <AnimatePresence mode="popLayout">
-              {displayGrid.length > 0 ? displayGrid.map((src, i) => (
+        {/* RIGHT */}
+        <div className="relative">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <AnimatePresence>
+              {displayGrid.map((src, i) => (
                 <motion.div
-                  key={`${src}-${i}`}
-                  initial={{ opacity: 0, scale: 0.8, rotateY: 20 }}
-                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  transition={{ delay: i * 0.1, duration: 0.8 }}
-                  className="aspect-[3/4] rounded-3xl overflow-hidden border border-[var(--border)] shadow-2xl hover:border-[var(--accent)]/50 hover:scale-110 hover:-translate-y-4 hover:z-30 transition-all duration-500 bg-[var(--bg-secondary)]"
+                  key={src}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className="aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] shadow-lg hover:scale-105 transition"
                 >
-                  <img src={src} alt="Archive Data" className="w-full h-full object-cover transition-transform duration-700 grayscale-[0.3] hover:grayscale-0" />
+                  <img 
+                    src={src} 
+                    alt="cover" 
+                    className="w-full h-full object-cover" 
+                  />
                 </motion.div>
-              )) : (
-                [...Array(6)].map((_, i) => (
-                  <div key={i} className="aspect-[3/4] rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] animate-pulse" />
-                ))
-              )}
+              ))}
             </AnimatePresence>
           </div>
-
-          {/* Points Bonus HUD */}
-          
         </div>
-      </div>
 
-      <style>{`
-        .animate-pulse-slow { animation: pulse 10s ease-in-out infinite; }
-        @keyframes pulse { 0%,100% { transform: scale(1); opacity:0.1; } 50% { transform: scale(1.2); opacity:0.25; } }
-      `}</style>
+      </div>
     </section>
   );
 };

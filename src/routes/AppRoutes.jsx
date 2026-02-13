@@ -35,6 +35,7 @@ import WalletPage from '../pages/Wallet'
 import CoinShopPage from '../pages/CoinShop'
 import PaymentSuccess from '../pages/PaymentSucess'
 import EditChapterPage from '../pages/EditChapter'
+import Profiledummy from '../pages/Profile2'
 function AppRoutes({ currentTheme, setTheme }) {
   return (
     <Routes>
@@ -47,6 +48,7 @@ function AppRoutes({ currentTheme, setTheme }) {
         <Route path='/home' element={<ToonLordHome />} />
         <Route path='/library' element={<LibraryPage  />} />
         <Route path='/profile' element={<ProfilePage  />} />
+        <Route path='/dummy' element={<Profiledummy/>}/>
         <Route path='/browse' element={<BrowsePage  />} />
         <Route path='/upload' element={<UploadPage  />} />
         <Route path='/manga/:mangaId' element={<AdvancedViewPage  />} />
@@ -77,6 +79,7 @@ function AppRoutes({ currentTheme, setTheme }) {
       <Route path='/UserLogin' element={<AuthScreen />} />
       <Route path='/act' element={<Activity/>}/>
       <Route path='/commentcreator' element={<CreatorComments/>}/>
+      
       <Route path="/admin" element={<AdminLayout />}>
           {/* This renders at /admin */}
           <Route index element={<AdminDashboard />} />
