@@ -10,7 +10,7 @@ import {
 import NavBar from "./NavBar";
 import { AppContext } from "../UserContext";
 import { useAlert } from "../context/AlertContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const SocialIcon = ({ icon, accent }) => (
   <a 
     href="#" 
@@ -44,7 +44,7 @@ function Layout() {
       if (searchQuery.trim().length >= 2) {
         setIsSearching(true);
         try {
-          const res = await axios.get(`http://localhost:5000/api/mangas/search/suggestions?q=${searchQuery}`);
+          const res = await axios.get(`${API_URL}/api/mangas/search/suggestions?q=${searchQuery}`);
           setSuggestions(res.data);
         } catch (error) {
           console.error("Search Error:", error);

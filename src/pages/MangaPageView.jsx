@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AppContext } from "../UserContext";
 import CommentSection from '../components/Comment';
 import ReportModal from '../components/ReportModal';
-
+const API_URL = import.meta.env.VITE_API_URL;
 const MangaReader = () => {
   const { id, chapterNum } = useParams();
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const MangaReader = () => {
     const token = localStorage.getItem('token');
     if (!token || !mangaData || lockStatus.isLocked || document.hidden) return;
     try {
-      await axios.post('http://localhost:5000/api/analytics/heartbeat', {
+      await axios.post(`${API_URL}/api/analytics/heartbeat`, {
         mangaId: id,
         chapterNumber: parseInt(chapterNum),
         genre: mangaData?.tags?.[0] || "General",
@@ -74,7 +74,7 @@ const MangaReader = () => {
     const finalStatus = isLastChapter ? 'Completed' : 'Reading';
     
     try {
-      await axios.post('http://localhost:5000/api/library/update', {
+      await axios.post(`${API_URL}/api/library/update`, {
         mangaId: id,
         mangaTitle: title,
         progress: parseInt(chapterNum),
@@ -105,10 +105,10 @@ const MangaReader = () => {
         setLoading(true);
         const token = localStorage.getItem("token");
         const [chapterRes, mangaRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/chapters/${id}/index/${chapterNum}`, {
+          axios.get(`${API_URL}/api/chapters/${id}/index/${chapterNum}`, {
             headers: { ...(token && { 'Authorization': `Bearer ${token}` }) }
           }),
-          axios.get(`http://localhost:5000/api/mangas/${id}`)
+          axios.get(`${API_URL}/api/mangas/${id}`)
         ]);
         if (!isMounted) return;
 

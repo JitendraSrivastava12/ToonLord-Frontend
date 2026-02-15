@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 import { useAlert } from "../context/AlertContext";
 import { AppContext } from "../UserContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const CreateSeries = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const CreateSeries = () => {
     if (isEditMode) {
       const fetchSeriesData = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/mangas/${id}`);
+          const res = await axios.get(`${API_URL}/api/mangas/${id}`);
           const data = res.data;
           setFormData({
             title: data.title,
@@ -97,8 +97,8 @@ const CreateSeries = () => {
 
     try {
       const url = isEditMode 
-        ? `http://localhost:5000/api/users/my-mangas/update/${id}` 
-        : `http://localhost:5000/api/mangas`;
+        ? `${API_URL}/api/users/my-mangas/update/${id}` 
+        : `${API_URL}/api/mangas`;
       
       const method = isEditMode ? 'put' : 'post';
 

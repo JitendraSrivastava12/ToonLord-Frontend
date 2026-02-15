@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, XCircle, ArrowRight, Download, ShieldCheck, Activity, Crown } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
+const API_URL = import.meta.env.VITE_API_URL;
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState('loading');
@@ -26,7 +26,7 @@ const PaymentSuccess = () => {
         return;
       }
       try {
-        const response = await fetch(`http://localhost:5000/api/payments/verify/${sessionId}`);
+        const response = await fetch(`${API_URL}/api/payments/verify/${sessionId}`);
         const data = await response.json();
 
         if (data.success) {

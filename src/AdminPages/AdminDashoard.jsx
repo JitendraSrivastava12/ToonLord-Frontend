@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const REVENUE_CHART_DATA = [40, 55, 60, 45, 70, 85, 50, 65, 75, 80, 90, 95];
-
+const API_URL = import.meta.env.VITE_API_URL;
 const StatCard = ({ title, value, change, isPositive, icon, color }) => {
   const colorMap = {
     blue: "bg-blue-50 text-blue-600",
@@ -61,7 +61,7 @@ const Dashboard = () => {
           localStorage.getItem("adminToken");
 
         const res = await axios.get(
-          "http://localhost:5000/admin/stats",
+          `${API_URL}/admin/stats`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppContext } from "../UserContext"; 
-
+const API_URL = import.meta.env.VITE_API_URL;
 const NotificationPage = () => {
   const { currentTheme } = useContext(AppContext);
   const [notifications, setNotifications] = useState([]);
@@ -19,7 +19,7 @@ const NotificationPage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/users/notifications', {
+      const response = await axios.get(`${API_URL}/api/users/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(Array.isArray(response.data) ? response.data : []);
@@ -37,7 +37,7 @@ const NotificationPage = () => {
     try {
       setIsProcessing(true);
       const token = localStorage.getItem('token');
-      await axios.delete('http://localhost:5000/api/users/notifications/clear', {
+      await axios.delete(`${API_URL}/api/users/notifications/clear`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications([]); 
@@ -51,7 +51,7 @@ const NotificationPage = () => {
   const handleMarkAllRead = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.patch('http://localhost:5000/api/users/notifications/read', {}, {
+      await axios.patch(`${API_URL}/api/users/notifications/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));

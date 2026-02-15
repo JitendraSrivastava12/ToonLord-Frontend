@@ -4,7 +4,7 @@ import { Save, ArrowLeft, Loader2, Edit3, Trash2 } from "lucide-react";
 import axios from "axios";
 import { AppContext } from "../UserContext";
 import { useAlert } from "../context/AlertContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const EditChapterPage = () => {
   const { mangaId, chapterId } = useParams();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const EditChapterPage = () => {
     const fetchChapter = async () => {
       try {
         // We use the mangaId and chapterId to get the specific chapter
-        const res = await axios.get(`http://localhost:5000/api/chapters/${mangaId}`);
+        const res = await axios.get(`${API_URL}/api/chapters/${mangaId}`);
         const chapter = res.data.find((ch) => ch._id === chapterId);
         
         if (chapter) {
@@ -51,7 +51,7 @@ const EditChapterPage = () => {
 
     try {
       await axios.patch(
-        `http://localhost:5000/api/chapters/${chapterId}`,
+        `${API_URL}/api/chapters/${chapterId}`,
         chapterData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

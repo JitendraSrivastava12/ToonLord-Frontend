@@ -24,7 +24,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
+const API_URL = import.meta.env.VITE_API_URL;
 function Analytics() {
   const { currentTheme, isRedMode } = useContext(AppContext);
   const [stats, setStats] = useState(null);
@@ -51,7 +51,7 @@ function Analytics() {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "http://localhost:5000/api/analytics/mystats",
+          `${API_URL}/api/analytics/mystats`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

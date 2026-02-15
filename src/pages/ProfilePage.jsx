@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 import { AppContext } from "../UserContext";
 import { useNavigate } from 'react-router-dom';
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { isRedMode, currentTheme, user, setUser } = useContext(AppContext);
@@ -54,7 +54,7 @@ const ProfilePage = () => {
   const [signature, setSignature] = useState('');
 
   const fileInputRef = useRef(null);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const theme = {
     primary: isRedMode ? 'bg-red-500' : 'bg-emerald-500',

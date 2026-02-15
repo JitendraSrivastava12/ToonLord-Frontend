@@ -9,7 +9,7 @@ const OFFERS = [
   { id: 'popular', coins: 500, price: 449, bonus: 50, icon: <Star />, tag: 'Most Popular', highlight: true },
   { id: 'pro', coins: 1200, price: 999, bonus: 200, icon: <Crown />, tag: 'Best Value' },
 ];
-
+const API_URL = import.meta.env.VITE_API_URL;
 const CoinShopPage = () => {
   const navigate = useNavigate();
   const { isRedMode, user } = useContext(AppContext);
@@ -24,7 +24,7 @@ const CoinShopPage = () => {
   const handleCheckout = async (offer) => {
     setLoadingId(offer.id);
     try {
-      const response = await fetch('http://localhost:5000/api/payments/create-checkout-session', {
+      const response = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

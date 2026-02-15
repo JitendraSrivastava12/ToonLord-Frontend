@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { CheckCircle2, AlertCircle, Info } from "lucide-react";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const LogsPage = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,8 +9,8 @@ const LogsPage = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
-        const res = await axios.get("http://localhost:5000/admin/logs", {
+        const token =  localStorage.getItem("adminToken");
+        const res = await axios.get(`${API_URL}/admin/logs`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setLogs(res.data);

@@ -38,7 +38,7 @@ const VisitorProfile = () => {
   });
   const MAX_LIMIT = 20; 
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchTargetData = async () => {

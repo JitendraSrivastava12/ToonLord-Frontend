@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { FireIcon, ClockIcon, StarIcon } from "@heroicons/react/24/solid";
 import { FaCrown } from "react-icons/fa";
 import { AppContext } from "../UserContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ToonLordHome = () => {
   const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
 
@@ -14,7 +14,7 @@ const ToonLordHome = () => {
     queryKey: ["homeFeed", isRedMode, familyMode],
     queryFn: async () => {
       const endpoint = isRedMode ? "adult" : "general";
-      const res = await axios.get(`http://localhost:5000/api/mangas/${endpoint}`);
+      const res = await axios.get(`${API_URL}/api/mangas/${endpoint}`);
       return res.data;
     },
     staleTime: 1000 * 60 * 30,

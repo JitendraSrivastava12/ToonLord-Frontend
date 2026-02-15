@@ -12,7 +12,7 @@ import { AppContext } from "../UserContext";
 import axios from 'axios';
 import { useAlert } from "../context/AlertContext";
 import { Link } from 'react-router-dom';
-
+const API_URL = import.meta.env.VITE_API_URL;
 // --- HELPER: Map Activity Type to UI ---
 const getActivityUI = (type) => {
   const map = {
@@ -95,8 +95,8 @@ export default function MangaDashboard() {
     const token = localStorage.getItem('token');
     try {
       const [seriesRes, commentsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/users/my-mangas', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:5000/api/comments/creator', { headers: { Authorization: `Bearer ${token}` } })
+        axios.get(`${API_URL}/api/users/my-mangas`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}/api/comments/creator`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
       setSeriesList(seriesRes.data);
       setComments(commentsRes.data);
@@ -124,7 +124,7 @@ export default function MangaDashboard() {
   const handleDeleteComment = async (id) => {
     if (!window.confirm("Delete this comment permanently?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/comments/${id}`, {
+      await axios.delete(`${API_URL}/api/comments/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setComments(prev => prev.filter(c => c._id !== id));
@@ -138,7 +138,7 @@ export default function MangaDashboard() {
     const parentId = comment._id;
     if (!replyText[parentId]) return;
     try {
-      await axios.post(`http://localhost:5000/api/comments/reply/${parentId}`, 
+      await axios.post(`${API_URL}/api/comments/reply/${parentId}`, 
         { 
           content: replyText[parentId],
           targetId: comment.onModelId?._id,

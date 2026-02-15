@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function MangaForm() {
   const [formData, setFormData] = useState({
     title: '',
@@ -33,7 +33,7 @@ export default function MangaForm() {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/manga', {
+      const response = await fetch(`${API_URL}/manga`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(submissionData),

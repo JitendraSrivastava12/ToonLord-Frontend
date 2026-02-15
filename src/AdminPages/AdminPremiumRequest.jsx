@@ -18,7 +18,7 @@ import { useAlert } from "../context/AlertContext";
 /* ============================
    CONTRACT MODAL (Upgraded)
 ============================ */
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ContractModal = ({
   isOpen,
   onClose,
@@ -183,7 +183,7 @@ const MangaPremiumRequests = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await axios.get(
-        "http://localhost:5000/admin/premium-queue",
+        `${API_URL}/admin/premium-queue`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -205,7 +205,7 @@ const MangaPremiumRequests = () => {
     try {
       const token = localStorage.getItem("adminToken");
       await axios.post(
-        "http://localhost:5000/admin/issue-contract",
+        `${API_URL}/admin/issue-contract`,
         {
           requestId: currentTicket._id,
           offeredPrice: contractData.offeredPrice,

@@ -12,7 +12,7 @@ import { useAlert } from '../context/AlertContext';
 import ReportModal from './ReportModal'; 
 
 const MAX_CHARS = 1000;
-
+const API_URL = import.meta.env.VITE_API_URL;
 // --- DELETE MODAL ---
 const ConfirmModal = ({ isOpen, onClose, onConfirm, isRedMode, loading }) => {
     if (!isOpen) return null;
@@ -154,7 +154,7 @@ const CommentSection = ({ targetId, targetType }) => {
 
     const fetchComments = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/comments/${targetId}?type=${targetType}`);
+            const res = await axios.get(`${API_URL}/api/comments/${targetId}?type=${targetType}`);
             const map = {}, roots = [];
             res.data.forEach((item, i) => { map[item._id] = i; res.data[i].replies = []; });
             res.data.forEach(item => {
@@ -201,7 +201,7 @@ const CommentSection = ({ targetId, targetType }) => {
         });
 
         try {
-            await axios.patch(`http://localhost:5000/api/comments/vote/${commentId}`, 
+            await axios.patch(`${API_URL}/api/comments/vote/${commentId}`, 
                 { voteType: voteTypeToSend }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -213,7 +213,7 @@ const CommentSection = ({ targetId, targetType }) => {
         if (!text.trim() || isLoading) return;
         setIsLoading(true);
         try {
-            const endpoint = replyTo ? `http://localhost:5000/api/comments/reply/${replyTo.id}` : `http://localhost:5000/api/comments`;
+            const endpoint = replyTo ? `${API_URL}/api/comments/reply/${replyTo.id}` : `${API_URL}/api/comments`;
             await axios.post(endpoint, { content: text, targetId, targetType }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
             setText(""); setReplyTo(null); setIsFocused(false); fetchComments();
             showAlert("Comment posted", "success");
@@ -233,7 +233,7 @@ const CommentSection = ({ targetId, targetType }) => {
             {/* DELETE CONFIRMATION */}
             <ConfirmModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onConfirm={async () => {
                 setIsLoading(true);
-                await axios.delete(`http://localhost:5000/api/comments/${pendingDeleteId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                await axios.delete(`${API_URL}/api/comments/${pendingDeleteId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
                 fetchComments(); setIsModalOpen(false); setIsLoading(false);
             }} isRedMode={isRedMode} loading={isLoading} />
 

@@ -8,7 +8,7 @@ import {
   SlidersHorizontal, X
 } from 'lucide-react';
 import { AppContext } from "../UserContext"; 
-
+const API_URL = import.meta.env.VITE_API_URL;
 const BrowsePage = () => {
   const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
   const [activeGenres, setActiveGenres] = useState([]); 
@@ -38,7 +38,7 @@ const BrowsePage = () => {
     queryKey: ['catalog', isRedMode, familyMode],
     queryFn: async () => {
       const endpoint = isRedMode ? 'adult' : 'general';
-      const res = await axios.get(`http://localhost:5000/api/mangas/${endpoint}`);
+      const res = await axios.get(`${API_URL}/api/mangas/${endpoint}`);
       return res.data;
     }
   });

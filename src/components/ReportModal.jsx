@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import useAlert from '../ui/Alert';
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraData,showAlert}) => {
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
@@ -32,7 +32,7 @@ const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraD
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post("http://localhost:5000/reports/submit", {
+      await axios.post(`${API_URL}/reports/submit`, {
         targetId,
         targetType,
         targetUser,

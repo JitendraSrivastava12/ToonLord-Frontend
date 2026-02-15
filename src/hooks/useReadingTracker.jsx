@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import axios from 'axios';
-
+const API_URL = import.meta.env.VITE_API_URL;
 export const useReadingTracker = (mangaId, chapterNumber, currentPage, genre) => {
   const heartbeatTimer = useRef(null);
 
@@ -13,7 +13,7 @@ export const useReadingTracker = (mangaId, chapterNumber, currentPage, genre) =>
 
       try {
         const token = localStorage.getItem('token');
-        await axios.post('http://localhost:5000/api/analytics/heartbeat', {
+        await axios.post(`${API_URL}/api/analytics/heartbeat`, {
           mangaId,
           chapterNumber,
           pageNumber: currentPage,

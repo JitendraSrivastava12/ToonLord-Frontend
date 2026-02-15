@@ -6,7 +6,7 @@ import ToonLordHero from '../components/ToonLordHero';
 import MangaGrid from '../components/MangaGrid';
 import CreatorCTA from '../components/CreatorCTA';
 import { AppContext } from "../UserContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ToonLordLanding = () => {
   const { currentTheme } = useContext(AppContext);
 

@@ -5,13 +5,13 @@ import { Star, Zap, Loader2, ShieldAlert, Baby, Orbit, Lock } from 'lucide-react
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppContext } from "../UserContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
   const { isRedMode, familyMode, currentTheme } = useContext(AppContext);
 
   const fetchManga = async (redMode) => {
     const endpoint = redMode ? 'adult' : 'general';
-    const response = await axios.get(`http://localhost:5000/api/mangas/${endpoint}`);
+    const response = await axios.get(`${API_URL}/api/mangas/${endpoint}`);
     return response.data;
   };
 

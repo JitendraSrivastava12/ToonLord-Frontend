@@ -22,7 +22,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { useAlert } from "../context/AlertContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 // --- Action Confirm Modal (Custom replacement for window.confirm) ---
 const ActionConfirmModal = ({
   isOpen,
@@ -291,7 +291,7 @@ const UserManagement = () => {
       const token = localStorage.getItem("adminToken");
       if (!token) return;
 
-      const response = await axios.get("http://localhost:5000/api/users/all", {
+      const response = await axios.get(`${API_URL}/api/users/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -317,7 +317,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem("adminToken");
       await axios.patch(
-        `http://localhost:5000/api/users/manage-status`,
+        `${API_URL}/api/users/manage-status`,
         { userId, status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -344,7 +344,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem("adminToken");
       await axios.delete(
-        `http://localhost:5000/api/users/delete/${userToPurge.id}`,
+        `${API_URL}/api/users/delete/${userToPurge.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

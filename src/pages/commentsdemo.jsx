@@ -5,7 +5,7 @@ import {
   MoreHorizontal, Calendar, BookOpen, Heart,
   Loader2, AlertCircle
 } from 'lucide-react';
-
+const API_URL = import.meta.env.VITE_API_URL;
 const CreatorComments = () => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const CreatorComments = () => {
     const token = localStorage.getItem('token');
     try {
       // Ensure your backend is using the "Deep Population" controller we discussed
-      const res = await axios.get('http://localhost:5000/api/comments/creator', {
+      const res = await axios.get(`${API_URL}/api/comments/creator`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setComments(res.data);
@@ -47,7 +47,7 @@ const CreatorComments = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this comment permanently?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/comments/${id}`, {
+      await axios.delete(`${API_URL}/api/comments/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setComments(prev => prev.filter(c => c._id !== id));
@@ -60,7 +60,7 @@ const CreatorComments = () => {
   const handleReply = async (parentId) => {
     if (!replyText[parentId]) return;
     try {
-      await axios.post(`http://localhost:5000/api/comments/reply/${parentId}`, 
+      await axios.post(`${API_URL}/api/comments/reply/${parentId}`, 
         { 
           content: replyText[parentId],
           targetId: comments.find(c => c._id === parentId)?.onModelId?._id,

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { AppContext } from "../UserContext";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
-
+const API_URL = import.meta.env.VITE_API_URL;
 function NavBar({ setIsSidebarOpen }) {
   const navigate = useNavigate();
   const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user } = useContext(AppContext);
@@ -45,7 +45,7 @@ function NavBar({ setIsSidebarOpen }) {
       if (searchQuery.trim().length >= 2) {
         setIsSearching(true);
         try {
-          const res = await axios.get(`http://localhost:5000/api/mangas/search/suggestions?q=${searchQuery}`);
+          const res = await axios.get(`${API_URL}/api/mangas/search/suggestions?q=${searchQuery}`);
           setSuggestions(res.data);
           setShowSearchDropdown(true);
         } catch (error) {
@@ -79,7 +79,7 @@ function NavBar({ setIsSidebarOpen }) {
     e.stopPropagation();
     try {
       const token = localStorage.getItem('token');
-      await axios.patch('http://localhost:5000/api/users/notifications/read', {}, {
+      await axios.patch(`${API_URL}/api/users/notifications/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       window.location.reload(); 

@@ -15,7 +15,7 @@ import { useAlert } from "../context/AlertContext";
 import ReportModal from "../components/ReportModal";
 
 const CHAPTERS_PER_PAGE = 50;
-
+const API_URL = import.meta.env.VITE_API_URL;
 const MangaDetail = () => {
   const { mangaId } = useParams();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const MangaDetail = () => {
   const { data: manga, isLoading: mangaLoading } = useQuery({
     queryKey: ["mangaDetail", mangaId],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:5000/api/mangas/${mangaId}`);
+      const res = await axios.get(`${API_URL}/api/mangas/${mangaId}`);
       return res.data;
     },
     staleTime: 1000 * 60 * 5,
@@ -61,7 +61,7 @@ const MangaDetail = () => {
   const { data: chapters = [] } = useQuery({
     queryKey: ["mangaChapters", mangaId],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:5000/api/chapters/${mangaId}`);
+      const res = await axios.get(`${API_URL}/api/chapters/${mangaId}`);
       let rawData = Array.isArray(res.data) ? res.data : (res.data.chapters || res.data.items || []);
       return rawData.sort((a, b) => (b.chapterNumber || 0) - (a.chapterNumber || 0));
     },
@@ -73,7 +73,7 @@ const MangaDetail = () => {
     queryFn: async () => {
       const token = localStorage.getItem('token');
       if (!token) return [];
-      const res = await axios.get("http://localhost:5000/api/library", {
+      const res = await axios.get(`${API_URL}/api/library`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -85,7 +85,7 @@ const MangaDetail = () => {
     const fetchUserRating = async () => {
       if (!user) return;
       try {
-        const res = await axios.get(`http://localhost:5000/api/ratings/${mangaId}`, {
+        const res = await axios.get(`${API_URL}/api/ratings/${mangaId}`, {
            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         if (res.data) setUserRating(res.data.score);
@@ -102,7 +102,7 @@ const MangaDetail = () => {
     if (!token) return showAlert("Please Login to Rate", "error");
 
     try {
-      await axios.post(`http://localhost:5000/api/ratings/rate`, 
+      await axios.post(`${API_URL}/api/ratings/rate`, 
         { mangaId, score }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -158,7 +158,7 @@ const MangaDetail = () => {
         totalChapters: totalChapters
       };
 
-      await axios.post("http://localhost:5000/api/library/update", payload, {
+      await axios.post(`${API_URL}/api/library/update`, payload, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json' 
@@ -187,7 +187,7 @@ const MangaDetail = () => {
     const token = localStorage.getItem('token');
     setIsSyncing(true);
     try {
-      const res = await axios.post(`http://localhost:5000/api/transactions/unlock/${mangaId}`, {}, {
+      const res = await axios.post(`${API_URL}/api/transactions/unlock/${mangaId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

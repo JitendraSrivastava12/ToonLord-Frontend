@@ -9,7 +9,7 @@ import {
 import axios from 'axios';
 import { AppContext } from "../UserContext";
 import { useAlert } from "../context/AlertContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 // --- 1. PROFESSIONAL LIGHT-THEME CONTRACT MODAL ---
 const ContractAcceptanceModal = ({ isOpen, manga, onAccept, onDecline, onCancel, loading }) => {
   const [signature, setSignature] = useState("");
@@ -194,7 +194,7 @@ const MySeries = () => {
     setLoading(true);
     const token = localStorage.getItem('token');
     try {
-      const res = await axios.get('http://localhost:5000/api/users/my-mangas', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${API_URL}/api/users/my-mangas`, { headers: { Authorization: `Bearer ${token}` } });
       setSeriesList(Array.isArray(res.data) ? res.data : []);
     } catch (err) { showAlert("Database Sync Failed", "error"); }
     finally { setLoading(false); }
@@ -205,7 +205,7 @@ const MySeries = () => {
   const fetchChaptersForManga = async (mangaId) => {
     if (chaptersByManga[mangaId]) return;
     try {
-      const res = await axios.get(`http://localhost:5000/api/chapters/${mangaId}`);
+      const res = await axios.get(`${API_URL}/api/chapters/${mangaId}`);
       setChaptersByManga(prev => ({ ...prev, [mangaId]: res.data }));
     } catch (err) { console.error(err); }
   };
@@ -215,7 +215,7 @@ const MySeries = () => {
     setRequestingPremium(true);
     const token = localStorage.getItem('token');
     try {
-      await axios.post(`http://localhost:5000/api/mangas/request-premium/${mangaId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_URL}/api/mangas/request-premium/${mangaId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       showAlert("Request Transmitted.", "success");
       setPremiumModal({ isOpen: false, manga: null });
       fetchMySeries();
@@ -228,7 +228,7 @@ const MySeries = () => {
     setSigningContract(true);
     const token = localStorage.getItem('token');
     try {
-      await axios.post(`http://localhost:5000/api/mangas/accept-contract/${mangaId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_URL}/api/mangas/accept-contract/${mangaId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       showAlert("Contract Executed. Asset is now LIVE PREMIUM!", "success");
       setContractModal({ isOpen: false, manga: null });
       fetchMySeries();
@@ -240,7 +240,7 @@ const MySeries = () => {
     const mangaId = contractModal.manga?._id;
     const token = localStorage.getItem('token');
     try {
-      await axios.post(`http://localhost:5000/api/mangas/decline-contract/${mangaId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`${API_URL}/api/mangas/decline-contract/${mangaId}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       showAlert("Offer Declined. Asset remains free.", "info");
       setContractModal({ isOpen: false, manga: null });
       fetchMySeries();
@@ -252,11 +252,11 @@ const MySeries = () => {
     const token = localStorage.getItem('token');
     try {
       if (type === 'series') {
-        await axios.delete(`http://localhost:5000/api/mangas/${data.id}`, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.delete(`${API_URL}/api/mangas/${data.id}`, { headers: { Authorization: `Bearer ${token}` } });
         setSeriesList(prev => prev.filter(s => s._id !== data.id));
         showAlert(`${data.title} purged.`, "success");
       } else if (type === 'chapter') {
-        await axios.delete(`http://localhost:5000/api/chapters/${data.mangaId}/${data.chapterId}`, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.delete(`${API_URL}/api/chapters/${data.mangaId}/${data.chapterId}`, { headers: { Authorization: `Bearer ${token}` } });
         setChaptersByManga(prev => ({ ...prev, [data.mangaId]: prev[data.mangaId].filter(ch => ch._id !== data.chapterId) }));
         showAlert(`Chapter purged.`, "success");
       }

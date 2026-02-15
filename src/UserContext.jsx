@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'; // Added axios for the heartbeat
-
+const API_URL = import.meta.env.VITE_API_URL;
 export const AppContext = createContext();
 
 export function AppProvider({ children }) {
@@ -27,7 +27,7 @@ export function AppProvider({ children }) {
       if (!token || !isLoggedIn) return;
 
       try {
-        const res = await axios.get('http://localhost:5000/api/users/getMe', {
+        const res = await axios.get(`${API_URL}/api/users/getMe`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         

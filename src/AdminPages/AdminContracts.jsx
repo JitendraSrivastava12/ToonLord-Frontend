@@ -11,7 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import { useAlert } from "../context/AlertContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ContractManagement = () => {
   const { showAlert } = useAlert();
   const [contracts, setContracts] = useState([]);
@@ -23,7 +23,7 @@ const ContractManagement = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await axios.get(
-        "http://localhost:5000/admin/all-contracts",
+        `${API_URL}/admin/all-contracts`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

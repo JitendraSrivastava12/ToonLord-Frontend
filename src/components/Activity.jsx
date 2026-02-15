@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BookOpen, MessageSquare, Star, Award, Zap, Clock, Bookmark } from 'lucide-react';
-
+const API_URL = import.meta.env.VITE_API_URL;
 const UserActivity = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ const UserActivity = () => {
     const fetchActivity = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/users/activity', {
+        const res = await axios.get(`${API_URL}/api/users/activity`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

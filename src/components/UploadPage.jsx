@@ -6,6 +6,7 @@ import { AppContext } from "../UserContext";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from "../context/AlertContext";
+const API_URL = import.meta.env.VITE_API_URL;
 const UploadPage = () => {
   const { isRedMode,currentTheme } = useContext(AppContext);
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ const UploadPage = () => {
     const fetchMyMangas = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/users/my-mangas', {
+        const res = await axios.get(`${API_URL}/api/users/my-mangas`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMyMangas(res.data);
@@ -357,7 +358,7 @@ const UploadPage = () => {
     });
 
     try {
-      const res = await axios.post('http://localhost:5000/api/chapters/upload', formData, {
+      const res = await axios.post(`${API_URL}/api/chapters/upload`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data' 

@@ -17,11 +17,7 @@ const AdminLogin = () => {
     setError('');
 
     try {
-      /** * 1. API CALL
-       * Using a relative path. Ensure your vite.config.js has a proxy 
-       * to http://localhost:5000 or use the full URL:
-       * 'http://localhost:5000/admin/admin-login'
-       */
+      
       const response = await axios.post(`${API_URL}/admin/admin-login`, { email, password });
       
       // Extracting data from your backend response
