@@ -3,7 +3,7 @@ import {
   LayoutDashboard, BookOpen, MessageSquare, Activity, 
   TrendingUp, Heart, Star, Eye, Calendar, User, Search, ChevronDown, 
   MoreHorizontal, ThumbsUp, Menu, X, Loader2, AlertTriangle, ArrowUpRight, 
-  CheckCircle, Trash2, Send
+  CheckCircle, Trash2, Send, Zap
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
@@ -29,52 +29,59 @@ const getActivityUI = (type) => {
 const SidebarItem = ({ icon: Icon, label, active, onClick, themeStyles }) => (
   <button 
     onClick={onClick} 
-    className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 ${
-      active ? `${themeStyles.activeSidebar} text-white shadow-lg` : 'text-[var(--text-dim)] hover:bg-white/5'
+    className={`w-full flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300  ${
+      active ? `${themeStyles.activeSidebar} text-white shadow-lg scale-[1.02]` : 'text-[var(--text-dim)] hover:bg-white/5'
     }`}
   >
     <Icon size={18} />
-    <span className="font-black uppercase italic text-[10px] tracking-widest">{label}</span>
+    <span className="font-semibold uppercase text-[10px] tracking-widest">{label}</span>
   </button>
 );
 
 const StatCard = ({ title, value, change, icon: Icon, subtext, themeStyles }) => (
-  <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-6 rounded-3xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)]">
+  <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-6 rounded-3xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] group hover:border-[var(--accent)]/30 transition-all">
     <div className="flex justify-between items-start mb-4">
-      <p className="text-[var(--text-dim)] font-black uppercase tracking-tighter text-[9px] italic opacity-70">{title}</p>
+      <p className="text-[var(--text-dim)] font-semibold uppercase tracking-tighter text-[9px] opacity-70">{title}</p>
       <Icon size={16} className={themeStyles.textAccent} />
     </div>
-    <h3 className="text-3xl font-black italic text-[var(--text-main)]">{value}</h3>
-    {change && <p className="text-[9px] font-black uppercase mt-2 text-green-400">{change} <span className="text-[var(--text-dim)] lowercase italic opacity-50">vs last month</span></p>}
-    {subtext && <p className="text-[9px] text-[var(--text-dim)] font-bold italic mt-2">{subtext}</p>}
+    <h3 className="text-3xl font-semibold text-[var(--text-main)] tracking-tighter">{value}</h3>
+    {change && <p className="text-[9px] font-semibold uppercase mt-2 text-green-400">{change} <span className="text-[var(--text-dim)] lowercase opacity-50">growth</span></p>}
+    {subtext && <p className="text-[9px] text-[var(--text-dim)] font-bold mt-2">{subtext}</p>}
   </div>
 );
-
-const VIEWS_DATA = [
-  { name: 'Jan 20', views: 3200 }, { name: 'Jan 22', views: 5100 },
-  { name: 'Jan 24', views: 4800 }, { name: 'Jan 26', views: 9000 },
-  { name: 'Jan 28', views: 12000 }, { name: 'Jan 30', views: 8000 },
-  { name: 'Feb 02', views: 18000 }, { name: 'Feb 04', views: 15000 },
-];
 
 export default function MangaDashboard() {
   const { currentTheme, isRedMode, user } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState('Overview');
   const [loading, setLoading] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default false for floating style
   const [seriesList, setSeriesList] = useState([]);
-  
-  // Comment States
   const [comments, setComments] = useState([]);
   const [commentSearch, setCommentSearch] = useState("");
   const [commentFilter, setCommentFilter] = useState("all");
   const [replyText, setReplyText] = useState({});
-
   const { showAlert } = useAlert();
 
   const creatorLogs = useMemo(() => 
     (user?.activityLog || []).filter(log => log.category === 'creator').reverse(), 
   [user]);
+
+  const stats = useMemo(() => {
+    const totalViews = seriesList.reduce((acc, curr) => acc + (Number(curr.views) || 0), 0);
+    const totalCommentsCount = comments.length; 
+    const totalChapters = seriesList.reduce((acc, curr) => acc + (Number(curr.TotalChapter) || 0), 0);
+    const ratedSeries = seriesList.filter(s => s.rating > 0);
+    const avgRating = ratedSeries.length 
+      ? (ratedSeries.reduce((a, b) => a + b.rating, 0) / ratedSeries.length).toFixed(1) 
+      : "0.0";
+
+    return {
+      totalViews: totalViews >= 1000 ? (totalViews / 1000).toFixed(1) + 'k' : totalViews,
+      totalComments: totalCommentsCount.toLocaleString(),
+      avgRating,
+      totalChapters
+    };
+  }, [seriesList, comments]);
 
   const themeStyles = useMemo(() => ({
     accent: isRedMode ? '#ef4444' : 'var(--accent)',
@@ -102,7 +109,6 @@ export default function MangaDashboard() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // --- COMMENT ACTIONS ---
   const filteredComments = useMemo(() => {
     return comments.filter(c => {
       const search = commentSearch.toLowerCase();
@@ -142,7 +148,7 @@ export default function MangaDashboard() {
       );
       setReplyText({ ...replyText, [parentId]: "" });
       showAlert("Reply posted successfully", "success");
-      fetchData(); // Refresh to show replies (optional)
+      fetchData(); 
     } catch (err) { 
       showAlert("Failed to send reply", "error");
     }
@@ -151,27 +157,40 @@ export default function MangaDashboard() {
   if (loading) return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4">
       <Loader2 className={`animate-spin ${themeStyles.textAccent}`} size={42} />
-      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--text-dim)] animate-pulse">Syncing Database</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.5em] text-[var(--text-dim)] animate-pulse">Establishing Secure Uplink</p>
     </div>
   );
 
   return (
     <div className={`flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] relative transition-all duration-700 theme-${currentTheme} `}>
       
-      {/* SIDEBAR */}
+      {/* --- FLOATING BACKDROP OVERLAY --- */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] transition-opacity duration-500"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* --- FLOATING SIDEBAR (THE VAULT) --- */}
       <aside className={`
-        fixed lg:sticky top-0 left-0 h-screen z-50
-        w-64 border-r border-[var(--border)] p-6 flex flex-col gap-8 
-        bg-[var(--bg-secondary)]/20 backdrop-blur-3xl transition-transform duration-500
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        fixed top-10 bottom-6 left-6 z-[60]
+        w-72 border border-white/10 p-8 flex flex-col gap-10
+        bg-[var(--bg-secondary)]/30 backdrop-blur-3xl rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)]
+        transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
+        ${isSidebarOpen ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-[120%] opacity-0 scale-95'}
+        lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:translate-x-0 lg:opacity-100 lg:scale-100 lg:ml-6
       `}>
-        <div className="flex justify-between items-center px-2">
-          <h1 className={`text-xl font-black italic tracking-tighter uppercase ${themeStyles.textAccent}`}>
-            Manga<span className="text-[var(--text-main)]">Creator</span>
+        <div className="flex justify-between items-center">
+          <h1 className={`text-2xl    font-bold tracking-tighter uppercase ${themeStyles.textAccent}  `}>
+            VAULT<span className="text-[var(--text-main)] not- ">LOG</span>
           </h1>
-          <button className="lg:hidden text-[var(--text-dim)]" onClick={() => setIsSidebarOpen(false)}><X size={20}/></button>
+          <button className="text-[var(--text-dim)] hover:text-white transition-colors" onClick={() => setIsSidebarOpen(false)}>
+            <X size={22}/>
+          </button>
         </div>
-        <nav className="flex flex-col gap-2">
+
+        <nav className="flex flex-col gap-3">
           {[
             { label: 'Overview', icon: LayoutDashboard },
             { label: 'My Mangas', icon: BookOpen },
@@ -188,90 +207,81 @@ export default function MangaDashboard() {
             />
           ))}
         </nav>
+
+        {/* VAULT STATUS DECORATION */}
+        <div className="mt-auto pt-6 border-t border-white/5">
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></div>
+            <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-[var(--text-dim)]">System_Online</span>
+          </div>
+        </div>
       </aside>
 
-      <main className="flex-1 p-8 lg:p-12 overflow-x-hidden">
-        <header className="mb-12">
-          <h2 className="text-5xl font-black uppercase italic leading-none tracking-tighter">{activeTab}</h2>
-          <div className={`h-1 w-12 mt-4 ${themeStyles.activeSidebar}`}></div>
+      {/* --- MAIN CONTENT --- */}
+      <main className="flex-1 px-8 py-2 lg:p-12 overflow-x-hidden">
+        <header className="mb-12 flex justify-between items-start">
+          <div>
+            <h2 className="text-5xl    font-bold uppercase leading-none tracking-tighter  ">{activeTab}</h2>
+            <div className={`h-1.5 w-24 mt-6 ${themeStyles.activeSidebar} rounded-full`}></div>
+          </div>
+          
+          {/* TRIGGER FOR MOBILE/FLOATING VIEW */}
+          
         </header>
 
         {/* --- TAB: OVERVIEW --- */}
         {activeTab === 'Overview' && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard themeStyles={themeStyles} title="Total Views" value="506.4k" change="+12.5%" icon={Eye} />
-              <StatCard themeStyles={themeStyles} title="Total Likes" value="32,800" change="+18.2%" icon={Heart} />
-              <StatCard themeStyles={themeStyles} title="Series" value={seriesList.length} subtext="Active works" icon={BookOpen} />
-              <StatCard themeStyles={themeStyles} title="Engagement" value="4.9" subtext="Average rating" icon={Star} />
+              <StatCard themeStyles={themeStyles} title="Cumulative Views" value={stats.totalViews} change="+2.4%" icon={Eye} />
+              <StatCard themeStyles={themeStyles} title="Comments" value={stats.totalComments} icon={MessageSquare} />
+              <StatCard themeStyles={themeStyles} title="Deployed Assets" value={seriesList.length} subtext={`${stats.totalChapters} Total Chapters`} icon={BookOpen} />
+              <StatCard themeStyles={themeStyles} title="Protocol Score" value={stats.avgRating} subtext="Avg. User Rating" icon={Star} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Analytics Chart */}
-              <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-8 rounded-3xl border border-[var(--border)]">
-                <h4 className="font-black uppercase italic mb-10 flex items-center gap-3 text-xs tracking-[0.2em] opacity-60">
-                  <TrendingUp size={18} className={themeStyles.textAccent}/> Analytics Trend
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-10 rounded-[40px] border border-[var(--border)]">
+                <h4 className="font-bold uppercase mb-12 flex items-center gap-3 text-[10px] tracking-[0.3em] opacity-40">
+                  <TrendingUp size={16} className={themeStyles.textAccent}/> Real-time Flux
                 </h4>
                 <div className="h-72">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={VIEWS_DATA}>
+                    <LineChart data={seriesList.length > 0 ? seriesList.slice(0, 8).map(s => ({ name: s.title.substring(0, 6), views: s.views })) : []}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--text-dim)', fontWeight: 'bold'}} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: 'var(--text-dim)', fontWeight: 'bold'}} />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 9, fill: 'var(--text-dim)', fontWeight: 'bold'}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9, fill: 'var(--text-dim)', fontWeight: 'bold'}} />
                       <Tooltip contentStyle={{backgroundColor: 'var(--bg-secondary)', borderRadius: '15px', border: '1px solid var(--border)', backdropFilter: 'blur(10px)'}} />
-                      <Line type="monotone" dataKey="views" stroke={themeStyles.accent} strokeWidth={4} dot={false} />
+                      <Line type="monotone" dataKey="views" stroke={themeStyles.accent} strokeWidth={4} dot={{ r: 4, fill: themeStyles.accent }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
-              {/* RECENT COMMENTS (OVERVIEW) */}
-              <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-8 rounded-3xl border border-[var(--border)]">
-                <h4 className="font-black uppercase italic mb-8 flex items-center gap-3 text-xs tracking-[0.2em] opacity-60">
-                  <MessageSquare size={18} className={themeStyles.textAccent}/> Reader Comments
+              <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-10 rounded-[40px] border border-[var(--border)]">
+                <h4 className="font-bold uppercase mb-10 flex items-center gap-3 text-[10px] tracking-[0.3em] opacity-40">
+                  <MessageSquare size={16} className={themeStyles.textAccent}/> Recent Feedbacks
                 </h4>
-                <div className="space-y-6">
-                  {comments.length > 0 ? comments.slice(0, 4).map(comment => (
-                    <div key={comment._id} className="flex gap-4 items-start border-b border-white/5 pb-4 last:border-0">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 border border-white/10">
-                        <img src={comment.userId?.profilePicture} className="w-full h-full object-cover" alt="" />
+                <div className="space-y-8">
+                  {comments.length > 0 ? comments.slice(0, 3).map(comment => (
+                    <div key={comment._id} className="flex gap-5 items-start">
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden bg-white/5 border border-white/10 shrink-0 shadow-lg">
+                        <img src={comment.userId?.profilePicture || '/default.png'} className="w-full h-full object-cover" alt="" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-center">
-                          <p className="text-sm font-black italic truncate">{comment.userId?.username}</p>
-                          <span className="text-[9px] text-[var(--text-dim)] font-bold shrink-0">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                        <div className="flex justify-between items-center mb-1">
+                          <p className="text-sm font-bold uppercase tracking-tight">{comment.userId?.username}</p>
+                          <span className="text-[8px] font-mono opacity-30">{new Date(comment.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <p className="text-[11px] text-[var(--text-dim)] line-clamp-1 mt-1 italic opacity-70">"{comment.content}"</p>
-                        <p className={`text-[8px] font-black uppercase mt-1 ${themeStyles.textAccent}`}>
-                          {comment.onModelId?.title} {comment.onModel === 'chapter' ? `— CH.${comment.onModelId?.chapterNumber}` : ''}
+                        <p className="text-xs text-[var(--text-dim)] line-clamp-1 opacity-70">"{comment.content}"</p>
+                        <p className={`text-[9px] font-bold uppercase mt-2 ${themeStyles.textAccent} tracking-widest`}>
+                          {comment.onModelId?.title}
                         </p>
                       </div>
                     </div>
                   )) : (
-                    <p className="text-center py-10 text-[var(--text-dim)] text-xs italic opacity-40">No recent interactions.</p>
+                    <p className="text-center py-10 text-[var(--text-dim)] text-xs opacity-40 uppercase tracking-widest font-bold">Archive Empty</p>
                   )}
                 </div>
-              </div>
-            </div>
-
-            {/* RECENT FEED */}
-            <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-8 rounded-3xl border border-[var(--border)]">
-              <h4 className="font-black uppercase italic mb-8 flex items-center gap-3 text-xs tracking-[0.2em] opacity-60">
-                <Activity size={18} className={themeStyles.textAccent}/> Recent Feed
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {creatorLogs.slice(0, 4).map((log, idx) => {
-                  const UI = getActivityUI(log.type);
-                  return (
-                    <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                      <div className={`p-3 rounded-xl ${UI.bg} ${UI.color}`}><UI.icon size={18}/></div>
-                      <div>
-                        <p className="text-xs font-black uppercase italic">{log.type.replace('_', ' ')}</p>
-                        <p className="text-[10px] text-[var(--text-dim)] font-bold truncate max-w-[200px]">{log.description}</p>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </div>
@@ -282,21 +292,20 @@ export default function MangaDashboard() {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 animate-in fade-in duration-500">
             {seriesList.map(manga => (
               <Link to={`/manga/${manga._id}`} key={manga._id}>
-                <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-6 rounded-3xl border border-[var(--border)] flex gap-6 hover:border-[var(--accent)]/50 transition-all group">
-                  <img src={manga.coverImage} className="w-32 h-44 rounded-2xl object-cover shadow-2xl" alt="" />
-                  <div className="flex-1 flex flex-col">
-                    <div className="flex justify-between items-start">
-                      <span className={`text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest ${manga.status === 'Ongoing' ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-[var(--text-dim)]'}`}>
-                        {manga.status}
-                      </span>
-                      <MoreHorizontal size={18} className="text-[var(--text-dim)]" />
+                <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-[var(--border)] flex gap-8 hover:border-[var(--accent)]/50 transition-all group shadow-xl">
+                  <div className="relative shrink-0">
+                    <img src={manga.coverImage} className="w-36 h-52 rounded-2xl object-cover shadow-2xl transition-transform group-hover:scale-105" alt="" />
+                    <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md rounded-lg text-[7px] font-bold uppercase tracking-widest border border-white/10 text-emerald-400">
+                       {manga.status}
                     </div>
-                    <h3 className="text-xl font-black italic mt-3 uppercase tracking-tighter">{manga.title}</h3>
-                    <p className="text-[var(--text-dim)] text-[10px] font-bold uppercase italic opacity-60">{manga.genre}</p>
-                    <div className="mt-auto flex gap-6 border-t border-white/5 pt-4">
-                      <div><p className="text-xs font-black italic">{manga.views || 0}</p><p className="text-[8px] text-[var(--text-dim)] uppercase font-black">Views</p></div>
-                      <div><p className="text-xs font-black italic">{manga.TotalChapter || 0}</p><p className="text-[8px] text-[var(--text-dim)] uppercase font-black">Chapters</p></div>
-                      <div><p className="text-xs font-black italic text-yellow-500">{manga.rating || 'N/A'}</p><p className="text-[8px] text-[var(--text-dim)] uppercase font-black">Rating</p></div>
+                  </div>
+                  <div className="flex-1 flex flex-col py-2">
+                    <h3 className="text-2xl font-bold uppercase tracking-tighter leading-tight group-hover:text-[var(--accent)] transition-colors line-clamp-2">{manga.title}</h3>
+                    <p className="text-[var(--text-dim)] text-[10px] font-bold uppercase tracking-[0.2em] mt-2 opacity-40">{manga.genre || "Uncategorized"}</p>
+                    <div className="mt-auto grid grid-cols-3 gap-4 border-t border-white/5 pt-6">
+                      <div className="text-center border-r border-white/5"><p className="text-sm font-bold tracking-tighter">{manga.views || 0}</p><p className="text-[7px] text-[var(--text-dim)] uppercase font-bold opacity-40 mt-1">Impression</p></div>
+                      <div className="text-center border-r border-white/5"><p className="text-sm font-bold tracking-tighter">{manga.TotalChapter || 0}</p><p className="text-[7px] text-[var(--text-dim)] uppercase font-bold opacity-40 mt-1">Sequence</p></div>
+                      <div className="text-center"><p className="text-sm font-bold tracking-tighter text-amber-500">{manga.rating || '0.0'}</p><p className="text-[7px] text-[var(--text-dim)] uppercase font-bold opacity-40 mt-1">Valuation</p></div>
                     </div>
                   </div>
                 </div>
@@ -305,137 +314,132 @@ export default function MangaDashboard() {
           </div>
         )}
 
-        {/* --- TAB: COMMENTS (FEEDBACK HUB) --- */}
+        {/* --- TAB: COMMENTS --- */}
         {activeTab === 'Comments' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
-            {/* Header & Filter Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[var(--bg-secondary)]/10 p-6 rounded-3xl border border-[var(--border)]">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[var(--bg-secondary)]/10 p-8 rounded-[2.5rem] border border-[var(--border)]">
               <div className="flex flex-wrap gap-4 flex-1">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" size={16} />
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[var(--text-dim)] opacity-40" size={16} />
                   <input 
                     type="text" 
-                    placeholder="Search users, series, or text..." 
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-6 text-xs outline-none focus:border-[var(--accent)] transition-all"
+                    placeholder="SCANNING_FOR_KEYWORD..." 
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-xs font-bold uppercase tracking-widest outline-none focus:border-[var(--accent)] transition-all"
                     onChange={(e) => setCommentSearch(e.target.value)}
                   />
                 </div>
                 <select 
-                  className="bg-white/5 border border-white/10 rounded-2xl px-6 py-3 text-xs font-black uppercase outline-none cursor-pointer"
+                  className="bg-white/5 border border-white/10 rounded-2xl px-8 py-4 text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer hover:bg-white/10 transition-all"
                   onChange={(e) => setCommentFilter(e.target.value)}
                 >
-                  <option value="all">All Content</option>
-                  <option value="manga">Series</option>
-                  <option value="chapter">Chapters</option>
+                  <option value="all">Unified Content</option>
+                  <option value="manga">Global Series</option>
+                  <option value="chapter">Local Chapters</option>
                 </select>
               </div>
             </div>
 
-            {/* Comments List */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {filteredComments.length > 0 ? filteredComments.map((comment) => (
-                <div key={comment._id} className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl border border-[var(--border)] rounded-[40px] overflow-hidden hover:border-[var(--accent)]/30 transition-all group">
-                  <div className="p-8">
-                    <div className="flex justify-between items-start mb-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
-                          <img src={comment.userId?.profilePicture} className="w-full h-full object-cover" alt="" />
+                <div key={comment._id} className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl border border-[var(--border)] rounded-[3rem] overflow-hidden hover:border-[var(--accent)]/30 transition-all group shadow-2xl">
+                  <div className="p-10">
+                    <div className="flex justify-between items-start mb-10">
+                      <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 border border-white/10 overflow-hidden flex-shrink-0 shadow-2xl">
+                          <img src={comment.userId?.profilePicture || '/default.png'} className="w-full h-full object-cover" alt="" />
                         </div>
                         <div>
-                          <h3 className="font-black text-lg uppercase italic tracking-wide">{comment.userId?.username || "Deleted User"}</h3>
-                          <div className="flex items-center gap-3 mt-1">
-                            <span className="flex items-center gap-1 text-[9px] font-bold text-[var(--text-dim)] uppercase">
+                          <h3 className=" font-bold text-xl uppercase tracking-tighter">{comment.userId?.username || "OPERATIVE"}</h3>
+                          <div className="flex items-center gap-4 mt-2">
+                            <span className="flex items-center gap-2 text-[8px] font-bold text-[var(--text-dim)] uppercase tracking-widest opacity-40">
                               <Calendar size={12}/> {new Date(comment.createdAt).toLocaleDateString()}
                             </span>
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${comment.onModel === 'manga' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'}`}>
-                              {comment.onModelId?.title} {comment.onModel === 'chapter' ? `— CH.${comment.onModelId?.chapterNumber}` : ''}
+                            <span className={`text-[8px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${comment.onModel === 'manga' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'}`}>
+                              {comment.onModelId?.title} {comment.onModel === 'chapter' ? `// CH.${comment.onModelId?.chapterNumber}` : ''}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => handleDeleteComment(comment._id)} 
-                          className="p-3 text-[var(--text-dim)] hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                      <button onClick={() => handleDeleteComment(comment._id)} className="p-4 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-md">
+                        <Trash2 size={20} />
+                      </button>
                     </div>
-
-                    <p className="ml-16 text-[var(--text-main)] text-sm leading-relaxed border-l-2 border-[var(--accent)]/30 pl-6 italic py-1 mb-8">
+                    <p className="ml-20 text-[var(--text-main)] text-base font-medium leading-relaxed border-l-4 border-[var(--accent)]/20 pl-8 py-2 mb-10">
                       "{comment.content}"
                     </p>
-
-                    <div className="ml-16 relative">
+                    <div className="ml-20 relative">
                       <input 
                         type="text" 
-                        placeholder="Type a response to this reader..." 
+                        placeholder="TRANSMIT_RESPONSE..." 
                         value={replyText[comment._id] || ""}
                         onChange={(e) => setReplyText({ ...replyText, [comment._id]: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-16 text-xs outline-none focus:border-[var(--accent)]/50 italic transition-all"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-8 pr-20 text-xs font-bold uppercase tracking-widest outline-none focus:border-[var(--accent)] transition-all"
                       />
                       <button 
                         onClick={() => handleReply(comment)}
-                        className={`absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-xl text-white ${themeStyles.activeSidebar} shadow-lg active:scale-90 transition-all`}
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-xl text-white ${themeStyles.activeSidebar} shadow-xl active:scale-95 transition-all`}
                       >
-                        <ArrowUpRight size={18} />
+                        <Send size={18} />
                       </button>
-                    </div>
-                  </div>
-                  
-                  {/* Footer Info */}
-                  <div className="bg-white/[0.02] px-8 py-3 border-t border-white/5 flex items-center gap-6">
-                    <div className="flex items-center gap-1 text-[var(--text-dim)] font-bold text-[10px] uppercase">
-                      <Heart size={12} className="text-red-500" /> {comment.likes?.length || 0} Likes
-                    </div>
-                    <div className="flex items-center gap-1 text-[var(--text-dim)] font-bold text-[10px] uppercase">
-                      <MessageSquare size={12} className="text-blue-500" /> {comment.replies?.length || 0} Replies
                     </div>
                   </div>
                 </div>
               )) : (
                 <div className="py-32 text-center bg-[var(--bg-secondary)]/5 rounded-[40px] border border-dashed border-[var(--border)]">
-                   <MessageSquare className="mx-auto mb-4 opacity-20" size={48} />
-                   <p className="text-sm font-black uppercase italic opacity-40">No readers have commented yet</p>
+                   <MessageSquare className="mx-auto mb-6 opacity-10" size={64} />
+                   <p className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-30">Neural History Empty</p>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* --- TAB: ACTIVITIES (FULL LOG) --- */}
+        {/* --- TAB: ACTIVITIES --- */}
         {activeTab === 'Activities' && (
-          <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-10 rounded-[40px] border border-[var(--border)] animate-in slide-in-from-right-8 duration-700">
+          <div className="bg-[var(--bg-secondary)]/10 backdrop-blur-2xl p-12 rounded-[3.5rem] border border-[var(--border)] animate-in slide-in-from-right-8 duration-700">
             <div className="relative space-y-12 ml-4">
               {creatorLogs.length > 0 ? creatorLogs.map((log, i) => {
                 const UI = getActivityUI(log.type);
                 return (
-                  <div key={i} className="relative flex gap-8 items-start">
-                    {i !== creatorLogs.length - 1 && <div className="absolute left-7 top-14 bottom-[-48px] w-[1px] bg-[var(--border)]"></div>}
-                    <div className={`z-10 p-4 rounded-2xl ${UI.bg} ${UI.color} shadow-xl border border-white/5`}>
-                      <UI.icon size={22} />
+                  <div key={i} className="relative flex gap-10 items-start group">
+                    {i !== creatorLogs.length - 1 && <div className="absolute left-8 top-16 bottom-[-55px] w-[2px] bg-white/5"></div>}
+                    <div className={`z-10 p-5 rounded-[1.5rem] ${UI.bg} ${UI.color} shadow-2xl border border-white/5 group-hover:scale-110 transition-transform`}>
+                      <UI.icon size={24} />
                     </div>
-                    <div className="flex-1 flex justify-between items-center bg-white/5 p-6 rounded-3xl border border-white/5">
+                    <div className="flex-1 flex justify-between items-center bg-white/[0.02] p-8 rounded-[2rem] border border-white/5 group-hover:bg-white/[0.04] transition-all">
                       <div>
-                        <h5 className="font-black text-lg uppercase italic leading-none">{log.type.replace('_', ' ')}</h5>
-                        <p className="text-[var(--text-dim)] text-xs mt-2 italic font-medium">{log.description}</p>
+                        <h5 className=" font-bold text-xl uppercase tracking-tighter leading-none">{log.type.replace('_', ' ')}</h5>
+                        <p className="text-[var(--text-dim)] text-sm mt-3 font-medium opacity-60 leading-relaxed">{log.description}</p>
                       </div>
-                      <span className="text-[var(--text-dim)] text-[10px] font-black uppercase tracking-widest">{new Date(log.timestamp).toLocaleDateString()}</span>
+                      <div className="text-right shrink-0 ml-4">
+                        <span className="text-emerald-500 text-[10px] font-bold uppercase tracking-[0.2em]">VERIFIED</span>
+                        <p className="text-[9px] text-[var(--text-dim)] font-bold uppercase tracking-widest mt-1">{new Date(log.timestamp).toLocaleDateString()}</p>
+                      </div>
                     </div>
                   </div>
                 );
               }) : (
-                <div className="text-center py-20 opacity-30">
-                  <Activity className="mx-auto mb-4" size={48} />
-                  <p className="text-xs uppercase font-black">No creator logs found</p>
+                <div className="py-32 text-center opacity-20">
+                  <Activity className="mx-auto mb-6" size={64} />
+                  <p className="text-[10px] font-bold uppercase tracking-[0.5em]">No System Records</p>
                 </div>
               )}
             </div>
           </div>
         )}
-
       </main>
+
+      {/* --- FLOATING VAULT TRIGGER BUTTON --- */}
+      <button 
+        onClick={() => setIsSidebarOpen(true)}
+        className={`fixed bottom-10 right-10 z-[50] p-5 rounded-full border backdrop-blur-2xl shadow-2xl transition-all duration-500 hover:rotate-12 group
+          ${isRedMode ? 'bg-red-600/20 border-red-500/50 hover:bg-red-600 shadow-red-500/30' : 'bg-[var(--accent)]/20 border-[var(--accent)]/50 hover:bg-[var(--accent)] shadow-[var(--accent-glow)]'}
+        `}
+      >
+        <Zap className="text-white group-hover:fill-white transition-all" size={28} />
+        {/* Visual Pulse for "Vault available" */}
+        <span className="absolute inset-0 rounded-full animate-ping bg-white/20"></span>
+      </button>
     </div>
   );
 }

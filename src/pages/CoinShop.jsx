@@ -52,7 +52,7 @@ const CoinShopPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 py-10">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 py-4 md:py-10">
       <div className="max-w-4xl mx-auto space-y-10">
         
         {/* HEADER */}
@@ -64,10 +64,10 @@ const CoinShopPage = () => {
             <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-3xl font-black uppercase tracking-tighter">
+            <h1 className="text-3xl  font-semibold   tracking-tighter">
               Coin <span className={accentText}>Treasury</span>
             </h1>
-            <p className="opacity-40 text-[10px] font-bold uppercase tracking-[0.2em]">Fuel your reading experience</p>
+            <p className="opacity-40 text-[10px] font-bold   tracking-[0.2em]">Fuel your reading experience</p>
           </div>
         </div>
 
@@ -80,7 +80,7 @@ const CoinShopPage = () => {
               className={`relative p-8 rounded-[2.5rem] border ${offer.highlight ? `${accentBorder} bg-opacity-5 ${isRedMode ? 'bg-red-500' : 'bg-blue-500'}` : 'border-[var(--border)] bg-[var(--bg-secondary)]'} flex flex-col items-center text-center space-y-4`}
             >
               {offer.highlight && (
-                <span className={`absolute -top-3 px-4 py-1 rounded-full ${accentBg} text-[8px] font-black uppercase tracking-widest text-white shadow-lg`}>
+                <span className={`absolute -top-3 px-4 py-1 rounded-full ${accentBg} text-[8px]  font-semibold   tracking-widest text-white shadow-lg`}>
                   {offer.tag}
                 </span>
               )}
@@ -90,10 +90,10 @@ const CoinShopPage = () => {
               </div>
 
               <div>
-                <h3 className="text-4xl font-black font-mono tracking-tighter">{offer.coins}</h3>
-                <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest">ToonCoins</p>
+                <h3 className="text-4xl  font-semibold font-mono tracking-tighter">{offer.coins}</h3>
+                <p className="text-[10px] font-bold opacity-40   tracking-widest">ToonCoins</p>
                 {offer.bonus > 0 && (
-                  <p className="text-[10px] font-black text-green-500 uppercase mt-1">+{offer.bonus} Bonus Included</p>
+                  <p className="text-[10px]  font-semibold text-green-500   mt-1">+{offer.bonus} Bonus Included</p>
                 )}
               </div>
 
@@ -101,7 +101,7 @@ const CoinShopPage = () => {
                 <button 
                   onClick={() => handleCheckout(offer)}
                   disabled={loadingId === offer.id}
-                  className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 ${
+                  className={`w-full py-4 rounded-2xl  font-semibold   tracking-widest text-xs transition-all flex items-center justify-center gap-2 ${
                     offer.highlight 
                     ? `${accentBg} text-white shadow-xl ${accentShadow}` 
                     : 'bg-[var(--bg-primary)] border border-[var(--border)] hover:border-[var(--text-dim)] shadow-sm'
@@ -122,7 +122,7 @@ const CoinShopPage = () => {
         <div className="flex flex-col items-center justify-center py-10 opacity-30 space-y-4">
            <div className="flex items-center gap-2">
               <ShieldCheck size={16} />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Secure Encrypted Transactions</span>
+              <span className="text-[10px] font-bold   tracking-widest">Secure Encrypted Transactions</span>
            </div>
            <p className="max-w-xs text-center text-[9px] leading-relaxed font-bold">
               Transactions processed by Stripe. Coins are credited to your vault instantly after verification.

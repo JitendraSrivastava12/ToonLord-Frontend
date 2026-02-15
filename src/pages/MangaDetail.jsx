@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Play, Heart, BookOpen, Layers, Eye, Star, 
   ChevronDown, ChevronUp, ShieldAlert, Bookmark, Bell, Lock,
-  ShoppingBag, X, CheckCircle2, Wallet, ArrowRight,Coins, RefreshCw
+  ShoppingBag, X, CheckCircle2, Wallet, ArrowRight, Coins, RefreshCw
 } from "lucide-react";
 import MangaDetailMap from "../components/MangaDetailMap";
 import { AppContext } from "../UserContext";
@@ -32,6 +32,10 @@ const MangaDetail = () => {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   
+  // --- NEW: RATING STATES ---
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+
   // Tracks multiple statuses (e.g., ['Reading', 'Favorite', 'Subscribe'])
   const [activeStatuses, setActiveStatuses] = useState([]); 
 
@@ -75,6 +79,40 @@ const MangaDetail = () => {
       return res.data;
     },
   });
+
+  // --- NEW: Fetch existing user rating on load ---
+  useEffect(() => {
+    const fetchUserRating = async () => {
+      if (!user) return;
+      try {
+        const res = await axios.get(`http://localhost:5000/api/ratings/${mangaId}`, {
+           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        if (res.data) setUserRating(res.data.score);
+      } catch (err) {
+        console.log("No existing rating found");
+      }
+    };
+    fetchUserRating();
+  }, [mangaId, user]);
+
+  // --- NEW: Handle Rating Submission ---
+  const handleRate = async (score) => {
+    const token = localStorage.getItem('token');
+    if (!token) return showAlert("Please Login to Rate", "error");
+
+    try {
+      await axios.post(`http://localhost:5000/api/ratings/rate`, 
+        { mangaId, score }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserRating(score);
+      showAlert(`Rating Updated: ${score} Stars`, "success");
+      queryClient.invalidateQueries(["mangaDetail", mangaId]);
+    } catch (err) {
+      showAlert("Rating failed to sync", "error");
+    }
+  };
 
   // --- ACCESS LOGIC HELPERS ---
   const isUploader = useMemo(() => {
@@ -181,8 +219,8 @@ const MangaDetail = () => {
       <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md text-center space-y-6">
           <ShieldAlert size={50} className="text-red-500 mx-auto animate-pulse" />
-          <h2 className="text-3xl font-black uppercase italic">Content Restricted</h2>
-          <Link to="/home" className="inline-block px-8 py-3 bg-white text-black rounded-2xl font-black uppercase text-[9px]">Back Home</Link>
+          <h2 className="text-3xl font-semibold uppercase  ">Content Restricted</h2>
+          <Link to="/home" className="inline-block px-8 py-3 bg-white text-black rounded-2xl font-semibold uppercase text-[9px]">Back Home</Link>
         </motion.div>
       </div>
     );
@@ -197,10 +235,10 @@ const MangaDetail = () => {
 
   return (
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme}`}>
-      <div className="max-w-5xl mx-auto px-4 py-8 lg:py-10 relative z-10">
+      <div className="max-w-5xl mx-auto px-4  lg:py-10 relative z-10">
         
         {/* HERO CARD */}
-        <section className="relative rounded-3xl p-6 lg:p-12 bg-[var(--bg-secondary)]/20 backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
+        <section className="relative rounded-3xl p-6 lg:p-12 bg-[var(--bg-secondary)] backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
             {/* COVER */}
@@ -212,14 +250,14 @@ const MangaDetail = () => {
             <div className="flex-1 flex flex-col justify-center space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl lg:text-5xl font-black uppercase italic text-[var(--text-main)] leading-none line-clamp-2">
+                  <h1 className="text-3xl lg:text-5xl font-semibold uppercase   text-[var(--text-main)] leading-none line-clamp-2">
                     {manga.title}
                   </h1>
                   {manga.isPremium && (
-                    <span className="bg-yellow-500 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase italic">Premium</span>
+                    <span className="bg-yellow-500 text-black text-[9px] font-semibold px-3 py-1 rounded-full uppercase  ">Premium</span>
                   )}
                 </div>
-                <p className={`text-[10px] font-black uppercase tracking-[0.3em] ${themeStyles.text}`}>
+                <p className={`text-[10px] font-semibold uppercase tracking-[0.3em] ${themeStyles.text}`}>
                   Author: <span className="text-[var(--text-main)]">{manga.author || "Unknown"}</span>
                 </p>
               </div>
@@ -237,7 +275,7 @@ const MangaDetail = () => {
                 <Link 
                   to={chapters.length > 0 ? `/manga/${mangaId}/${chapters[chapters.length - 1]?.chapterNumber}` : "#"} 
                   onClick={() => chapters.length > 0 && syncLibrary('Reading')}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button} ${chapters.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-semibold uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button} ${chapters.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                 >
                   <Play size={18} fill="currentColor" /> 
                   {activeStatuses.includes('Reading') ? 'In Library' : 'Read Now'}
@@ -247,7 +285,7 @@ const MangaDetail = () => {
                 {manga.isPremium && !isOwned && !isUploader && (
                   <button 
                     onClick={() => setIsPurchaseModalOpen(true)}
-                    className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 font-black uppercase tracking-widest text-[9px] hover:scale-105 transition-all"
+                    className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 font-semibold uppercase tracking-widest text-[9px] hover:scale-105 transition-all"
                   >
                     <ShoppingBag size={16} />
                     Unlock Access ({manga.price || 0} Coins)
@@ -257,7 +295,7 @@ const MangaDetail = () => {
                 <button 
                   onClick={() => syncLibrary('Favorite')}
                   disabled={isSyncing}
-                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-black uppercase tracking-widest text-[9px]
+                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
                     ${activeStatuses.includes('Favorite') 
                       ? 'border-red-500 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
                       : 'border-[var(--border)] text-[var(--text-dim)] hover:text-red-500'}`}
@@ -269,7 +307,7 @@ const MangaDetail = () => {
                 <button 
                   onClick={() => syncLibrary('Bookmarks')}
                   disabled={isSyncing}
-                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-black uppercase tracking-widest text-[9px]
+                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
                     ${activeStatuses.includes('Bookmarks') 
                       ? 'border-yellow-500 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
                       : 'border-[var(--border)] text-[var(--text-dim)] hover:text-yellow-500'}`}
@@ -281,7 +319,7 @@ const MangaDetail = () => {
                 <button 
                   onClick={() => syncLibrary('Subscribe')}
                   disabled={isSyncing}
-                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-black uppercase tracking-widest text-[9px]
+                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
                     ${activeStatuses.includes('Subscribe') 
                       ? 'border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
                       : 'border-[var(--border)] text-[var(--text-dim)] hover:text-purple-500'}`}
@@ -292,22 +330,51 @@ const MangaDetail = () => {
 
                 <button 
                   onClick={() => setReportModalOpen(true)}
-                  className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] transition-all shadow font-black uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-red-500 hover:border-red-500/40"
+                  className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] transition-all shadow font-semibold uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-red-500 hover:border-red-500/40"
                 >
                   <ShieldAlert size={16} /> 
                   Report
                 </button>
+              </div>
+
+              {/* LIVE INTERACTIVE RATING MODULE */}
+              <div className="flex flex-col gap-3 p-5 rounded-2xl bg-white/5 border border-white/10 w-fit">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-40">Your Rating</p>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <motion.button
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.8 }}
+                      key={star}
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      onClick={() => handleRate(star)}
+                      className="transition-colors"
+                    >
+                      <Star 
+                        size={24} 
+                        fill={(hoverRating || userRating) >= star ? "#fbbf24" : "none"} 
+                        className={(hoverRating || userRating) >= star ? "text-yellow-400" : "text-[var(--border)]"} 
+                      />
+                    </motion.button>
+                  ))}
+                </div>
+                {userRating > 0 && (
+                  <p className="text-[8px] font-bold text-yellow-500 uppercase tracking-widest">
+                    Last input: {userRating}/5 Stars
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </section>
 
         {/* TABS MODULE */}
-        <div className="mt-10 bg-[var(--bg-secondary)]/15 backdrop-blur-2xl border border-[var(--border)] rounded-3xl overflow-hidden">
+        <div className="mt-10 bg-[var(--bg-secondary)] backdrop-blur-2xl border border-[var(--border)] rounded-3xl overflow-hidden">
           <nav className="flex border-b border-[var(--border)]">
             {["about", "toc", "review"].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-4 text-[9px] font-black uppercase tracking-[0.3em] transition-all
+                className={`flex-1 py-4 text-[9px] font-semibold uppercase tracking-[0.3em] transition-all
                   ${activeTab === tab ? 'bg-[var(--accent)] text-white shadow' : 'text-[var(--text-dim)] hover:bg-white/5'}`}>
                 {tab === "toc" ? "Chapters" : tab === "review" ? "Comments" : "Details"}
               </button>
@@ -317,10 +384,10 @@ const MangaDetail = () => {
             <AnimatePresence mode="wait">
               {activeTab === "about" && (
                 <motion.div key="about-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl space-y-4">
-                  <h2 className="text-xl font-black uppercase italic">Description</h2>
-                  <p className="text-[var(--text-dim)] leading-relaxed text-sm font-medium italic opacity-90">{shortDesc}</p>
+                  <h2 className="text-xl font-semibold uppercase  ">Description</h2>
+                  <p className="text-[var(--text-dim)] leading-relaxed text-sm font-medium   opacity-90">{shortDesc}</p>
                   {manga.description?.length > 280 && (
-                    <button onClick={() => setExpanded(!expanded)} className={`text-[9px] font-black uppercase flex items-center gap-2 ${themeStyles.text}`}>
+                    <button onClick={() => setExpanded(!expanded)} className={`text-[9px] font-semibold uppercase flex items-center gap-2 ${themeStyles.text}`}>
                       {expanded ? <><ChevronUp size={14}/> Less</> : <><ChevronDown size={14}/> More</>}
                     </button>
                   )}
@@ -355,24 +422,23 @@ const MangaDetail = () => {
                           className="group flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-primary)]/50 border border-[var(--border)] hover:border-[var(--accent)]/50 transition-all shadow"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="text-[var(--text-main)] font-black text-sm uppercase">Chapter {ch.chapterNumber}</span>
+                            <span className="text-[var(--text-main)] font-semibold text-sm uppercase">Chapter {ch.chapterNumber}</span>
                             {manga.isPremium && ch.chapterNumber > 3 && !isLocked && !isUploader && (
-                               <span className="text-[7px] font-black bg-green-500/20 text-green-500 px-2 py-0.5 rounded-full border border-green-500/20">OWNED</span>
+                               <span className="text-[7px] font-semibold bg-green-500/20 text-green-500 px-2 py-0.5 rounded-full border border-green-500/20">OWNED</span>
                             )}
                           </div>
                           
-                          {/* Updated Lock Icon View: Standard colors, icon at the end */}
                           <div className="flex items-center gap-2">
                              {isLocked ? (
                                <Lock size={14} className="text-red-500" />
                              ) : (
-                               <span className="text-[8px] font-black uppercase opacity-0 group-hover:opacity-100 transition-all">Read →</span>
+                               <span className="text-[8px] font-semibold uppercase opacity-0 group-hover:opacity-100 transition-all">Read →</span>
                              )}
                           </div>
                         </Link>
                       );
                     }) : (
-                      <p className="text-gray-500 text-xs uppercase font-black tracking-widest p-4">No chapters available yet.</p>
+                      <p className="text-gray-500 text-xs uppercase font-semibold tracking-widest p-4">No chapters available yet.</p>
                     )}
                   </div>
 
@@ -383,7 +449,7 @@ const MangaDetail = () => {
                         <button
                           key={i}
                           onClick={() => setTocPage(i + 1)}
-                          className={`w-10 h-10 rounded-xl font-black text-[10px] transition-all ${
+                          className={`w-10 h-10 rounded-xl font-semibold text-[10px] transition-all ${
                             tocPage === i + 1 
                             ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' 
                             : 'bg-[var(--bg-primary)] border border-[var(--border)] text-[var(--text-dim)] hover:bg-white/5'
@@ -442,37 +508,37 @@ const MangaDetail = () => {
                   <div className={`w-16 h-16 rounded-3xl ${isRedMode ? 'bg-red-500/10' : 'bg-[var(--accent)]/10'} flex items-center justify-center mx-auto`}>
                     <ShoppingBag size={28} className={themeStyles.text} />
                   </div>
-                  <h3 className="text-2xl font-black uppercase italic tracking-tight">Unlock Series</h3>
+                  <h3 className="text-2xl font-semibold uppercase   tracking-tight">Unlock Series</h3>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-dim)] leading-relaxed">
                     Confirm purchase to gain full access to <br/>
-                    <span className="text-[var(--text-main)] italic">"{manga?.title}"</span>
+                    <span className="text-[var(--text-main)]  ">"{manga?.title}"</span>
                   </p>
                 </div>
 
                 {/* Financial Summary */}
                 <div className="space-y-3">
                    <div className="bg-[var(--bg-secondary)]/30 border border-[var(--border)] rounded-2xl p-5 flex justify-between items-center">
-                      <div>
-                        <p className="text-[9px] font-black uppercase text-[var(--text-dim)] mb-1">Item Cost</p>
-                        <div className="flex items-center gap-2">
-                          <Coins size={14} className="text-yellow-500" />
-                          <span className="text-xl font-black">{manga?.price}</span>
-                        </div>
-                      </div>
-                      <ArrowRight size={20} className="text-[var(--border)]" />
-                      <div className="text-right">
-                        <p className="text-[9px] font-black uppercase text-[var(--text-dim)] mb-1">Wallet Balance</p>
-                        <div className="flex items-center gap-2 justify-end">
-                          <span className={`text-xl font-black ${toonCoins < manga?.price ? 'text-red-500' : ''}`}>
-                            {toonCoins}
-                          </span>
-                          <Wallet size={14} className="text-[var(--text-dim)]" />
-                        </div>
-                      </div>
+                     <div>
+                       <p className="text-[9px] font-semibold uppercase text-[var(--text-dim)] mb-1">Item Cost</p>
+                       <div className="flex items-center gap-2">
+                         <Coins size={14} className="text-yellow-500" />
+                         <span className="text-xl font-semibold">{manga?.price}</span>
+                       </div>
+                     </div>
+                     <ArrowRight size={20} className="text-[var(--border)]" />
+                     <div className="text-right">
+                       <p className="text-[9px] font-semibold uppercase text-[var(--text-dim)] mb-1">Wallet Balance</p>
+                       <div className="flex items-center gap-2 justify-end">
+                         <span className={`text-xl font-semibold ${toonCoins < manga?.price ? 'text-red-500' : ''}`}>
+                           {toonCoins}
+                         </span>
+                         <Wallet size={14} className="text-[var(--text-dim)]" />
+                       </div>
+                     </div>
                    </div>
 
                    {toonCoins < manga?.price && (
-                     <p className="text-[9px] font-black text-red-500 uppercase tracking-widest text-center px-4">
+                     <p className="text-[9px] font-semibold text-red-500 uppercase tracking-widest text-center px-4">
                        Insufficient balance. Please recharge your wallet.
                      </p>
                    )}
@@ -483,7 +549,7 @@ const MangaDetail = () => {
                   <button
                     disabled={isSyncing || toonCoins < manga?.price}
                     onClick={handleConfirmPurchase}
-                    className={`w-full py-4 rounded-2xl font-black uppercase tracking-tighter text-[11px] flex items-center justify-center gap-3 transition-all
+                    className={`w-full py-4 rounded-2xl font-semibold uppercase tracking-tighter text-[11px] flex items-center justify-center gap-3 transition-all
                       ${toonCoins < manga?.price 
                         ? 'bg-[var(--border)] text-[var(--text-dim)] cursor-not-allowed' 
                         : 'bg-white text-black hover:scale-[1.02] active:scale-95 shadow-xl'
@@ -498,7 +564,7 @@ const MangaDetail = () => {
                   
                   <button
                     onClick={() => setIsPurchaseModalOpen(false)}
-                    className="w-full py-4 text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)] hover:text-[var(--text-main)] transition-colors"
+                    className="w-full py-4 text-[9px] font-semibold uppercase tracking-widest text-[var(--text-dim)] hover:text-[var(--text-main)] transition-colors"
                   >
                     Not Now
                   </button>
@@ -527,10 +593,10 @@ const MangaDetail = () => {
 
 const StatBox = ({ icon, label, value, color = 'text-[var(--text-main)]', accent = 'text-[var(--text-dim)]' }) => (
   <div className="bg-[var(--bg-primary)]/30 border border-[var(--border)] p-4 rounded-2xl transition-all shadow">
-    <div className={`flex items-center gap-2 mb-2 ${accent} uppercase font-black text-[8px] tracking-[0.2em] opacity-60`}>
+    <div className={`flex items-center gap-2 mb-2 ${accent} uppercase font-semibold text-[8px] tracking-[0.2em] opacity-60`}>
       {icon} {label}
     </div>
-    <p className={`text-sm font-black italic tracking-tight ${color}`}>{value}</p>
+    <p className={`text-sm font-semibold   tracking-tight ${color}`}>{value}</p>
   </div>
 );
 

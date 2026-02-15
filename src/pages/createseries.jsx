@@ -121,12 +121,12 @@ const CreateSeries = () => {
   if (loading) return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4">
       <RefreshCw className="animate-spin text-[var(--accent)]" size={48} />
-      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--text-dim)] animate-pulse">Establishing Secure Uplink</p>
+      <p className="text-[10px]  font-bold   tracking-[0.5em] text-[var(--text-dim)] animate-pulse">Establishing Secure Uplink</p>
     </div>
   );
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme} py-28`}>
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme} py-4`}>
       
       {/* BACKGROUND AMBIENCE */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
@@ -136,17 +136,17 @@ const CreateSeries = () => {
       <div className="relative z-10 max-w-6xl mx-auto p-6 lg:p-12 pb-32">
         
         {/* HEADER */}
-        <header className="flex items-center gap-8 mb-16">
+        <header className="flex items-center gap-8 mb-6">
            <button onClick={() => navigate(-1)} className="p-5 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[2rem] hover:border-[var(--accent)]/50 transition-all group">
               <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
            </button>
            <div className="space-y-2">
-              <h1 className="text-6xl font-black uppercase tracking-tighter italic leading-none">
+              <h1 className="text-4xl  font-bold   tracking-tighter    leading-none">
                 {isEditMode ? "Sync" : "Deploy"} <span style={{ color: accentColor }}>Series</span>
               </h1>
               <div className="flex items-center gap-3">
                 <span className="h-[1px] w-8 bg-[var(--accent)]" />
-                <p className="text-[var(--text-dim)] text-[10px] font-black uppercase tracking-[0.4em]">
+                <p className="text-[var(--text-dim)] text-[10px]  font-bold   tracking-[0.4em]">
                   {isEditMode ? `OBJECT_ID: ${id}` : "INIT_SEQUENCE: CREATOR_UPLINK"}
                 </p>
               </div>
@@ -177,7 +177,7 @@ const CreateSeries = () => {
                   <div className="p-8 bg-[var(--bg-primary)] rounded-[2.5rem] border border-[var(--border)] mb-6 transition-all group-hover:border-[var(--accent)]/50 group-hover:shadow-[0_0_30px_rgba(var(--accent-rgb),0.2)]">
                     <Upload size={40} style={{ color: accentColor }} />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-dim)] group-hover:text-[var(--text-main)] transition-colors">Inject Cover Data</span>
+                  <span className="text-[10px]  font-bold   tracking-[0.3em] text-[var(--text-dim)] group-hover:text-[var(--text-main)] transition-colors">Inject Cover Data</span>
                 </label>
               )}
             </div>
@@ -189,8 +189,8 @@ const CreateSeries = () => {
                     <ShieldAlert size={22} />
                   </div>
                   <div>
-                    <p className="text-[11px] font-black uppercase text-[var(--text-main)] tracking-widest">Adult Protocol</p>
-                    <p className="text-[9px] text-[var(--text-dim)] uppercase font-bold tracking-tighter mt-1">{isAdult ? "Restricted 18+" : "Unrestricted Access"}</p>
+                    <p className="text-[11px]  font-bold   text-[var(--text-main)] tracking-widest">Adult Protocol</p>
+                    <p className="text-[9px] text-[var(--text-dim)]   font-bold tracking-tighter mt-1">{isAdult ? "Restricted 18+" : "Unrestricted Access"}</p>
                   </div>
                 </div>
                 <button 
@@ -214,12 +214,12 @@ const CreateSeries = () => {
           >
             
             <div className="space-y-8">
-              <div className="flex items-center gap-3 text-[var(--text-dim)] text-[11px] font-black uppercase tracking-[0.4em]">
+              <div className="flex items-center gap-3 text-[var(--text-dim)] text-[11px]  font-bold   tracking-[0.4em]">
                 <BookOpen size={16} style={{ color: accentColor }} /> Data Integrity
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Series Title</label>
+                <label className="text-[10px]  font-bold text-[var(--text-dim)]   tracking-[0.2em] ml-2">Series Title</label>
                 <input 
                   required
                   type="text" 
@@ -232,17 +232,17 @@ const CreateSeries = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Architect (Author)</label>
+                  <label className="text-[10px]  font-bold text-[var(--text-dim)]   tracking-[0.2em] ml-2">Architect (Author)</label>
                   <input type="text" value={formData.author} onChange={(e) => setFormData({...formData, author: e.target.value})} className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-8 py-5 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" placeholder="AUTHOR_NAME" />
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Illustrator (Artist)</label>
+                  <label className="text-[10px]  font-bold text-[var(--text-dim)]   tracking-[0.2em] ml-2">Illustrator (Artist)</label>
                   <input type="text" value={formData.artist} onChange={(e) => setFormData({...formData, artist: e.target.value})} className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-8 py-5 text-sm font-bold outline-none focus:border-[var(--accent)] transition-all" placeholder="ARTIST_NAME" />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-[var(--text-dim)] uppercase tracking-[0.2em] ml-2">Story Dossier (Synopsis)</label>
+                <label className="text-[10px]  font-bold text-[var(--text-dim)]   tracking-[0.2em] ml-2">Story Dossier (Synopsis)</label>
                 <textarea 
                   required
                   rows="5"
@@ -256,7 +256,7 @@ const CreateSeries = () => {
 
             {/* TAGS */}
             <div className="space-y-6 pt-10 border-t border-[var(--border)]">
-              <div className="flex items-center gap-3 text-[var(--text-dim)] text-[11px] font-black uppercase tracking-[0.4em]">
+              <div className="flex items-center gap-3 text-[var(--text-dim)] text-[11px]  font-bold   tracking-[0.4em]">
                 <Tag size={16} style={{ color: accentColor }} /> Sector Classification
               </div>
               <div className="flex gap-4">
@@ -276,7 +276,7 @@ const CreateSeries = () => {
                   <motion.span 
                     layout
                     key={tag} 
-                    className="flex items-center gap-3 pl-5 pr-3 py-2.5 bg-[var(--bg-primary)] border border-[var(--border)] text-[9px] font-black uppercase tracking-widest rounded-xl hover:border-[var(--accent)] transition-colors"
+                    className="flex items-center gap-3 pl-5 pr-3 py-2.5 bg-[var(--bg-primary)] border border-[var(--border)] text-[9px]  font-bold   tracking-widest rounded-xl hover:border-[var(--accent)] transition-colors"
                   >
                     {tag} <X size={14} className="cursor-pointer hover:text-red-500 transition-colors" onClick={() => setTags(tags.filter(t => t !== tag))} />
                   </motion.span>
@@ -287,11 +287,11 @@ const CreateSeries = () => {
             <button 
               type="submit" 
               disabled={submitting}
-              className={`group w-full py-6 rounded-2xl font-black uppercase tracking-[0.5em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-4 disabled:opacity-50 active:scale-[0.98] ${glowClass}`}
+              className={`group w-full py-6 rounded-2xl  font-bold   tracking-[0.5em] text-[11px] shadow-2xl transition-all flex items-center justify-center gap-4 disabled:opacity-50 active:scale-[0.98] ${glowClass}`}
               style={{ backgroundColor: accentColor, color: '#fff' }}
             >
               {submitting ? <Loader2 className="animate-spin" size={20} /> : <RocketIcon className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />}
-              {submitting ? "UPLOADING_PROTOCOL..." : isEditMode ? "COMMIT_SYNC" : "DEPLOY_SERIES_PROTOCOL"}
+              {submitting ? "UPLOADING_PROTOCOL..." : isEditMode ? "COMMIT_SYNC" : "DEPLOY SERIES"}
             </button>
           </motion.div>
         </form>

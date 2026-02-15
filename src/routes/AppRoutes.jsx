@@ -35,7 +35,10 @@ import WalletPage from '../pages/Wallet'
 import CoinShopPage from '../pages/CoinShop'
 import PaymentSuccess from '../pages/PaymentSucess'
 import EditChapterPage from '../pages/EditChapter'
-import Profiledummy from '../pages/Profile2'
+import VisitorProfile from '../pages/Profile2'
+import Subscription from '../pages/Subscription'
+import NotFound from '../pages/NotFound'
+import LogsPage from '../AdminPages/LogPage'
 function AppRoutes({ currentTheme, setTheme }) {
   return (
     <Routes>
@@ -48,7 +51,7 @@ function AppRoutes({ currentTheme, setTheme }) {
         <Route path='/home' element={<ToonLordHome />} />
         <Route path='/library' element={<LibraryPage  />} />
         <Route path='/profile' element={<ProfilePage  />} />
-        <Route path='/dummy' element={<Profiledummy/>}/>
+      <Route path="/profile/:id" element={<VisitorProfile/>} />
         <Route path='/browse' element={<BrowsePage  />} />
         <Route path='/upload' element={<UploadPage  />} />
         <Route path='/manga/:mangaId' element={<AdvancedViewPage  />} />
@@ -58,12 +61,13 @@ function AppRoutes({ currentTheme, setTheme }) {
         <Route path='/shop' element={<CoinShopPage  />} />
         
         <Route path="/create-series" element={<CreateSeries  />} />
-        <Route path="/edit-series/:id" element={<CreateSeries  />} />
+      <Route path="/create-series/:id" element={<CreateSeries />} />
         <Route path='/my-series' element={<MySeries  />} />
         <Route path='/settings' element={<Settings/>} />
           <Route path='/dashboard' element={<CreatorDashboard/>} />
           <Route path="/edit-chapter/:mangaId/:chapterId" element={<EditChapterPage/>} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/subscription" element={<Subscription />} />
         
         {/* Optional: You can reuse CoinShopPage for cancels or make a custom one */}
         <Route path="/payment-cancel" element={<CoinShopPage />} />
@@ -85,11 +89,16 @@ function AppRoutes({ currentTheme, setTheme }) {
           <Route index element={<AdminDashboard />} />
           <Route path='/admin/request' element={<AsdminPremiumRequest/>}/>
           <Route path='/admin/reports' element={<ReportsManagement/>}/>
+          
           <Route path='/admin/contracts' element={<ContractManagement/>}/>
           <Route path='/admin/users' element={<UserManagement/>}/>
+           <Route path="/admin/logs" element={<LogsPage />} />
           <Route path='/admin/manga' element={<MangaManagement/>}/>
         </Route>
+        <Route path="*" element={<NotFound />} />
     </Routes>
+    
+    
   )
 }
 

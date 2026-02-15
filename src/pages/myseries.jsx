@@ -31,7 +31,7 @@ const ContractAcceptanceModal = ({ isOpen, manga, onAccept, onDecline, onCancel,
               <ScrollText size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-black text-gray-900 uppercase tracking-tight italic">Monetization Contract</h2>
+              <h2 className="text-lg  font-bold text-gray-900 uppercase tracking-tight italic">Monetization Contract</h2>
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Draft Protocol: {manga?._id?.slice(-8).toUpperCase()}</p>
             </div>
           </div>
@@ -42,12 +42,12 @@ const ContractAcceptanceModal = ({ isOpen, manga, onAccept, onDecline, onCancel,
           {/* Partnership Summary */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-              <p className="text-[9px] font-black uppercase text-blue-600 mb-1 tracking-widest">Asset Valuation</p>
-              <p className="text-2xl font-black text-gray-900 italic">{manga?.pendingPrice} <span className="text-xs text-blue-500 font-bold not-italic">Coins</span></p>
+              <p className="text-[9px]  font-bold uppercase text-blue-600 mb-1 tracking-widest">Asset Valuation</p>
+              <p className="text-2xl  font-bold text-gray-900 italic">{manga?.pendingPrice} <span className="text-xs text-blue-500 font-bold not-italic">Coins</span></p>
             </div>
             <div className="bg-green-50 p-5 rounded-2xl border border-green-100">
-              <p className="text-[9px] font-black uppercase text-green-600 mb-1 tracking-widest">Revenue Split</p>
-              <p className="text-2xl font-black text-gray-900 italic">70% <span className="text-xs text-green-500 font-bold not-italic">Creator</span></p>
+              <p className="text-[9px]  font-bold uppercase text-green-600 mb-1 tracking-widest">Revenue Split</p>
+              <p className="text-2xl  font-bold text-gray-900 italic">70% <span className="text-xs text-green-500 font-bold not-italic">Creator</span></p>
             </div>
           </div>
 
@@ -55,7 +55,7 @@ const ContractAcceptanceModal = ({ isOpen, manga, onAccept, onDecline, onCancel,
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-gray-500">
               <ShieldCheck size={14} />
-              <span className="text-[10px] font-black uppercase tracking-widest">General Terms of Use</span>
+              <span className="text-[10px]  font-bold uppercase tracking-widest">General Terms of Use</span>
             </div>
             <div className="h-32 overflow-y-auto bg-gray-50 rounded-xl p-5 text-[11px] text-gray-600 leading-relaxed border border-gray-100">
               <p className="mb-2">● The Creator grants ToonLord the right to restrict access to <span className="font-bold text-gray-900">"{manga?.title}"</span> behind a paywall.</p>
@@ -76,7 +76,7 @@ const ContractAcceptanceModal = ({ isOpen, manga, onAccept, onDecline, onCancel,
 
           {/* Signature Verification */}
           <div className="space-y-3 border-t border-gray-100 pt-6">
-            <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest px-1">
+            <div className="flex justify-between items-center text-[9px]  font-bold uppercase tracking-widest px-1">
               <span className="text-gray-400 italic">Signature Verification</span>
               {isSigned && <span className="text-green-600 font-bold flex items-center gap-1"><CheckCircle size={10}/> Verified</span>}
             </div>
@@ -95,14 +95,14 @@ const ContractAcceptanceModal = ({ isOpen, manga, onAccept, onDecline, onCancel,
           <div className="flex gap-4 pt-2">
             <button 
               onClick={onDecline} 
-              className="flex-1 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] text-red-500 hover:bg-red-50 transition-all border border-red-100"
+              className="flex-1 py-4 rounded-2xl  font-bold uppercase tracking-widest text-[10px] text-red-500 hover:bg-red-50 transition-all border border-red-100"
             >
               Decline Offer
             </button>
             <button 
               disabled={!isSigned || loading} 
               onClick={onAccept} 
-              className={`flex-[1.5] py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 transition-all
+              className={`flex-[1.5] py-4 rounded-2xl  font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 transition-all
                 ${isSigned ? 'bg-yellow-500 text-black shadow-xl shadow-yellow-200 hover:-translate-y-0.5 active:scale-95' : 'bg-gray-100 text-gray-300 cursor-not-allowed'}
               `}
             >
@@ -127,18 +127,18 @@ const PremiumRequestModal = ({ isOpen, manga, onConfirm, onCancel, loading }) =>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center border border-yellow-500/20 shadow-inner"><Zap className="text-yellow-500" size={36} fill="currentColor" /></div>
             <div className="space-y-1">
-              <h3 className="text-3xl font-black uppercase italic tracking-tighter text-[var(--text-main)]">Premium <span className="text-yellow-500">Uplink</span></h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-dim)]">Protocol: {manga?.title}</p>
+              <h3 className="text-3xl  font-bold uppercase italic tracking-tighter text-[var(--text-main)]">Premium <span className="text-yellow-500">Uplink</span></h3>
+              <p className="text-[10px]  font-bold uppercase tracking-[0.4em] text-[var(--text-dim)]">Protocol: {manga?.title}</p>
             </div>
           </div>
           <div className="bg-[var(--bg-primary)]/60 rounded-[1.5rem] border border-[var(--border)] p-6 space-y-5 shadow-inner text-center">
             <p className="text-[12px] text-[var(--text-dim)] leading-relaxed italic opacity-80">Admin evaluation of performance metrics is required for coin valuation.</p>
             <div className="h-[1px] w-full bg-[var(--border)]" />
-            <div className="flex items-center justify-between"><span className="text-[9px] font-black uppercase text-yellow-500/70 tracking-widest">Attempts Remainder</span><span className="text-[10px] font-bold text-[var(--text-main)] uppercase">{2 - (manga?.premiumRequestCount || 0)} Units</span></div>
+            <div className="flex items-center justify-between"><span className="text-[9px]  font-bold uppercase text-yellow-500/70 tracking-widest">Attempts Remainder</span><span className="text-[10px] font-bold text-[var(--text-main)] uppercase">{2 - (manga?.premiumRequestCount || 0)} Units</span></div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button onClick={onCancel} className="flex-1 order-2 sm:order-1 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] border border-[var(--border)] text-[var(--text-dim)] hover:bg-white/5 transition-all">Abort</button>
-            <button onClick={onConfirm} disabled={loading} className="flex-[1.5] order-1 sm:order-2 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] bg-yellow-500 text-black shadow-lg hover:shadow-yellow-500/20 transition-all flex items-center justify-center gap-3">
+            <button onClick={onCancel} className="flex-1 order-2 sm:order-1 py-4 rounded-2xl  font-bold uppercase tracking-[0.2em] text-[10px] border border-[var(--border)] text-[var(--text-dim)] hover:bg-white/5 transition-all">Abort</button>
+            <button onClick={onConfirm} disabled={loading} className="flex-[1.5] order-1 sm:order-2 py-4 rounded-2xl  font-bold uppercase tracking-[0.2em] text-[10px] bg-yellow-500 text-black shadow-lg hover:shadow-yellow-500/20 transition-all flex items-center justify-center gap-3">
               {loading ? <Loader2 className="animate-spin" size={18} /> : <><CheckCircle size={18} /> Transmit Request</>}
             </button>
           </div>
@@ -157,11 +157,11 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, accentColor
       <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-md bg-[var(--bg-secondary)] border border-[var(--border)] rounded-3xl p-8 shadow-2xl overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: accentColor }} />
         <div className="space-y-6">
-          <div className="flex items-center gap-3 text-red-500"><AlertTriangle size={24} /><h3 className="text-xl font-black uppercase italic tracking-tight">{title}</h3></div>
+          <div className="flex items-center gap-3 text-red-500"><AlertTriangle size={24} /><h3 className="text-xl  font-bold uppercase italic tracking-tight">{title}</h3></div>
           <p className="text-[var(--text-dim)] text-sm font-medium leading-relaxed italic">{message}</p>
           <div className="flex gap-3 pt-4">
-            <button onClick={onCancel} className="flex-1 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] bg-[var(--bg-primary)] border border-[var(--border)] transition-all hover:bg-white/5">Abort</button>
-            <button onClick={onConfirm} className="flex-1 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] text-white transition-all hover:brightness-110 shadow-lg" style={{ backgroundColor: accentColor }}>Confirm Purge</button>
+            <button onClick={onCancel} className="flex-1 py-3 rounded-xl  font-bold uppercase tracking-widest text-[10px] bg-[var(--bg-primary)] border border-[var(--border)] transition-all hover:bg-white/5">Abort</button>
+            <button onClick={onConfirm} className="flex-1 py-3 rounded-xl  font-bold uppercase tracking-widest text-[10px] text-white transition-all hover:brightness-110 shadow-lg" style={{ backgroundColor: accentColor }}>Confirm Purge</button>
           </div>
         </div>
       </motion.div>
@@ -266,19 +266,19 @@ const MySeries = () => {
 
   const filteredSeries = seriesList.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  if (loading) return <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4"><Loader2 className="animate-spin text-[var(--accent)]" size={48} /><p className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--text-dim)]">Syncing Database</p></div>;
+  if (loading) return <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center gap-4"><Loader2 className="animate-spin text-[var(--accent)]" size={48} /><p className="text-[10px]  font-bold uppercase tracking-[0.5em] text-[var(--text-dim)]">Syncing Database</p></div>;
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 md:px-8 lg:px-12 py-10 transition-all duration-700 theme-${currentTheme}`}>
+    <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 md:px-8 lg:px-12 py-2 md:py-10 transition-all duration-700 theme-${currentTheme}`}>
       <div className="fixed top-0 right-0 w-[40%] h-[30%] blur-[120px] opacity-[0.05] rounded-full pointer-events-none" style={{ backgroundColor: accentColor }} />
 
       <div className="relative z-10 max-w-6xl mx-auto space-y-8 md:space-y-12">
         <header className="flex flex-col md:flex-row justify-between items-center gap-6 p-6 md:p-10 rounded-3xl bg-[var(--bg-secondary)]/30 backdrop-blur-2xl border border-[var(--border)]">
           <div className="space-y-2">
-            <h1 className="text-3xl md:text-4xl font-black uppercase italic leading-snug">My <span className={accentText}>Series</span></h1>
-            <p className="text-[var(--text-dim)] text-[9px] font-black uppercase tracking-[0.25em]">Content Management System</p>
+            <h1 className="text-3xl md:text-4xl  font-bold uppercase italic leading-snug">My <span className={accentText}>Series</span></h1>
+            <p className="text-[var(--text-dim)] text-[9px]  font-bold uppercase tracking-[0.25em]">Content Management System</p>
           </div>
-          <Link to="/create-series" className="flex items-center gap-3 px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs text-white bg-[var(--accent)] shadow-lg hover:scale-105 transition-transform shadow-accent/20"><Plus size={18} /> New Series</Link>
+          <Link to="/create-series" className="flex items-center gap-3 px-8 py-4 rounded-xl  font-bold uppercase tracking-widest text-xs text-white bg-[var(--accent)] shadow-lg hover:scale-105 transition-transform shadow-accent/20"><Plus size={18} /> New Series</Link>
         </header>
 
         <div className="flex flex-col md:flex-row gap-4 items-center">
@@ -299,14 +299,14 @@ const MySeries = () => {
                 <div className="flex flex-col md:flex-row gap-8 p-6">
                   <div className="relative w-full md:w-40 h-64 rounded-2xl overflow-hidden shadow-md shrink-0">
                     <img src={series.coverImage} className="w-full h-full object-cover" alt="cover" />
-                    <div className={`absolute bottom-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-xl text-[9px] font-black border border-white/10 ${series.isAdult ? 'text-red-500' : 'text-[var(--accent)]'}`}>{series.isAdult ? '18+' : series.status || 'Active'}</div>
+                    <div className={`absolute bottom-3 left-3 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-xl text-[9px]  font-bold border border-white/10 ${series.isAdult ? 'text-red-500' : 'text-[var(--accent)]'}`}>{series.isAdult ? '18+' : series.status || 'Active'}</div>
                   </div>
 
                   <div className="flex-1 flex flex-col justify-between py-2">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h2 className="text-2xl md:text-3xl font-black italic uppercase tracking-tight group-hover:text-[var(--accent)] transition-colors">{series.title}</h2>
-                        <div className="flex gap-6 text-[var(--text-dim)] text-[9px] font-black uppercase tracking-[0.2em] mt-4">
+                        <h2 className="text-2xl md:text-3xl  font-bold italic uppercase tracking-tight group-hover:text-[var(--accent)] transition-colors">{series.title}</h2>
+                        <div className="flex gap-6 text-[var(--text-dim)] text-[9px]  font-bold uppercase tracking-[0.2em] mt-4">
                           <span className="flex items-center gap-2"><BookOpen size={14}/> {series.TotalChapter || 0} Ch.</span>
                           <span className="flex items-center gap-2"><BarChart size={14}/> {series.views || 0} Views</span>
                         </div>
@@ -314,16 +314,16 @@ const MySeries = () => {
 
                       <div className="flex flex-col items-end gap-2">
                         {series.isPremium ? (
-                          <div className="px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-2"><CheckCircle size={14} /> Premium • {series.price} Coins</div>
+                          <div className="px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-[9px]  font-bold uppercase tracking-widest flex items-center gap-2"><CheckCircle size={14} /> Premium • {series.price} Coins</div>
                         ) : series.premiumRequestStatus === 'contract_offered' ? (
                           <div className="flex flex-col items-end gap-2 p-3 rounded-2xl bg-yellow-500/5 border border-yellow-500/20 shadow-lg shadow-yellow-500/5">
-                             <span className="text-[8px] font-black text-yellow-500 uppercase animate-pulse tracking-[0.1em]">Offer Received</span>
-                             <button onClick={() => setContractModal({ isOpen: true, manga: series })} className="px-4 py-2 bg-yellow-500 text-black text-[9px] font-black uppercase rounded-lg hover:scale-105 transition-all shadow-md">Sign Contract</button>
+                             <span className="text-[8px]  font-bold text-yellow-500 uppercase animate-pulse tracking-[0.1em]">Offer Received</span>
+                             <button onClick={() => setContractModal({ isOpen: true, manga: series })} className="px-4 py-2 bg-yellow-500 text-black text-[9px]  font-bold uppercase rounded-lg hover:scale-105 transition-all shadow-md">Sign Contract</button>
                           </div>
                         ) : (
                           <div className="flex flex-col items-end gap-1">
-                            <button disabled={series.premiumRequestStatus === 'pending' || series.premiumRequestCount >= 2} onClick={() => setPremiumModal({ isOpen: true, manga: series })} className={`px-4 py-2 rounded-xl border text-[9px] font-black uppercase transition-all ${series.premiumRequestStatus === 'pending' ? 'border-[var(--border)] text-[var(--text-dim)]' : 'border-yellow-500/30 text-yellow-500 hover:bg-yellow-500 hover:text-black shadow-lg shadow-yellow-500/5'}`}>{series.premiumRequestStatus === 'pending' ? 'Reviewing Stats...' : 'Go Premium'}</button>
-                            <span className="text-[7px] font-black opacity-30 uppercase tracking-tighter">Attempts: {series.premiumRequestCount || 0}/2</span>
+                            <button disabled={series.premiumRequestStatus === 'pending' || series.premiumRequestCount >= 2} onClick={() => setPremiumModal({ isOpen: true, manga: series })} className={`px-4 py-2 rounded-xl border text-[9px]  font-bold uppercase transition-all ${series.premiumRequestStatus === 'pending' ? 'border-[var(--border)] text-[var(--text-dim)]' : 'border-yellow-500/30 text-yellow-500 hover:bg-yellow-500 hover:text-black shadow-lg shadow-yellow-500/5'}`}>{series.premiumRequestStatus === 'pending' ? 'Reviewing Stats...' : 'Go Premium'}</button>
+                            <span className="text-[7px]  font-bold opacity-30 uppercase tracking-tighter">Attempts: {series.premiumRequestCount || 0}/2</span>
                           </div>
                         )}
                       </div>
@@ -336,7 +336,7 @@ const MySeries = () => {
                     </div>
 
                     <div className="mt-6 pt-4 border-t border-[var(--border)]">
-                      <button onClick={() => { const isExpanding = expandedSeries !== series._id; setExpandedSeries(isExpanding ? series._id : null); if (isExpanding) fetchChaptersForManga(series._id); }} className={`flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.25em] transition-all ${expandedSeries === series._id ? accentText : 'text-[var(--text-dim)]'}`}>{expandedSeries === series._id ? <ChevronUp size={16}/> : <ChevronDown size={16}/>} Manage Chapters</button>
+                      <button onClick={() => { const isExpanding = expandedSeries !== series._id; setExpandedSeries(isExpanding ? series._id : null); if (isExpanding) fetchChaptersForManga(series._id); }} className={`flex items-center gap-3 text-[10px]  font-bold uppercase tracking-[0.25em] transition-all ${expandedSeries === series._id ? accentText : 'text-[var(--text-dim)]'}`}>{expandedSeries === series._id ? <ChevronUp size={16}/> : <ChevronDown size={16}/>} Manage Chapters</button>
                       <AnimatePresence>
                         {expandedSeries === series._id && (
                           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
@@ -384,7 +384,7 @@ const MySeries = () => {
 };
 
 const StatItem = ({ val, label }) => (
-  <div className="text-center group"><p className="text-[var(--text-main)] font-black text-3xl italic tracking-tighter transition-transform group-hover:scale-105">{val}</p><p className="text-[8px] uppercase font-black tracking-[0.2em] text-[var(--text-dim)] mt-1">{label}</p></div>
+  <div className="text-center group"><p className="text-[var(--text-main)]  font-bold text-3xl italic tracking-tighter transition-transform group-hover:scale-105">{val}</p><p className="text-[8px] uppercase  font-bold tracking-[0.2em] text-[var(--text-dim)] mt-1">{label}</p></div>
 );
 
 const ActionButton = ({ to, icon }) => (

@@ -80,8 +80,8 @@ const EditChapterPage = () => {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-2xl font-black uppercase italic">Edit <span className={isRedMode ? 'text-red-500' : 'text-[var(--accent)]'}>Chapter</span></h1>
-            <p className="text-[9px] font-black uppercase tracking-widest text-[var(--text-dim)]">Updating Metadata for ID: {chapterId}</p>
+            <h1 className="text-2xl   font-semibold uppercase   ">Edit <span className={isRedMode ? 'text-red-500' : 'text-[var(--accent)]'}>Chapter</span></h1>
+            <p className="text-[9px]   font-semibold uppercase tracking-widest text-[var(--text-dim)]">Updating Metadata for ID: {chapterId}</p>
           </div>
         </div>
 
@@ -89,7 +89,7 @@ const EditChapterPage = () => {
         <form onSubmit={handleUpdate} className="p-8 rounded-3xl bg-[var(--bg-secondary)]/30 border border-[var(--border)] backdrop-blur-xl space-y-6">
           
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[var(--text-dim)]">Chapter Number</label>
+            <label className="text-[10px]   font-semibold uppercase tracking-widest text-[var(--text-dim)]">Chapter Number</label>
             <input 
               type="number" 
               required
@@ -100,7 +100,7 @@ const EditChapterPage = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[var(--text-dim)]">Chapter Title (Optional)</label>
+            <label className="text-[10px]   font-semibold uppercase tracking-widest text-[var(--text-dim)]">Chapter Title (Optional)</label>
             <input 
               type="text" 
               placeholder="e.g. The Beginning of the End"
@@ -113,7 +113,7 @@ const EditChapterPage = () => {
           <button 
             type="submit" 
             disabled={updating}
-            className="w-full py-4 rounded-xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            className="w-full py-4 rounded-xl   font-semibold uppercase tracking-widest text-sm flex items-center justify-center gap-3 text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
             style={{ backgroundColor: accentColor }}
           >
             {updating ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
@@ -123,8 +123,8 @@ const EditChapterPage = () => {
 
         {/* Warning Zone */}
         <div className="p-6 rounded-2xl border border-red-500/20 bg-red-500/5">
-           <p className="text-[9px] font-black uppercase text-red-500 tracking-tighter mb-1">System Warning</p>
-           <p className="text-[11px] text-[var(--text-dim)] italic">Changing chapter numbers may disrupt the reading sequence for your subscribers. Proceed with caution.</p>
+           <p className="text-[9px]   font-semibold uppercase text-red-500 tracking-tighter mb-1">System Warning</p>
+           <p className="text-[11px] text-[var(--text-dim)]   ">Changing chapter numbers may disrupt the reading sequence for your subscribers. Proceed with caution.</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react"; // Added useEffect
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -8,13 +8,13 @@ import {
 import mangaCoverPlaceholder from "../assets/Background/LoginBackground.png";
 import { AppContext } from "../UserContext"; 
 import { useAlert } from "../context/AlertContext";
-
+const API_URL = import.meta.env.VITE_API_URL;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const AuthScreen = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
   const [resetStep, setResetStep] = useState(1); 
-  // State to handle the Two-Step Signup process
   const [signupStep, setSignupStep] = useState(1); 
   
   const navigate = useNavigate();
@@ -29,18 +29,52 @@ const AuthScreen = () => {
     otp: "",
   });
 
+  /* ---------------- GOOGLE AUTH LOGIC ---------------- */
+  useEffect(() => {
+    /* global google */
+    if (window.google) {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID, // REPLACE THIS
+        callback: handleGoogleResponse,
+      });
+    }
+  }, []);
+
+  const handleGoogleResponse = async (response) => {
+    try {
+      const res = await axios.post(`${API_URL}/api/users/google-login`, {
+        idToken: response.credential,
+      });
+
+      if (res.data.token) {
+        login(res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        showAlert("Logged in successfully via Google!", "success");
+        navigate("/");
+      }
+    } catch (err) {
+      showAlert(err.response?.data?.message || "Google Authentication failed", "error");
+    }
+  };
+
+  const triggerGoogleLogin = () => {
+    if (window.google) {
+      google.accounts.id.prompt(); // Shows the One Tap UI and allows the button to work
+    } else {
+      showAlert("Google Service not loaded yet. Please refresh.", "error");
+    }
+  };
+  /* ---------------- END GOOGLE LOGIC ---------------- */
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // HANDLER FOR LOGIN / SIGNUP
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // 1. LOGIN LOGIC
     if (isLogin) {
       try {
-        const res = await axios.post("http://localhost:5000/api/users/login", {
+        const res = await axios.post(`${API_URL}/api/users/login`, {
           email: formData.email,
           password: formData.password
         });
@@ -56,19 +90,16 @@ const AuthScreen = () => {
       return;
     }
 
-    // 2. SIGNUP LOGIC (Two Steps)
     try {
       if (signupStep === 1) {
-        // Step 1: Request Signup OTP
-        await axios.post("http://localhost:5000/api/users/request-signup-otp", {
+        await axios.post(`${API_URL}/api/users/request-signup-otp`, {
           email: formData.email,
           username: formData.name
         });
         showAlert("Verification code sent to email!", "success");
         setSignupStep(2);
       } else {
-        // Step 2: Finalize Signup
-        const res = await axios.post("http://localhost:5000/api/users/signup", {
+        const res = await axios.post(`${API_URL}/api/users/signup`, {
           username: formData.name,
           mobile: formData.mobile,
           email: formData.email,
@@ -87,16 +118,15 @@ const AuthScreen = () => {
     }
   };
 
-  // HANDLER FOR PASSWORD RESET
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
       if (resetStep === 1) {
-        await axios.post("http://localhost:5000/api/users/forgot-password", { email: formData.email });
+        await axios.post(`${API_URL}/api/users/forgot-password`, { email: formData.email });
         showAlert("OTP sent to your email", "success");
         setResetStep(2);
       } else {
-        await axios.post("http://localhost:5000/api/users/reset-password", { 
+        await axios.post(`${API_URL}/api/users/reset-password`, { 
           email: formData.email, 
           otp: formData.otp, 
           newPassword: formData.password 
@@ -170,17 +200,14 @@ const AuthScreen = () => {
                   </div>
                 )}
                 
-                {/* Email field remains visible for Login and Signup Step 1 */}
                 {(isLogin || signupStep === 1) && (
                   <FloatingInput icon={<Mail size={18} />} label="Email" type="email" name="email" value={formData.email} onChange={handleChange} />
                 )}
 
-                {/* OTP Field for Signup Step 2 */}
                 {!isLogin && signupStep === 2 && (
                   <FloatingInput icon={<KeyRound size={18} />} label="Enter OTP" type="text" name="otp" value={formData.otp} onChange={handleChange} />
                 )}
 
-                {/* Password field shown in Login and Signup Step 1 */}
                 {(isLogin || signupStep === 1) && (
                   <div className="relative">
                     <FloatingInput icon={<Lock size={18} />} label="Password" type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange} />
@@ -235,7 +262,7 @@ const AuthScreen = () => {
 
           <div className="mt-10">
             <div className="flex flex-col sm:flex-row gap-4">
-              <SocialButton icon={<Chrome size={20} />} label="Google" />
+              <SocialButton onClick={triggerGoogleLogin} icon={<Chrome size={20} />} label="Google" />
               <SocialButton icon={<Github size={20} />} label="GitHub" />
             </div>
           </div>
@@ -245,7 +272,6 @@ const AuthScreen = () => {
   );
 };
 
-// INPUT COMPONENTS
 const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
   <div className="relative group w-full">
     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors peer-focus:text-red-600">
@@ -265,8 +291,12 @@ const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
   </div>
 );
 
-const SocialButton = ({ icon, label }) => (
-  <button className="flex-1 flex items-center justify-center gap-3 py-3.5 bg-white/[0.05] border border-white/10 rounded-2xl text-[10px] font-black uppercase hover:bg-white/10 transition-all">
+const SocialButton = ({ icon, label, onClick }) => (
+  <button 
+    type="button" 
+    onClick={onClick}
+    className="flex-1 flex items-center justify-center gap-3 py-3.5 bg-white/[0.05] border border-white/10 rounded-2xl text-[10px] font-black uppercase hover:bg-white/10 transition-all"
+  >
     {icon} <span>{label}</span>
   </button>
 );

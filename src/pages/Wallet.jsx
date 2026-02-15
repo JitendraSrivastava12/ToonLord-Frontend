@@ -19,18 +19,18 @@ const WalletPage = () => {
   const transactions = user?.transactions || [];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 md:px-12 py-10">
-      <div className="max-w-4xl mx-auto space-y-10">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] px-4 md:px-12 py-4 md:py-6">
+      <div className="max-w-5xl mx-auto space-y-10">
         
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-black uppercase tracking-tighter">Wallet</h1>
-            <p className="opacity-40 text-[11px] font-bold uppercase tracking-widest mt-2">
-              Account Balance & Activity
+            <h1 className="text-3xl font-bold tracking-tight">Wallet</h1>
+            <p className="text-sm text-[var(--text-dim)] mt-1">
+              View your balance and recent activity
             </p>
           </div>
-          <WalletIcon size={34} className={accentText} />
+          <WalletIcon size={32} className={accentText} />
         </div>
 
         {/* BALANCES */}
@@ -40,44 +40,46 @@ const WalletPage = () => {
             amount={toonCoins} 
             icon={<Coins size={22}/>} 
             color="yellow" 
+            description="Used for in-app purchases"
           />
 
           {user?.role === 'author' && (
             <BalanceCard 
-              label="Withdrawable Earnings" 
+              label="Available Earnings" 
               amount={withdrawable} 
               icon={<TrendingUp size={22}/>} 
               color="green" 
               isMoney 
+              description="Eligible for withdrawal"
             />
           )}
         </div>
 
         {/* QUICK ACTIONS */}
         <div className="grid grid-cols-2 gap-4">
-          <button className="flex items-center justify-center gap-3 p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] hover:border-yellow-500/40 transition-all">
+          <button className="flex items-center justify-center gap-3 p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] hover:border-yellow-500/40 transition">
             <PlayCircle size={18} className="text-yellow-500" />
-            <span className="text-[11px] font-black uppercase tracking-widest">
-              Watch Ad (+5 Coins)
+            <span className="text-sm font-semibold">
+              Watch Ad & Earn Coins
             </span>
           </button>
 
           <button 
-            className={`flex items-center justify-center gap-3 p-4 rounded-2xl ${accentBg} text-white shadow-lg hover:scale-[1.02] transition-all`}
+            className={`flex items-center justify-center gap-3 p-4 rounded-xl ${accentBg} text-white shadow hover:scale-[1.02] transition`}
             onClick={() => navigate('/shop')}
           >
             <PlusCircle size={18} />
-            <span className="text-[11px] font-black uppercase tracking-widest">
-              Buy Coins
+            <span className="text-sm font-semibold">
+              Purchase Coins
             </span>
           </button>
         </div>
 
         {/* TRANSACTIONS */}
-        <div className="p-8 bg-[var(--bg-secondary)] rounded-[3rem] border border-[var(--border)]">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-xl font-black uppercase tracking-tighter">Transaction History</h2>
-            <History size={20} className="opacity-20" />
+        <div className="p-8 bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border)]">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-semibold">Transaction History</h2>
+            <History size={18} className="opacity-30" />
           </div>
 
           <div className="space-y-3">
@@ -88,38 +90,38 @@ const WalletPage = () => {
               return (
                 <motion.div 
                   key={i}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="flex items-center justify-between p-5 bg-[var(--bg-primary)] rounded-2xl border border-[var(--border)] hover:border-[var(--text-dim)] transition-all"
+                  transition={{ delay: i * 0.03 }}
+                  className="flex items-center justify-between p-4 bg-[var(--bg-primary)] rounded-xl border border-[var(--border)] hover:border-[var(--text-dim)] transition"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl ${isIn ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                      {isIn ? <ArrowDownLeft size={18}/> : <ArrowUpRight size={18}/>}
+                    <div className={`p-2 rounded-lg ${isIn ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                      {isIn ? <ArrowDownLeft size={16}/> : <ArrowUpRight size={16}/>}
                     </div>
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-tight">
+                      <p className="text-sm font-medium capitalize">
                         {tx.type?.replace(/_/g, ' ') || 'Transaction'}
                       </p>
-                      <p className="text-[9px] opacity-40 font-mono">
-                        {new Date(tx.createdAt).toLocaleDateString()} • {new Date(tx.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      <p className="text-xs text-[var(--text-dim)]">
+                        {new Date(tx.createdAt).toLocaleString()}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <p className={`text-sm font-black font-mono ${isIn ? 'text-green-500' : 'text-red-500'}`}>
-                      {isIn ? '+' : '-'}{amount}
+                    <p className={`text-sm font-bold ${isIn ? 'text-green-500' : 'text-red-500'}`}>
+                      {isIn ? '+' : '-'}{amount.toLocaleString()}
                     </p>
-                    <p className="text-[8px] opacity-40 uppercase font-black tracking-widest">
+                    <p className="text-xs text-[var(--text-dim)]">
                       {tx.currency === 'toonCoins' ? 'TC' : tx.currency}
                     </p>
                   </div>
                 </motion.div>
               );
             }) : (
-              <div className="py-20 text-center opacity-20 text-[10px] font-black uppercase tracking-[0.3em]">
-                No transactions yet
+              <div className="py-16 text-center text-sm text-[var(--text-dim)]">
+                No transactions available
               </div>
             )}
           </div>
@@ -131,34 +133,39 @@ const WalletPage = () => {
 };
 
 /* BALANCE CARD */
-const BalanceCard = ({ label, amount, icon, color, isMoney }) => {
+const BalanceCard = ({ label, amount, icon, color, isMoney, description }) => {
   const formatted = isMoney
-    ? `₹${Number(amount).toFixed(2)}`
+    ? `₹${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`
     : Number(amount).toLocaleString();
 
   return (
-    <div className="p-8 rounded-[2.5rem] bg-[var(--bg-secondary)] border border-[var(--border)] flex flex-col justify-between h-40 relative overflow-hidden group">
+    <div className="p-6 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border)] flex flex-col justify-between h-40 relative overflow-hidden">
       
-      <div className={`absolute -right-4 -bottom-4 p-12 opacity-[0.03] transition-transform group-hover:scale-110 group-hover:-rotate-12 text-${color}-500`}>
+      <div className={`absolute -right-4 -bottom-4 p-12 opacity-[0.03] text-${color}-500`}>
         {icon}
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg bg-${color}-500/10 text-${color}-500`}>
           {icon}
         </div>
-        <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-50">
-          {label}
-        </p>
+        <div>
+          <p className="text-sm font-semibold">
+            {label}
+          </p>
+          <p className="text-xs text-[var(--text-dim)]">
+            {description}
+          </p>
+        </div>
       </div>
 
       <div>
-        <p className="text-4xl font-black font-mono tracking-tighter">
+        <p className="text-3xl font-bold font-mono">
           {formatted}
         </p>
         {isMoney && (
-          <p className="text-[8px] font-bold uppercase opacity-30 mt-1">
-            Available for withdrawal
+          <p className="text-xs text-[var(--text-dim)] mt-1">
+            Ready for withdrawal
           </p>
         )}
       </div>

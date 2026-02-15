@@ -44,21 +44,21 @@ const ToonLordHome = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <div className="w-8 h-8 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs tracking-widest text-[var(--text-dim)] uppercase">
-          Loading
+        <p className="text-xs tracking-wide text-[var(--text-dim)]">
+          Loading content
         </p>
       </div>
     );
 
   return (
     <div className={`min-h-screen pb-20 theme-${currentTheme}`}>
-      {/* HERO SPOTLIGHT */}
+      {/* HERO FEATURED */}
       {processedData.spotlight && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-1 md:pt-8 pb-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative rounded-[2.5rem] bg-[var(--bg-secondary)]/30 backdrop-blur-2xl border border-[var(--border)] shadow-xl flex flex-col lg:flex-row items-center overflow-hidden min-h-[360px] sm:min-h-[420px]"
+            className="relative rounded-[2.5rem] bg-[var(--bg-secondary)]/30 backdrop-blur-xl border border-[var(--border)] shadow-lg flex flex-col lg:flex-row items-center overflow-hidden min-h-[360px] sm:min-h-[420px]"
           >
             {/* BACKGROUND BLUR */}
             <div className="absolute inset-0 opacity-10">
@@ -72,15 +72,15 @@ const ToonLordHome = () => {
             {/* TEXT */}
             <div className="relative z-10 flex-1 p-6 sm:p-10 lg:p-14 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-[var(--bg-primary)] shadow">
-                  <FaCrown className="text-yellow-500 text-lg" />
+                <div className="p-2 rounded-lg bg-[var(--bg-primary)] shadow-sm">
+                  <FaCrown className="text-[var(--accent)] text-lg" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-widest text-[var(--text-dim)]">
-                  Spotlight
+                <span className="text-xs tracking-wide text-[var(--text-dim)]">
+                  Featured series
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight line-clamp-3">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight line-clamp-3">
                 {processedData.spotlight.title}
               </h1>
 
@@ -92,13 +92,13 @@ const ToonLordHome = () => {
               <div className="flex flex-wrap gap-4 pt-2">
                 <Link
                   to={`/manga/${processedData.spotlight._id}`}
-                  className="px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-semibold hover:scale-105 transition"
+                  className="px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-medium hover:opacity-90 transition"
                 >
-                  Read Now
+                  Read series
                 </Link>
 
                 <span className="px-5 py-3 rounded-xl border border-[var(--border)] text-sm text-[var(--text-dim)]">
-                  Trending
+                  Popular this week
                 </span>
               </div>
             </div>
@@ -106,8 +106,8 @@ const ToonLordHome = () => {
             {/* IMAGE */}
             <div className="relative z-10 hidden lg:block p-8">
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="w-60 h-[340px] rounded-[2rem] overflow-hidden shadow-xl border border-white/10"
+                whileHover={{ scale: 1.03 }}
+                className="w-60 h-[340px] rounded-[2rem] overflow-hidden shadow-lg border border-white/10"
               >
                 <img
                   src={processedData.spotlight.coverImage}
@@ -123,17 +123,17 @@ const ToonLordHome = () => {
       {/* SECTIONS */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-14">
         <ArchiveSection
-          title="Latest Updates"
+          title="Recently updated"
           icon={<ClockIcon className="w-5 h-5" />}
           mangas={processedData.latest}
-          badge="New"
+          badge="Updated"
         />
 
         <ArchiveSection
-          title="Trending Now"
+          title="Most read"
           icon={<FireIcon className="w-5 h-5" />}
           mangas={processedData.trending}
-          badge="Hot"
+          badge="Popular"
         />
       </div>
     </div>
@@ -150,7 +150,7 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
         <h2 className="text-xl sm:text-2xl font-semibold">{title}</h2>
       </div>
       <button className="text-sm text-[var(--text-dim)] hover:text-[var(--text-main)] transition">
-        View all →
+        View all
       </button>
     </header>
 
@@ -164,17 +164,15 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
           viewport={{ once: true }}
         >
           <Link to={`/manga/${manga._id}`} className="group block">
-            <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] transition group-hover:shadow-lg group-hover:-translate-y-1">
+            <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] transition group-hover:shadow-md group-hover:-translate-y-0.5">
               <img
                 src={manga.coverImage}
                 alt=""
-                className="w-full h-full object-cover group-hover:scale-105 transition"
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition"
               />
 
               <span
-                className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold text-white ${
-                  badge === "Hot" ? "bg-orange-500" : "bg-blue-500"
-                }`}
+                className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-medium text-white bg-[var(--accent)]/80"
               >
                 {badge}
               </span>
@@ -185,8 +183,8 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
                 {manga.title}
               </h3>
               <div className="flex items-center justify-between text-xs text-[var(--text-dim)]">
-                <div className="flex items-center gap-1 text-yellow-500">
-                  <StarIcon className="w-3 h-3" />
+                <div className="flex items-center gap-1">
+                  <StarIcon className="w-3 h-3 text-yellow-500" />
                   <span>{manga.rating || "4.8"}</span>
                 </div>
                 <span>{manga.TotalChapter || 0} ch</span>

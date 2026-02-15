@@ -5,12 +5,14 @@ import {
   Zap, Activity, Clock, BookOpen, 
   Phone, Link as LinkIcon,
   CheckCircle2, ChevronRight, X, ScrollText, MessageSquare, Heart,
-  Star, History, ShieldCheck, AlertTriangle, FileUp, Trash2, Plus, Cpu, Scale, Fingerprint, Users
+  Star, History, ShieldCheck, AlertTriangle, FileUp, Trash2, Plus, Cpu, Scale, Fingerprint, Users, UserPlus, Globe, Trophy, Search, Crown
 } from 'lucide-react';
 import axios from 'axios';
 import { AppContext } from "../UserContext";
+import { useNavigate } from 'react-router-dom';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { isRedMode, currentTheme, user, setUser } = useContext(AppContext);
   const [activeTab, setActiveTab] = useState('Overview');
   const [isEditing, setIsEditing] = useState(false);
@@ -21,17 +23,25 @@ const ProfilePage = () => {
   const [myMangas, setMyMangas] = useState([]);
   const [myComments, setMyComments] = useState([]);
   const [myReports, setMyReports] = useState([]);
+  const [followersList, setFollowersList] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
   
+  // --- NEW: Live Search State ---
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Loading States
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [reportsLoading, setReportsLoading] = useState(false);
+  const [connectionsLoading, setConnectionsLoading] = useState(false);
 
   // --- View More Pagination State ---
   const [visibleCounts, setVisibleCounts] = useState({
     activity: 3,
-    mangas: 3,
+    mangas: 6,
     comments: 3,
-    reports: 3
+    reports: 3,
+    followers: 8,
+    following: 8
   });
   const INCREMENT = 5;
 
@@ -79,6 +89,37 @@ const ProfilePage = () => {
     };
     initProfile();
   }, [setUser, API_URL]);
+
+  // --- NEW: Fetch Connections logic (Followers/Following) ---
+  useEffect(() => {
+    const fetchConnections = async () => {
+      if (activeTab !== 'Followers' && activeTab !== 'Following') return;
+      setConnectionsLoading(true);
+      setSearchQuery(""); // Clear search on tab switch
+      try {
+        const token = localStorage.getItem('token');
+        const type = activeTab.toLowerCase(); 
+        const res = await axios.get(`${API_URL}/api/users/me/${type}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (activeTab === 'Followers') setFollowersList(res.data);
+        else setFollowingList(res.data);
+      } catch (err) {
+        console.error("Error fetching connections", err);
+      } finally {
+        setConnectionsLoading(false);
+      }
+    };
+    fetchConnections();
+  }, [activeTab, API_URL]);
+
+  // --- NEW: Live Search Filtering Logic ---
+  const filteredFollowers = followersList.filter(u => 
+    u.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const filteredFollowing = followingList.filter(u => 
+    u.username?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Fetch Comments logic
   useEffect(() => {
@@ -201,20 +242,44 @@ const ProfilePage = () => {
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pb-20 font-sans selection:bg-emerald-500/30 theme-${currentTheme}`}>
       
       {/* 1. HEADER SECTION */}
-      <div className="max-w-7xl mx-auto px-6 pt-10">
+      <div className="max-w-7xl mx-auto px-6 md:pt-10">
         <div className={`${theme.card} rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center gap-8 border ${theme.dynamicBorder}`}>
-          <div className="relative group">
-            <img 
-              src={form.preview || '/default.png'} 
-              alt="Profile"
-              className={`w-28 h-28 rounded-full border-4 ${isRedMode ? 'border-red-500/20' : 'border-emerald-500/20'} object-cover shadow-2xl transition-all group-hover:${theme.accentBorder}`} 
-            />
-            <button 
-              onClick={() => fileInputRef.current.click()}
-              className={`absolute bottom-0 right-0 p-2 bg-[var(--card-bg)] border ${theme.dynamicBorder} rounded-full text-[var(--text-main)] hover:${theme.text} transition-all shadow-lg`}
-            >
-              <Camera size={14} />
-            </button>
+          
+          {/* PROFILE IMAGE WITH VIP LOGIC */}
+          <div className="relative group flex items-center justify-center">
+            {user?.vipStatus?.isVip ? (
+              /* VIP PREMIUM BORDER */
+              <div className="p-1 rounded-full bg-gradient-to-tr from-amber-400 via-amber-600 to-amber-300 shadow-[0_0_30px_rgba(217,119,6,0.15)]">
+                <div className="bg-[var(--card-bg)] p-1 rounded-full">
+                  <img 
+                    src={form.preview || '/default.png'} 
+                    alt="Profile"
+                    className="w-28 h-28 rounded-full object-cover shadow-2xl transition-all" 
+                  />
+                </div>
+                {/* LARGE VIP CROWN BADGE */}
+                <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-1.5 border-4 border-[var(--card-bg)] z-10 shadow-xl">
+                  <Crown size={16} className="text-white fill-white" />
+                </div>
+              </div>
+            ) : (
+              /* STANDARD BORDER */
+              <>
+                <img 
+                  src={form.preview || '/default.png'} 
+                  alt="Profile"
+                  className={`w-28 h-28 rounded-full border-4 ${isRedMode ? 'border-red-500/20' : 'border-emerald-500/20'} object-cover shadow-2xl transition-all group-hover:${theme.accentBorder}`} 
+                />
+                <button 
+                  onClick={() => fileInputRef.current.click()}
+                  className={`absolute bottom-0 right-0 p-2 bg-[var(--card-bg)] border ${theme.dynamicBorder} rounded-full text-[var(--text-main)] hover:${theme.text} transition-all shadow-lg`}
+                >
+                  <Camera size={14} />
+                </button>
+              </>
+            )}
+
+            {/* Hidden Input */}
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -229,16 +294,21 @@ const ProfilePage = () => {
               <span className={`px-2 py-0.5 ${isRedMode ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'} text-[10px] font-bold uppercase rounded border`}>
                 {user?.role || 'Reader'}
               </span>
+              {user?.vipStatus?.isVip && (
+                <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px]  font-bold uppercase rounded border tracking-widest">
+                  VIP_{user.vipStatus.plan}
+                </span>
+              )}
             </div>
             
             {/* FOLLOWER STATS */}
             <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-4">
-               <div className="flex flex-col">
-                  <span className={`text-lg font-black font-mono leading-none ${theme.text}`}>1.4k</span>
+               <div className="flex flex-col cursor-pointer hover:opacity-70 transition-opacity" onClick={() => setActiveTab('Followers')}>
+                  <span className={`text-lg  font-bold font-mono leading-none ${theme.text}`}>{user?.followers?.length || 0}</span>
                   <span className="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-widest">Followers</span>
                </div>
-               <div className="flex flex-col">
-                  <span className={`text-lg font-black font-mono leading-none ${theme.text}`}>284</span>
+               <div className="flex flex-col cursor-pointer hover:opacity-70 transition-opacity" onClick={() => setActiveTab('Following')}>
+                  <span className={`text-lg  font-bold font-mono leading-none ${theme.text}`}>{user?.following?.length || 0}</span>
                   <span className="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-widest">Following</span>
                </div>
             </div>
@@ -261,11 +331,11 @@ const ProfilePage = () => {
 
         {/* TABS */}
         <div className={`flex gap-8 mt-8 border-b ${theme.dynamicBorder} px-4 overflow-x-auto no-scrollbar`}>
-          {['Overview', 'Followers', 'Following', 'Upload List', 'Comments', 'Reports', 'Settings'].map(tab => (
+          {['Overview', 'Followers', 'Following', 'Upload List', 'Comments', 'Reports'].map(tab => (
             <button 
               key={tab} 
               onClick={() => {setActiveTab(tab); setIsEditing(false);}}
-              className={`pb-4 text-[11px] font-black uppercase tracking-[0.2em] transition-all relative whitespace-nowrap ${activeTab === tab ? theme.text : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
+              className={`pb-4 text-[11px]  font-bold uppercase tracking-[0.2em] transition-all relative whitespace-nowrap ${activeTab === tab ? theme.text : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'}`}
             >
               {tab}
               {activeTab === tab && <motion.div layoutId="line" className={`absolute bottom-0 left-0 right-0 h-0.5 ${theme.primary}`} />}
@@ -289,7 +359,7 @@ const ProfilePage = () => {
                   <Input label="Phone" value={form.mobile} onChange={v => setForm({...form, mobile: v})} />
                   <Input label="Email Address" value={user?.email} disabled />
                   <div className="md:col-span-2">
-                    <label className="text-[10px] font-black text-[var(--text-muted)] uppercase mb-2 block ml-1">Biography</label>
+                    <label className="text-[10px]  font-bold text-[var(--text-muted)] uppercase mb-2 block ml-1">Biography</label>
                     <textarea 
                       value={form.bio} 
                       onChange={e => setForm({...form, bio: e.target.value})} 
@@ -313,13 +383,13 @@ const ProfilePage = () => {
                     <div className={`${theme.card} rounded-3xl p-8 border ${theme.dynamicBorder}`}>
                       <div className="flex justify-between items-center mb-8">
                         <h3 className="text-lg font-bold uppercase tracking-tight">Personal Details</h3>
-                        <button onClick={() => setIsEditing(true)} className={`text-[10px] font-black uppercase tracking-widest ${theme.text} hover:opacity-80`}>Update Info</button>
+                        <button onClick={() => setIsEditing(true)} className={`text-[10px]  font-bold uppercase tracking-widest ${theme.text} hover:opacity-80`}>Update Info</button>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                         <DetailItem label="Email Address" value={user?.email || 'Not provided'} isVerified />
                         <DetailItem label="Phone" value={user?.mobile || 'Not provided'} />
                         <div className="md:col-span-2">
-                          <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-2">Bio</p>
+                          <p className="text-[10px]  font-bold text-[var(--text-muted)] uppercase tracking-widest mb-2">Bio</p>
                           <p className="text-sm text-[var(--text-main)] leading-relaxed italic opacity-80">
                             {user?.bio ? `"${user.bio}"` : "History purged or not yet established."}
                           </p>
@@ -335,7 +405,7 @@ const ProfilePage = () => {
                           </div>
                           <h3 className="text-lg font-bold uppercase tracking-tight">Real-time Activity</h3>
                         </div>
-                        <span className="text-[10px] font-black opacity-30 tracking-[0.4em]">LIVE_FEED</span>
+                        <span className="text-[10px]  font-bold opacity-30 tracking-[0.4em]">LIVE_FEED</span>
                       </div>
                       <motion.div layout className="space-y-2">
                         {filteredLogs.length > 0 ? (
@@ -346,7 +416,7 @@ const ProfilePage = () => {
                             {filteredLogs.length > visibleCounts.activity && (
                               <button 
                                 onClick={() => handleViewMore('activity')}
-                                className={`w-full py-3 mt-4 text-[10px] font-black uppercase tracking-widest border border-dashed ${theme.dynamicBorder} rounded-xl hover:bg-[var(--text-main)]/[0.02] transition-all opacity-60 hover:opacity-100 flex items-center justify-center gap-2`}
+                                className={`w-full py-3 mt-4 text-[10px]  font-bold uppercase tracking-widest border border-dashed ${theme.dynamicBorder} rounded-xl hover:bg-[var(--text-main)]/[0.02] transition-all opacity-60 hover:opacity-100 flex items-center justify-center gap-2`}
                               >
                                 <Plus size={12} /> Load older activities
                               </button>
@@ -366,20 +436,37 @@ const ProfilePage = () => {
                   </motion.div>
                 )}
 
-                {/* EMPTY FOLLOWER TABS */}
-                {activeTab === 'Followers' && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${theme.card} rounded-3xl p-20 border ${theme.dynamicBorder} text-center`}>
-                    <Users className="mx-auto text-[var(--text-muted)] opacity-20 mb-4" size={48} />
-                    <p className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest">Nodes Empty</p>
-                    <p className="text-xs text-[var(--text-muted)] opacity-60 mt-2">No users currently tracking your broadcast signal.</p>
-                  </motion.div>
-                )}
+                {/* Followers/Following TABS with SEARCH */}
+                {(activeTab === 'Followers' || activeTab === 'Following') && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${theme.card} rounded-3xl p-8 border ${theme.dynamicBorder}`}>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                        <h3 className="text-lg font-bold uppercase tracking-tight">{activeTab} Database</h3>
+                        <div className="relative w-full md:w-64">
+                            <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30" />
+                            <input 
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder={`Filter ${activeTab}...`}
+                                className={`w-full ${theme.input} pl-10 pr-4 py-2.5 rounded-xl border ${theme.dynamicBorder} text-[10px]  font-bold uppercase tracking-widest outline-none focus:${theme.accentBorder} transition-all`}
+                            />
+                        </div>
+                    </div>
 
-                {activeTab === 'Following' && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`${theme.card} rounded-3xl p-20 border ${theme.dynamicBorder} text-center`}>
-                    <Users className="mx-auto text-[var(--text-muted)] opacity-20 mb-4" size={48} />
-                    <p className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest">Connections Idle</p>
-                    <p className="text-xs text-[var(--text-muted)] opacity-60 mt-2">You haven't established any network connections yet.</p>
+                    {connectionsLoading ? (
+                      <div className="py-20 flex justify-center"><Loader2 className={`animate-spin ${theme.text}`} /></div>
+                    ) : (activeTab === 'Followers' ? filteredFollowers : filteredFollowing).length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {(activeTab === 'Followers' ? filteredFollowers : filteredFollowing).slice(0, visibleCounts[activeTab.toLowerCase()]).map(u => (
+                          <UserCard key={u._id} targetUser={u} theme={theme} onNavigate={() => navigate(`/profile/${u._id}`)} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-20 opacity-20 flex flex-col items-center gap-4 uppercase  font-bold tracking-widest">
+                        <Users size={48} />
+                        <p className="text-sm">{searchQuery ? "No operatives found" : "Archive Empty"}</p>
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
@@ -390,23 +477,27 @@ const ProfilePage = () => {
                         <span className={`px-2 py-1 rounded bg-[var(--text-main)]/[0.05] text-[10px] font-bold`}>{myMangas.length} TITLES</span>
                     </div>
                     {myMangas.length > 0 ? (
-                      <motion.div layout className="grid grid-cols-1 gap-4">
+                      <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {myMangas.slice(0, visibleCounts.mangas).map((manga, i) => (
-                           <div key={i} className={`p-4 rounded-2xl border ${theme.dynamicBorder} flex items-center gap-4 hover:bg-[var(--text-main)]/[0.02] transition-all group`}>
-                              <div className="w-12 h-16 rounded-lg bg-[var(--text-main)]/10 overflow-hidden">
-                                 {manga.coverImage && <img src={manga.coverImage} alt={manga.title} className="w-full h-full object-cover" />}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="text-sm font-bold uppercase tracking-tight">{manga.title}</h4>
-                                <p className="text-[10px] text-[var(--text-muted)] font-bold uppercase">{manga.status || 'Pending Review'}</p>
-                              </div>
-                              <ChevronRight size={16} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-all" />
+                           <div 
+                              key={manga._id} 
+                              onClick={() => navigate(`/manga/${manga._id}`)}
+                              className={`p-4 rounded-2xl border ${theme.dynamicBorder} flex items-center gap-4 hover:bg-[var(--text-main)]/[0.02] transition-all cursor-pointer group`}
+                           >
+                             <div className="w-14 h-20 rounded-xl bg-[var(--text-main)]/10 overflow-hidden border border-white/5">
+                                 {manga.coverImage && <img src={manga.coverImage} alt={manga.title} className="w-full h-full object-cover transition-transform group-hover:scale-110" />}
+                             </div>
+                             <div className="flex-1 min-w-0">
+                               <h4 className="text-sm font-bold uppercase tracking-tight truncate">{manga.title}</h4>
+                               <span className="text-[9px] px-2 py-0.5 rounded-full bg-[var(--text-main)]/5 border border-[var(--text-main)]/10 font-bold uppercase mt-1 inline-block">{manga.status || 'Active'}</span>
+                             </div>
+                             <ChevronRight size={16} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                            </div>
                         ))}
                         {myMangas.length > visibleCounts.mangas && (
                           <button 
                             onClick={() => handleViewMore('mangas')}
-                            className={`py-4 rounded-2xl border-2 border-dotted ${theme.dynamicBorder} text-[10px] font-black uppercase tracking-tighter ${theme.text} hover:bg-[var(--text-main)]/[0.02] transition-all flex items-center justify-center gap-2`}
+                            className={`py-4 rounded-2xl border-2 border-dotted ${theme.dynamicBorder} text-[10px]  font-bold uppercase tracking-tighter ${theme.text} hover:bg-[var(--text-main)]/[0.02] transition-all flex items-center justify-center gap-2`}
                           >
                             <Plus size={14} /> View More Titles
                           </button>
@@ -437,15 +528,15 @@ const ProfilePage = () => {
                                   <img src={comment.context.image} className="w-8 h-10 object-cover rounded-md border border-[var(--text-main)]/10" alt="Target" />
                                 )}
                                 <div>
-                                  <p className={`text-[10px] font-black uppercase tracking-widest ${theme.text}`}>
-                                    {comment.context?.title} {comment.context?.chapterNumber ? `— Ch. ${comment.context.chapterNumber}` : ''}
+                                  <p className={`text-[10px]  font-bold uppercase tracking-widest ${theme.text}`}>
+                                    {comment.context?.title}
                                   </p>
                                   <span className="text-[10px] font-mono opacity-40">
                                     {new Date(comment.createdAt).toLocaleDateString()}
                                   </span>
                                 </div>
                               </div>
-                              <button onClick={() => handleDeleteComment(comment._id)} className="p-2 text-red-500/20 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                              <button onClick={() => handleDeleteComment(comment._id)} className="p-2 text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                                 <Trash2 size={14} />
                               </button>
                             </div>
@@ -466,7 +557,7 @@ const ProfilePage = () => {
                           <div className="pt-4 flex justify-center">
                             <button 
                               onClick={() => handleViewMore('comments')}
-                              className={`px-8 py-3 rounded-full bg-[var(--text-main)]/[0.05] text-[10px] font-black uppercase tracking-widest hover:${theme.primary} hover:text-white transition-all shadow-sm flex items-center gap-2`}
+                              className={`px-8 py-3 rounded-full bg-[var(--text-main)]/[0.05] text-[10px]  font-bold uppercase tracking-widest hover:${theme.primary} hover:text-white transition-all shadow-sm flex items-center gap-2`}
                             >
                               <Plus size={12} /> Show More Comments
                             </button>
@@ -497,7 +588,7 @@ const ProfilePage = () => {
                           <div key={report._id} className={`p-5 rounded-2xl border ${theme.dynamicBorder} bg-[var(--text-main)]/[0.02] group`}>
                             <div className="flex justify-between items-start mb-4">
                               <div>
-                                <p className={`text-[10px] font-black uppercase tracking-widest ${theme.text} mb-1`}>
+                                <p className={`text-[10px]  font-bold uppercase tracking-widest ${theme.text} mb-1`}>
                                   {report.targetType} Report — {report.reason}
                                 </p>
                                 <p className="text-xs font-bold opacity-60 uppercase tracking-tighter">
@@ -521,7 +612,7 @@ const ProfilePage = () => {
                         {myReports.length > visibleCounts.reports && (
                           <button 
                             onClick={() => handleViewMore('reports')}
-                            className={`w-full py-4 rounded-2xl border-2 border-dotted ${theme.dynamicBorder} text-[10px] font-black uppercase tracking-tighter ${theme.text} hover:bg-[var(--text-main)]/[0.02] transition-all flex items-center justify-center gap-2`}
+                            className={`w-full py-4 rounded-2xl border-2 border-dotted ${theme.dynamicBorder} text-[10px]  font-bold uppercase tracking-tighter ${theme.text} hover:bg-[var(--text-main)]/[0.02] transition-all flex items-center justify-center gap-2`}
                           >
                             <Plus size={14} /> View Older Reports
                           </button>
@@ -537,75 +628,7 @@ const ProfilePage = () => {
                   </motion.div>
                 )}
 
-                {activeTab === 'Settings' && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-                    <div className={`${theme.card} rounded-3xl p-8 border ${theme.dynamicBorder}`}>
-                      <h3 className="text-lg font-bold uppercase tracking-tight mb-6 flex items-center gap-2">
-                        <Cpu size={20} className={theme.text} /> Interface Engine
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                          <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-4">Core Theme</p>
-                          <div className="flex gap-4">
-                            <button className={`flex-1 p-4 rounded-2xl border-2 transition-all ${!isRedMode ? 'border-emerald-500 bg-emerald-500/5' : 'border-transparent bg-[var(--text-main)]/[0.03]'}`}>
-                              <div className="w-full h-2 bg-emerald-500 rounded-full mb-2" />
-                              <span className="text-xs font-bold uppercase">Emerald Quest</span>
-                            </button>
-                            <button className={`flex-1 p-4 rounded-2xl border-2 transition-all ${isRedMode ? 'border-red-500 bg-red-500/5' : 'border-transparent bg-[var(--text-main)]/[0.03]'}`}>
-                              <div className="w-full h-2 bg-red-500 rounded-full mb-2" />
-                              <span className="text-xs font-bold uppercase">Crimson Void</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-4">Reading Direction</p>
-                          <select className={`w-full ${theme.input} p-4 rounded-2xl border ${theme.dynamicBorder} font-bold text-sm outline-none cursor-pointer`}>
-                            <option>Top to Bottom (Webtoon)</option>
-                            <option>Right to Left (Manga)</option>
-                            <option>Left to Right (Comic)</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={`${theme.card} rounded-3xl p-8 border ${theme.dynamicBorder}`}>
-                      <h3 className="text-lg font-bold uppercase tracking-tight mb-6 flex items-center gap-2">
-                        <ShieldCheck size={20} className={theme.text} /> Privacy Protocols
-                      </h3>
-                      <div className="space-y-4">
-                        <ToggleItem title="Public Activity Feed" description="Allow others to see your interaction history" defaultChecked={true} />
-                        <ToggleItem title="Anonymous Mode" description="Hide your presence from public leaderboards" defaultChecked={false} />
-                      </div>
-                    </div>
-
-                    <div className={`${theme.card} rounded-3xl p-8 border ${theme.dynamicBorder}`}>
-                      <h3 className="text-lg font-bold uppercase tracking-tight mb-6 flex items-center gap-2">
-                        <Zap size={20} className={theme.text} /> Account Security
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        <button className={`p-4 rounded-2xl border ${theme.dynamicBorder} bg-[var(--text-main)]/[0.02] text-left hover:bg-[var(--text-main)]/[0.05] transition-all group`}>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-bold uppercase">Update Password</span>
-                            <ChevronRight size={16} className="opacity-20 group-hover:opacity-100 transition-all" />
-                          </div>
-                          <p className="text-[10px] text-[var(--text-muted)] mt-1">Enhance your credentials</p>
-                        </button>
-                        <button className={`p-4 rounded-2xl border ${theme.dynamicBorder} bg-[var(--text-main)]/[0.02] text-left hover:bg-[var(--text-main)]/[0.05] transition-all group`}>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-bold uppercase">Active Sessions</span>
-                            <ChevronRight size={16} className="opacity-20 group-hover:opacity-100 transition-all" />
-                          </div>
-                          <p className="text-[10px] text-[var(--text-muted)] mt-1">Manage connected devices</p>
-                        </button>
-                      </div>
-                      <div className="pt-6 border-t border-red-500/10">
-                        <button className="flex items-center gap-2 text-red-500/50 hover:text-red-500 text-[10px] font-black uppercase tracking-[0.2em] transition-all">
-                          <AlertTriangle size={14} /> Deactivate ToonLord Neural Link
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+                
               </>
             )}
           </AnimatePresence>
@@ -613,6 +636,54 @@ const ProfilePage = () => {
 
         {/* RIGHT AREA - SIDEBAR */}
         <div className="lg:col-span-4 space-y-6">
+          {/* --- VIP ACTIVATION PROTOCOL --- */}
+          {!user?.vipStatus?.isVip && (
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className={`${theme.card} rounded-3xl p-8 relative overflow-hidden group border-2 border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.15)]`}
+            >
+              {/* Holographic Background Effect */}
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 blur-[50px] pointer-events-none" 
+              />
+              
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-2xl flex items-center justify-center mb-6 shadow-inner border border-amber-500/20">
+                  <Crown size={24} className="fill-amber-500" />
+                </div>
+                
+                <h3 className="text-2xl font-black italic tracking-tighter mb-2 uppercase text-amber-500">Unlock VIP Mode</h3>
+                <p className="text-[10px] text-[var(--text-muted)] font-bold leading-relaxed mb-6 uppercase tracking-[0.2em] opacity-70">
+                  Execute premium subscription protocol.
+                </p>
+
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[var(--text-main)] group/item">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> 
+                    <span className="group-hover/item:text-amber-500 transition-colors">Ad-Free Link Established</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[var(--text-main)] group/item">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> 
+                    <span className="group-hover/item:text-amber-500 transition-colors">Exclusive Premium Sigils</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-[var(--text-main)] group/item">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> 
+                    <span className="group-hover/item:text-amber-500 transition-colors">Early Access Permissions</span>
+                  </li>
+                </ul>
+
+                <button 
+                  onClick={() => navigate('/subscription')}
+                  className="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-600 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-[0_10px_20px_rgba(245,158,11,0.3)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  Authorize Payment <Zap size={16} fill="white" />
+                </button>
+              </div>
+            </motion.div>
+          )}
           {user?.role !== 'author' && !user?.authorRequestPending && (
             <div className={`${theme.card} rounded-3xl p-8 relative overflow-hidden group border ${theme.dynamicBorder}`}>
               <div className={`absolute top-0 right-0 w-32 h-32 ${isRedMode ? 'bg-red-500/10' : 'bg-emerald-500/10'} blur-[60px] transition-all group-hover:blur-[80px]`} />
@@ -628,7 +699,7 @@ const ProfilePage = () => {
               </ul>
               <button 
                 onClick={() => setIsContractOpen(true)}
-                className={`w-full py-4 ${theme.button} text-white shadow-lg font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95`}
+                className={`w-full py-4 ${theme.button} text-white shadow-lg  font-bold text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95`}
               >
                 Apply Now <ChevronRight size={16} />
               </button>
@@ -646,18 +717,19 @@ const ProfilePage = () => {
           )}
 
           <div className={`${theme.card} rounded-3xl p-8 border ${theme.dynamicBorder}`}>
-            <h3 className="text-xs font-black text-[var(--text-muted)] uppercase tracking-widest mb-6">Account Verification</h3>
+            <h3 className="text-xs  font-bold text-[var(--text-muted)] uppercase tracking-widest mb-6">Account Verification</h3>
             <div className="p-4 bg-[var(--text-main)]/[0.03] rounded-2xl border border-dashed ${theme.dynamicBorder} text-center">
               <div className={`mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-3 bg-[var(--text-main)]/[0.05] ${theme.text}`}>
                 <ShieldCheck size={24} />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest mb-1">Status: Operational</p>
+              <p className="text-[10px]  font-bold uppercase tracking-widest mb-1">Status: Operational</p>
               <p className="text-[9px] text-[var(--text-muted)] leading-relaxed">All security protocols are active and current.</p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Contract Modal */}
       <AnimatePresence>
         {isContractOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
@@ -672,7 +744,7 @@ const ProfilePage = () => {
                   <div className="flex items-center gap-4">
                     <Scale className="text-slate-800" size={24} />
                     <div>
-                        <h3 className="text-xl font-serif font-black uppercase tracking-tighter">Content Creator Agreement</h3>
+                        <h3 className="text-xl font-serif  font-bold uppercase tracking-tighter">Content Creator Agreement</h3>
                         <p className="text-[9px] font-mono uppercase text-slate-500 tracking-widest">Document ref: TL-AUTH-2026-X</p>
                     </div>
                   </div>
@@ -693,9 +765,6 @@ const ProfilePage = () => {
                         <li>Infringement upon third-party trademarks or character designs.</li>
                         <li>Intentional manipulation of engagement metrics.</li>
                     </ul>
-                    <div className="pt-10 opacity-30 text-[10px] font-mono text-center">
-                        *** END OF DOCUMENT - TOONLORD LEGAL CORE ***
-                    </div>
                 </div>
 
                 <div className="p-8 bg-slate-50 border-t-2 border-slate-900">
@@ -706,7 +775,7 @@ const ProfilePage = () => {
                     <span className="text-xs font-bold text-slate-700 text-left">I have meticulously reviewed the Terms and acknowledge that this agreement is legally binding under digital jurisdiction.</span>
                   </label>
                   <div className="relative mb-6">
-                    <p className="absolute -top-2.5 left-4 bg-slate-50 px-2 text-[10px] font-black uppercase text-slate-400">Digital Signature</p>
+                    <p className="absolute -top-2.5 left-4 bg-slate-50 px-2 text-[10px]  font-bold uppercase text-slate-400">Digital Signature</p>
                     <input 
                         type="text" 
                         placeholder="PLEASE TYPE 'I ACCEPT' TO VALIDATE" 
@@ -716,11 +785,11 @@ const ProfilePage = () => {
                     />
                   </div>
                   <div className="flex gap-4">
-                    <button onClick={() => setIsContractOpen(false)} className="px-6 py-4 text-xs font-black uppercase text-slate-400 hover:text-slate-900 transition-colors">Discard</button>
+                    <button onClick={() => setIsContractOpen(false)} className="px-6 py-4 text-xs  font-bold uppercase text-slate-400 hover:text-slate-900 transition-colors">Discard</button>
                     <button 
                       onClick={handleRequestAuthor} 
                       disabled={signature.toUpperCase() !== 'I ACCEPT' || !hasReadTerms || loading}
-                      className={`flex-1 py-4 font-black uppercase text-xs tracking-widest transition-all ${signature.toUpperCase() === 'I ACCEPT' && hasReadTerms ? 'bg-slate-900 text-white shadow-xl' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                      className={`flex-1 py-4  font-bold uppercase text-xs tracking-widest transition-all ${signature.toUpperCase() === 'I ACCEPT' && hasReadTerms ? 'bg-slate-900 text-white shadow-xl' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
                     >
                       {loading ? 'Transmitting...' : 'Execute Agreement'}
                     </button>
@@ -734,6 +803,68 @@ const ProfilePage = () => {
   );
 };
 
+// --- SQUARE BOX USER CARD WITH CIRCULAR IMAGE & DETAILS ---
+
+const UserCard = ({ targetUser, theme, onNavigate }) => {
+  const isVip = targetUser.vipStatus?.isVip || false;
+
+  return (
+    <div 
+      onClick={onNavigate}
+      className={`p-6 rounded-[2.5rem] border ${isVip ? 'border-amber-500/20 shadow-amber-500/5' : theme.dynamicBorder} bg-[var(--text-main)]/[0.02] flex flex-col items-center text-center group hover:bg-[var(--text-main)]/[0.04] transition-all cursor-pointer relative overflow-hidden shadow-lg`}
+    >
+      <div className={`absolute top-0 right-0 w-24 h-24 ${isVip ? 'bg-amber-500/5' : (theme.primary + ' opacity-[0.03]')} blur-3xl`} />
+
+      <div className="relative mb-4 shrink-0">
+        {isVip ? (
+          /* VIP MINI CIRCULAR BORDER */
+          <div className="p-[2px] rounded-full bg-gradient-to-tr from-amber-400 to-amber-600 shadow-md">
+            <div className="bg-[var(--card-bg)] p-[2px] rounded-full">
+              <img 
+                src={targetUser.profilePicture || '/default.png'} 
+                className="w-20 h-20 rounded-full object-cover transition-transform group-hover:scale-110" 
+                alt={targetUser.username} 
+              />
+            </div>
+            <div className="absolute -bottom-1 -right-1 p-1 bg-amber-500 rounded-full border-2 border-[var(--card-bg)]">
+              <Crown size={10} className="text-white fill-white" />
+            </div>
+          </div>
+        ) : (
+          /* STANDARD CIRCLE */
+          <>
+            <img 
+              src={targetUser.profilePicture || '/default.png'} 
+              className={`w-20 h-20 rounded-full border-4 ${theme.accentBorder} object-cover shadow-xl transition-transform group-hover:scale-110`} 
+              alt={targetUser.username} 
+            />
+            {targetUser.role === 'author' && (
+              <div className={`absolute -bottom-1 -right-1 p-1.5 rounded-full ${theme.primary} text-white shadow-md border-2 border-[var(--card-bg)]`}>
+                <Trophy size={12} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="w-full">
+        <div className="flex flex-col items-center gap-1 mb-2">
+          <p className={`text-sm  font-bold uppercase tracking-tight truncate w-full ${isVip ? 'text-amber-600' : ''}`}>
+            {targetUser.username}
+          </p>
+          <span className={`text-[8px] px-2 py-0.5 rounded-full border ${theme.dynamicBorder} font-bold uppercase opacity-60 tracking-widest bg-[var(--text-main)]/5`}>
+            {isVip ? 'VIP Reader' : (targetUser.role || 'Reader')}
+          </span>
+        </div>
+        
+        <p className="text-[10px] text-[var(--text-muted)] line-clamp-2 italic mb-4 h-8 leading-relaxed">
+          {targetUser.bio || "No biography established."}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 // --- HELPER COMPONENTS ---
 
 const ToggleItem = ({ title, description, defaultChecked }) => {
@@ -743,11 +874,11 @@ const ToggleItem = ({ title, description, defaultChecked }) => {
     <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-[var(--text-main)]/[0.02] transition-all">
       <div className="flex-1 text-left">
         <p className="text-sm font-bold uppercase tracking-tight">{title}</p>
-        <p className="text-xs text-[var(--text-muted)]">{description}</p>
+        <p className="text-xs text-[var(--text-muted)] opacity-60">{description}</p>
       </div>
       <button 
         onClick={() => setEnabled(!enabled)}
-        className={`w-12 h-6 rounded-full transition-all relative ${enabled ? (isRedMode ? 'bg-red-500' : 'bg-emerald-500') : 'bg-[var(--text-main)]/10'}`}
+        className={`w-12 h-6 rounded-full transition-all relative ${enabled ? (isRedMode ? 'bg-red-500' : 'bg-emerald-500') : 'bg-white/10'}`}
       >
         <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${enabled ? 'left-7' : 'left-1'}`} />
       </button>
@@ -763,7 +894,7 @@ const StatusBadge = ({ status }) => {
     dismissed: "bg-slate-500/10 text-slate-500 border-slate-500/20",
   };
   return (
-    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${styles[status] || styles.pending}`}>
+    <span className={`px-2 py-0.5 rounded text-[8px]  font-bold uppercase border ${styles[status] || styles.pending}`}>
       {status}
     </span>
   );
@@ -805,7 +936,7 @@ const DetailItem = ({ label, value, isVerified }) => {
   const { isRedMode } = useContext(AppContext);
   return (
     <div className="group cursor-default text-left">
-      <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1 group-hover:text-[var(--text-main)] transition-colors">{label}</p>
+      <p className="text-[10px]  font-bold text-[var(--text-muted)] uppercase tracking-widest mb-1 group-hover:text-[var(--text-main)] transition-colors">{label}</p>
       <div className="flex items-center gap-2">
         <span className="text-sm font-bold text-[var(--text-main)] font-mono">{value}</span>
         {isVerified && <CheckCircle2 size={14} className={isRedMode ? "text-red-500" : "text-emerald-500"} />}
@@ -827,7 +958,7 @@ const Input = ({ label, value, onChange, disabled }) => {
   const { isRedMode } = useContext(AppContext);
   return (
     <div className="text-left">
-      <label className="text-[10px] font-black text-[var(--text-muted)] uppercase mb-2 block ml-1">{label}</label>
+      <label className="text-[10px]  font-bold text-[var(--text-muted)] uppercase mb-2 block ml-1">{label}</label>
       <input 
         disabled={disabled}
         value={value} 

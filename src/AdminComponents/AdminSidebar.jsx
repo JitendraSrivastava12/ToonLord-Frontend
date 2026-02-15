@@ -66,10 +66,6 @@ const Sidebar = ({ isOpen, onClose, adminUser, onLogout }) => {
         <div className="px-6 mb-2 text-[10px] uppercase tracking-[0.15em] text-gray-400 font-black">Overview</div>
     <SidebarItem icon={LayoutDashboard} label="Dashboard" path="/admin" onClick={onClose} />
 
-        <SidebarItem icon={BarChart3} label="Analytics" path="/admin/analytics" onClick={onClose} />
-
-        <SidebarItem icon={FileText} label="Revenue" path="/admin/revenue" onClick={onClose} />
-
         <div className="px-6 mt-6 mb-2 text-[10px] uppercase tracking-[0.15em] text-gray-400 font-black">Management</div>
          <SidebarItem icon={Users} label="Users" path="/admin/users" onClick={onClose} />
 

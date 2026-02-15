@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Home, Compass, Library, LayoutDashboard, User, FileUp,
   BarChart3, Settings as SettingsIcon, Cpu, Twitter, Github, Youtube,
-  Search, ShieldAlert, Star, Loader2, LogOut, LogIn, Sparkles
+  Search, ShieldAlert, Star, Loader2, LogOut, LogIn, Sparkles, Users, Layers
 } from "lucide-react";
 import NavBar from "./NavBar";
 import { AppContext } from "../UserContext";
@@ -24,7 +24,7 @@ const SocialIcon = ({ icon, accent }) => (
 
 function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isLoggedIn, logout, isRedMode, toggleRedMode, familyMode, currentTheme, user } = useContext(AppContext);
+  const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user } = useContext(AppContext);
   const { showAlert } = useAlert();
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,9 +36,9 @@ function Layout() {
   const searchInputRef = useRef(null);
 
   const isLight = currentTheme === "light";
-  const activeAccent = isRedMode ? "#ff003c" : isLight ? "#6366f1" : "#60a5fa";
+  const activeAccent = isRedMode ? '#ef4444' : 'var(--accent)';
 
-  // --- LIVE SEARCH LOGIC ---
+  // --- UPDATED LIVE SEARCH LOGIC ---
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length >= 2) {
@@ -92,12 +92,10 @@ function Layout() {
 
   const protectedRoutes = ["/profile", "/library", "/dashboard", "/my-series", "/upload", "/analytics"];
 
-  // --- ROLE-BASED ACCESS HANDLER ---
   const handleNavigationAccess = (e, item, sectionTitle) => {
     const isProtected = protectedRoutes.includes(item.to);
     const isCreatorSection = sectionTitle === "Creator Studio";
 
-    // Check Login for protected routes
     if (!isLoggedIn && isProtected) {
       e.preventDefault();
       showAlert("Access Denied: Login Required", "error");
@@ -105,15 +103,9 @@ function Layout() {
       return;
     }
 
-    // Check Role for Creator Studio
     if (isCreatorSection && user?.role === "reader") {
       e.preventDefault();
-      showAlert(
-        "Only Creators can use this. Switch your role to Creator in Profile to use these tools.", 
-        "error"
-      );
-      // We keep the sidebar open so they can see the context, 
-      // or set to false if you prefer it closing immediately.
+      showAlert("Creators only. Apply in Profile.", "error");
       return;
     }
 
@@ -131,7 +123,7 @@ function Layout() {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 26, stiffness: 220 }}
-            className={`fixed top-0 left-0 z-[1001] h-full w-[280px] sm:w-[300px] border-r ${themeStyles.border} ${themeStyles.sidebarBg} shadow-2xl flex flex-col`}
+            className={`fixed top-0 left-0 z-[1001] h-full w-[280px] sm:w-[320px] border-r ${themeStyles.border} ${themeStyles.sidebarBg} shadow-2xl flex flex-col`}
           >
             <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, transparent, ${activeAccent}, transparent)` }} />
 
@@ -143,7 +135,7 @@ function Layout() {
                     <Cpu size={22} style={{ color: activeAccent }} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-black tracking-tighter text-xl italic leading-none">
+                    <span className="font-bold tracking-tighter text-xl italic leading-none">
                       TOON<span style={{ color: activeAccent }}>LORD</span>
                     </span>
                     <span className={`text-[8px] font-bold uppercase tracking-[0.3em] ${themeStyles.dim}`}>Premium Mangas</span>
@@ -154,7 +146,7 @@ function Layout() {
                 </button>
               </div>
 
-              {/* SEARCH SECTION (MOBILE ONLY UI) */}
+              {/* MOBILE SEARCH SECTION */}
               <div className="px-5 mb-6 lg:hidden">
                 <div className={`flex items-center rounded-2xl border transition-all ${themeStyles.input} focus-within:ring-2`} style={{ "--tw-ring-color": `${activeAccent}33` }}>
                   <div className="pl-4 pr-2">
@@ -165,35 +157,63 @@ function Layout() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="EXECUTE SEARCH..."
-                    className="w-full bg-transparent py-3.5 text-[10px] font-black uppercase tracking-widest outline-none"
+                    placeholder="Search titles or users..."
+                    className="w-full bg-transparent py-3.5 text-[10px] font-bold uppercase tracking-widest outline-none"
                   />
-                  {searchQuery && <X size={14} className="mr-3 opacity-40" onClick={() => setSearchQuery("")} />}
+                  {searchQuery && <X size={14} className="mr-3 opacity-40 cursor-pointer" onClick={() => setSearchQuery("")} />}
                 </div>
 
+                {/* SEARCH RESULTS DROPDOWN (SIDEBAR) */}
                 <AnimatePresence>
                   {suggestions.length > 0 && (
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }} 
                       animate={{ opacity: 1, y: 0 }} 
                       exit={{ opacity: 0, y: -10 }}
-                      className={`mt-2 rounded-2xl border ${themeStyles.border} overflow-hidden max-h-[220px] overflow-y-auto custom-scrollbar`}
+                      className={`mt-2 rounded-2xl border ${themeStyles.border} overflow-hidden max-h-[300px] overflow-y-auto bg-black/20 shadow-inner`}
                     >
-                      {suggestions.map(manga => (
-                        <div 
-                          key={manga._id} 
-                          onClick={() => { navigate(`/manga/${manga._id}`); setIsSidebarOpen(false); }}
-                          className={`flex items-center gap-3 p-3 transition-all cursor-pointer border-b last:border-0 ${themeStyles.border} ${themeStyles.itemHover}`}
-                        >
-                          <img src={manga.coverImage} className="w-9 h-12 object-cover rounded-lg shadow-md" alt="" />
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-[11px] font-black truncate uppercase italic">{manga.title}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[9px] font-bold text-yellow-500 flex items-center gap-1"><Star size={10} fill="currentColor"/> {manga.rating || '0.0'}</span>
+                      {suggestions.map((item) => {
+                        const isUser = item.type === 'user';
+                        return (
+                          <div 
+                            key={item._id} 
+                            onClick={() => { 
+                              navigate(isUser ? `/profile/${item._id}` : `/manga/${item._id}`); 
+                              setIsSidebarOpen(false); 
+                              setSearchQuery("");
+                            }}
+                            className={`flex items-center gap-3 p-3 transition-all cursor-pointer border-b last:border-0 ${themeStyles.border} ${themeStyles.itemHover}`}
+                          >
+                            {/* DYNAMIC IMAGE: CIRCLE FOR USER, COVER FOR MANGA */}
+                            <div className="relative shrink-0">
+                                <img 
+                                  src={isUser ? (item.profilePicture || '/default.png') : item.coverImage} 
+                                  className={`w-9 h-11 object-cover ${isUser ? 'rounded-full aspect-square w-9 h-9' : 'rounded-lg'} border border-white/10`} 
+                                  alt="" 
+                                />
+                                <div className={`absolute -bottom-1 -right-1 p-0.5 rounded-full border border-black ${isUser ? 'bg-blue-500' : 'bg-emerald-500'}`}>
+                                    {isUser ? <Users size={8} className="text-white"/> : <Layers size={8} className="text-white" />}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-[11px] font-bold truncate uppercase italic leading-tight">
+                                {isUser ? item.username : item.title}
+                              </span>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className={`text-[7px] font-black uppercase tracking-widest ${isUser ? 'text-blue-400' : 'text-emerald-400'}`}>
+                                  {isUser ? (item.role || 'Member') : (item.status || 'Active')}
+                                </span>
+                                {!isUser && (
+                                  <span className="text-[7px] font-bold text-yellow-500 flex items-center gap-0.5">
+                                    <Star size={8} fill="currentColor"/> {item.rating || '0.0'}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -203,7 +223,7 @@ function Layout() {
               <div className="flex-1 overflow-y-auto px-4 space-y-7 no-scrollbar ">
                 {navSections.map((section, sIdx) => (
                   <div key={sIdx}>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.25em] opacity-30 mb-4 px-3">{section.title}</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-30 mb-4 px-3">{section.title}</h4>
                     <div className="space-y-1.5">
                       {section.items.map((item, idx) => {
                         const isActive = location.pathname === item.to;
@@ -214,7 +234,7 @@ function Layout() {
                             key={idx}
                             to={isLoggedIn || !isProtected ? item.to : "/loginlanding"}
                             onClick={(e) => handleNavigationAccess(e, item, section.title)}
-                            className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all group ${
+                            className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider transition-all group ${
                               isActive ? 'text-white' : `${themeStyles.dim} ${themeStyles.itemHover}`
                             }`}
                             style={isActive ? { 
@@ -234,7 +254,7 @@ function Layout() {
                 ))}
               </div>
 
-              {/* FOOTER: SYSTEM CONTROLS */}
+              {/* FOOTER CONTROLS */}
               <div className="md:hidden p-5 border-t border-white/5 bg-black/10 space-y-3">
                 <button
                   onClick={() => toggleRedMode()}
@@ -245,10 +265,10 @@ function Layout() {
                   <div className="flex items-center gap-3">
                     <ShieldAlert size={18} className={isRedMode ? 'text-red-500 animate-pulse' : 'text-slate-500 group-hover:text-white transition-colors'} />
                     <div className="flex flex-col items-start">
-                      <span className={`text-[9px] font-black uppercase tracking-tighter ${isRedMode ? 'text-red-500' : 'text-slate-400'}`}>
-                        {isRedMode ? 'Protocol Red' : 'Secure Protocol'}
+                      <span className={`text-[9px] font-bold uppercase tracking-tighter ${isRedMode ? 'text-red-500' : 'text-slate-400'}`}>
+                        {isRedMode ? 'Protocol Red' : 'Secure Mode'}
                       </span>
-                      <span className="text-[7px] font-bold opacity-30 uppercase">Premium Mangas</span>
+                      <span className="text-[7px] font-bold opacity-30 uppercase">System Status</span>
                     </div>
                   </div>
                   <div className={`w-9 h-5 rounded-full relative transition-all ${isRedMode ? 'bg-red-500' : 'bg-slate-700'}`}>
@@ -258,17 +278,17 @@ function Layout() {
 
                 <button
                   onClick={() => {
-                    if(isLoggedIn) { logout(); showAlert("System Logged Out", "info"); }
+                    if(isLoggedIn) { logout(); showAlert("Logged Out", "info"); }
                     else navigate("/loginlanding");
                     setIsSidebarOpen(false);
                   }}
-                  className={` w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${
+                  className={` w-full py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${
                     isLoggedIn 
-                    ? 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white' 
-                    : 'bg-white text-black hover:bg-slate-200'
+                    ? 'bg-red-500/10 text-red-500 border border-red-500/20' 
+                    : 'bg-white text-black'
                   }`}
                 >
-                  {isLoggedIn ? <><LogOut size={16}/> Logout</> : <><Sparkles size={16}/> Login/Signup</>}
+                  {isLoggedIn ? <><LogOut size={16}/> Logout</> : <><Sparkles size={16}/> Enter Net</>}
                 </button>
               </div>
             </div>
@@ -276,40 +296,39 @@ function Layout() {
         )}
       </AnimatePresence>
 
-      {/* MAIN LAYOUT */}
+      {/* MAIN CONTENT */}
       <div className="flex flex-col min-h-screen">
         <NavBar setIsSidebarOpen={setIsSidebarOpen} />
-        
         <main className="flex-1 pt-24 pb-12 px-3 sm:px-6">
-          <Outlet context={[isRedMode, familyMode, currentTheme]} key={location.pathname} />
+          <Outlet context={[isRedMode, currentTheme]} key={location.pathname} />
         </main>
 
         <footer className={`mt-auto border-t ${themeStyles.border} ${themeStyles.sidebarBg} backdrop-blur-3xl`}>
           <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-              <div className="col-span-1">
+              <div className="col-span-1 md:col-span-2">
                 <div className="flex items-center gap-3 mb-6">
                   <Cpu size={32} style={{ color: activeAccent }} />
-                  <span className="font-black tracking-tighter text-xl uppercase italic">
+                  <span className="font-bold tracking-tighter text-xl uppercase italic">
                     Toon<span style={{ color: activeAccent }}>Lord</span>
                   </span>
                 </div>
-                <p className={`text-xs leading-relaxed font-bold uppercase tracking-tight opacity-60`}>
+                <p className="text-xs leading-relaxed font-bold uppercase tracking-tight opacity-60 max-w-sm">
                   The next generation of digital storytelling. Build, read, and explore in the Neural Net.
                 </p>
               </div>
 
               <div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 opacity-30">Platform</h4>
-                <ul className="space-y-4 text-[11px] font-black uppercase tracking-wider">
-                  <li><Link to="/browse" className="hover:opacity-50 transition-all">Browse</Link></li>
-                  <li><Link to="/library" className="hover:opacity-50 transition-all">Library</Link></li>
-                  <li><Link to="/dashboard" className="hover:opacity-50 transition-all">Creator Studio</Link></li>
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] mb-6 opacity-30">Platform</h4>
+                <ul className="space-y-4 text-[11px] font-bold uppercase tracking-wider">
+                  <li><Link to="/browse">Browse</Link></li>
+                  <li><Link to="/library">Library</Link></li>
+                  <li><Link to="/dashboard">Creator Studio</Link></li>
                 </ul>
               </div>
 
               <div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 opacity-30">Neural Net</h4>
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] mb-6 opacity-30">Neural Net</h4>
                 <div className="flex gap-3">
                   <SocialIcon icon={<Twitter size={18} />} accent={activeAccent} />
                   <SocialIcon icon={<Github size={18} />} accent={activeAccent} />
@@ -319,10 +338,10 @@ function Layout() {
             </div>
 
             <div className={`mt-16 pt-8 border-t ${themeStyles.border} flex flex-col md:flex-row justify-between items-center gap-6`}>
-              <p className="text-[9px] font-black uppercase tracking-widest opacity-40">
+              <p className="text-[9px] font-bold uppercase tracking-widest opacity-40">
                 © 2026 ToonLord AI // Created By Jitendra Srivastava
               </p>
-              <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest bg-black/20 px-4 py-2 rounded-full border border-white/5">
+              <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-widest bg-black/20 px-4 py-2 rounded-full border border-white/5">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Star, ChevronLeft, ChevronRight, 
-  SlidersHorizontal, X, Activity, Terminal
+  SlidersHorizontal, X
 } from 'lucide-react';
 import { AppContext } from "../UserContext"; 
 
@@ -78,7 +78,7 @@ const BrowsePage = () => {
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-[var(--accent)] text-white shadow-2xl"
+            className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-[var(--accent)] text-white shadow-lg"
           >
             <SlidersHorizontal size={20}/>
           </motion.button>
@@ -87,22 +87,24 @@ const BrowsePage = () => {
 
       {/* OVERLAY */}
       {filtersOpen && (
-        <div onClick={() => setFiltersOpen(false)} className="fixed inset-0 bg-black/60 z-40 lg:hidden" />
+        <div onClick={() => setFiltersOpen(false)} className="fixed inset-0 bg-black/40 z-40 lg:hidden" />
       )}
 
       {/* SIDEBAR */}
       <aside className={`
-        fixed lg:relative z-50 top-0 left-0 h-full w-72
-        bg-[var(--bg-secondary)]/90 backdrop-blur-xl border-r border-white/10
-        p-6 transition-transform duration-300
+        fixed lg:relative z-50 top-0 left-0 h-full w-72 
+        bg-[var(--bg-secondary)]/95 backdrop-blur border-r border-[var(--border)]
+        px-6 pt-20 md:pt-6 transition-transform duration-300
         ${filtersOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}>
         <header className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-xs tracking-widest text-[var(--accent)] flex items-center gap-2">
-              <Terminal size={14}/> FILTER SYSTEM
+            <p className="text-xs text-[var(--text-dim)] mb-1">
+              Filters
             </p>
-            <h2 className="text-lg font-black uppercase">Parameters</h2>
+            <h2 className="text-lg font-semibold">
+              Browse options
+            </h2>
           </div>
           <button onClick={() => setFiltersOpen(false)} className="lg:hidden">
             <X size={18}/>
@@ -113,29 +115,29 @@ const BrowsePage = () => {
 
           {/* SEARCH */}
           <div>
-            <p className="text-xs opacity-60 mb-2">Search</p>
+            <p className="text-xs text-[var(--text-dim)] mb-2">Search</p>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" size={14}/>
               <input
                 value={searchQuery}
                 onChange={e => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-                placeholder="Search title or author"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                placeholder="Search by title or author"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </div>
           </div>
 
           {/* SORT */}
           <div>
-            <p className="text-xs opacity-60 mb-2">Sort</p>
+            <p className="text-xs text-[var(--text-dim)] mb-2">Sort by</p>
             <div className="space-y-2">
               {sortOptions.map(opt => (
                 <button key={opt}
                   onClick={()=>setSortBy(opt)}
                   className={`w-full py-2 rounded-xl text-sm transition ${
                     sortBy===opt 
-                      ? "bg-[var(--accent)] text-white shadow" 
-                      : "bg-black/20 hover:bg-black/30"
+                      ? "bg-[var(--accent)] text-white" 
+                      : "bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)]"
                   }`}>
                   {opt}
                 </button>
@@ -145,7 +147,7 @@ const BrowsePage = () => {
 
           {/* GENRES */}
           <div>
-            <p className="text-xs opacity-60 mb-2">Genres</p>
+            <p className="text-xs text-[var(--text-dim)] mb-2">Genres</p>
             <div className="flex flex-wrap gap-2">
               {genres.map(g => (
                 <button key={g}
@@ -153,7 +155,7 @@ const BrowsePage = () => {
                   className={`px-3 py-1.5 rounded-full text-xs transition ${
                     activeGenres.includes(g) 
                       ? "bg-[var(--accent)] text-white" 
-                      : "bg-black/20 hover:bg-black/30"
+                      : "bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)]"
                   }`}>
                   {g}
                 </button>
@@ -164,39 +166,40 @@ const BrowsePage = () => {
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 px-4 sm:px-6 lg:px-12 py-10">
+      <main className="flex-1 px-4 sm:px-6 lg:px-12 py-1 md:py-10">
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-[var(--accent)] mb-2">
-            <Activity size={16}/> 
-            <span className="text-xs tracking-widest uppercase">Catalog Stream</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase">
-            Data <span className="text-[var(--accent)]">Grid</span>
+          <p className="text-sm text-[var(--text-dim)] mb-2">
+            Browse library
+          </p>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold">
+            All series
           </h1>
-          <p className="text-sm opacity-60 mt-1">{filteredList.length} results</p>
+          <p className="text-sm text-[var(--text-dim)] mt-1">
+            {filteredList.length} results
+          </p>
         </header>
 
         {/* GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-          {currentItems.map((manga, index) => (
+          {currentItems.map((manga) => (
             <motion.div key={manga._id} initial={{opacity:0,y:15}} animate={{opacity:1,y:0}}>
               <Link to={`/manga/${manga._id}`} className="group block">
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-black/20 transition group-hover:-translate-y-1 group-hover:shadow-xl">
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                   <img 
                     src={manga.coverImage} 
                     alt={manga.title} 
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-[1.02]"
                   />
-                  <div className="absolute top-2 right-2 bg-black/70 px-2 py-0.5 rounded-full text-xs text-yellow-400 flex items-center gap-1">
+                  <div className="absolute top-2 right-2 bg-black/60 px-2 py-0.5 rounded-full text-xs text-yellow-400 flex items-center gap-1">
                     <Star size={12} fill="currentColor"/>{manga.rating||"5.0"}
                   </div>
                 </div>
                 <div className="mt-2 space-y-1">
-                  <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-[var(--accent)] transition">
+                  <h3 className="text-sm font-medium line-clamp-2 group-hover:text-[var(--accent)] transition">
                     {manga.title}
                   </h3>
-                  <div className="text-xs opacity-60 flex justify-between">
+                  <div className="text-xs text-[var(--text-dim)] flex justify-between">
                     <span>{manga.status}</span>
                     <span>{manga.TotalChapter||0} ch</span>
                   </div>
@@ -212,19 +215,19 @@ const BrowsePage = () => {
             <button 
               disabled={currentPage===1} 
               onClick={()=>setCurrentPage(p=>p-1)} 
-              className="p-3 rounded-full bg-black/30 disabled:opacity-30 hover:bg-black/40 transition"
+              className="p-3 rounded-full bg-[var(--bg-secondary)] disabled:opacity-30 hover:bg-[var(--bg-primary)] transition"
             >
               <ChevronLeft size={18}/>
             </button>
 
-            <span className="font-semibold">
+            <span className="font-medium">
               {currentPage} / {totalPages}
             </span>
 
             <button 
               disabled={currentPage===totalPages} 
               onClick={()=>setCurrentPage(p=>p+1)} 
-              className="p-3 rounded-full bg-black/30 disabled:opacity-30 hover:bg-black/40 transition"
+              className="p-3 rounded-full bg-[var(--bg-secondary)] disabled:opacity-30 hover:bg-[var(--bg-primary)] transition"
             >
               <ChevronRight size={18}/>
             </button>

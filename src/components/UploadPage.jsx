@@ -403,10 +403,10 @@ const UploadPage = () => {
       <div className="relative z-10 p-4 md:p-10 max-w-7xl mx-auto">
         <header className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 p-8 rounded-[2.5rem] bg-[var(--bg-secondary)]/40 backdrop-blur-2xl border border-[var(--border)] shadow-2xl">
           <div className="space-y-1">
-            <h1 className="text-4xl font-black uppercase tracking-tighter italic">
+            <h1 className="text-4xl  font-bold uppercase tracking-tighter italic">
               Studio <span style={{ color: themeColor }}>Upload</span>
             </h1>
-            <p className="text-[var(--text-dim)] text-[10px] font-black uppercase tracking-[0.4em]">Cloudinary Intelligence Terminal</p>
+            <p className="text-[var(--text-dim)] text-[10px]  font-bold uppercase tracking-[0.4em]">Cloudinary Intelligence Terminal</p>
           </div>
         </header>
 
@@ -414,13 +414,13 @@ const UploadPage = () => {
           {/* LEFT: PARAMETERS */}
           <div className="lg:col-span-4 space-y-6">
             <div className="p-8 rounded-[3rem] bg-[var(--bg-secondary)]/20 border border-border-[var(--border)] shadow-2xl">
-              <h2 className="text-[11px] font-black uppercase text-[var(--text-dim)] mb-8 flex items-center gap-2">
+              <h2 className="text-[11px]  font-bold uppercase text-[var(--text-dim)] mb-8 flex items-center gap-2">
                <LayoutDashboard size={14} style={{ color: accentColor }} />  Core Parameters
               </h2>
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Series Selection</label>
+                  <label className="text-[9px]  font-bold uppercase text-[var(--text-dim)] ml-1">Series Selection</label>
                   <select 
                     value={selectedManga}
                     onChange={(e) => setSelectedManga(e.target.value)}
@@ -436,52 +436,52 @@ const UploadPage = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Chapter</label>
+                    <label className="text-[9px]  font-bold uppercase text-[var(--text-dim)] ml-1">Chapter</label>
                     <input type="number" value={chapterNum} onChange={(e) => setChapterNum(e.target.value)} placeholder="01" className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-5 py-4 text-xs outline-none" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Volume</label>
+                    <label className="text-[9px]  font-bold uppercase text-[var(--text-dim)] ml-1">Volume</label>
                     <input type="text" value={volumeNum} onChange={(e) => setVolumeNum(e.target.value)} placeholder="--" className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)]rounded-2xl px-5 py-4 text-xs outline-none" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-[var(--text-dim)] ml-1">Chapter Title</label>
+                  <label className="text-[9px]  font-bold uppercase text-[var(--text-dim)] ml-1">Chapter Title</label>
                   <input type="text" value={chapterTitle} onChange={(e) => setChapterTitle(e.target.value)} placeholder="The Awakening" className="w-full bg-[var(--bg-primary)]/50 border border-[var(--border)] rounded-2xl px-5 py-4 text-xs outline-none" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase ttext-[var(--text-dim)] ml-1">Upload Quality</label>
+                  <label className="text-[9px]  font-bold uppercase ttext-[var(--text-dim)] ml-1">Upload Quality</label>
                   <div className="flex gap-3 items-center">
                     <label className="inline-flex items-center gap-2 text-xs cursor-pointer">
                       <input type="radio" name="quality" value="high" checked={quality === 'high'} onChange={() => setQuality('high')} />
-                      <span className="font-black uppercase text-[10px] ml-1">High (Original)</span>
+                      <span className=" font-bold uppercase text-[10px] ml-1">High (Original)</span>
                     </label>
 
                     <label className="inline-flex items-center gap-2 text-xs cursor-pointer">
                       <input type="radio" name="quality" value="low" checked={quality === 'low'} onChange={() => setQuality('low')} />
-                      <span className="font-black uppercase text-[10px] ml-1">Low MB (Compressed)</span>
+                      <span className=" font-bold uppercase text-[10px] ml-1">Low MB (Compressed)</span>
                     </label>
                   </div>
-                  <p className="text-[10px] texttext-[var(--text-dim)] italic">Choose <span className="font-black">Low MB</span> to compress images before upload (smaller size, faster uploads).</p>
+                  <p className="text-[10px] texttext-[var(--text-dim)] italic">Choose <span className=" font-bold">Low MB</span> to compress images before upload (smaller size, faster uploads).</p>
 
                   {quality === 'low' && (
                     <div className="mt-2 space-y-3">
                       <div className="flex items-center gap-3">
                         <label className="inline-flex items-center gap-2 text-xs cursor-pointer">
                           <input type="checkbox" checked={convertPngToJpeg} onChange={(e) => setConvertPngToJpeg(e.target.checked)} />
-                          <span className="text-[10px] font-black uppercase ml-1">Convert PNG → JPEG for extra savings</span>
+                          <span className="text-[10px]  font-bold uppercase ml-1">Convert PNG → JPEG for extra savings</span>
                         </label>
                       </div>
 
                       <div className="flex items-center gap-4">
                         <div className="w-1/2">
-                          <label className="text-[9px] font-black uppercase text-text-[var(--text-dim)]">JPEG Quality: <span className="font-bold">{jpegQuality}%</span></label>
+                          <label className="text-[9px]  font-bold uppercase text-text-[var(--text-dim)]">JPEG Quality: <span className="font-bold">{jpegQuality}%</span></label>
                           <input type="range" min={30} max={90} value={jpegQuality} onChange={(e) => setJpegQuality(Number(e.target.value))} className="w-full" />
                         </div>
 
                         <div className="w-1/2">
-                          <label className="text-[9px] font-black uppercase text-text-[var(--text-dim)]">Max Width</label>
+                          <label className="text-[9px]  font-bold uppercase text-text-[var(--text-dim)]">Max Width</label>
                           <select value={maxWidth} onChange={(e) => setMaxWidth(Number(e.target.value))} className="w-full bg-[var(--bg-secondary)]/20 border border-border-[var(--border)] rounded-2xl px-3 py-2 text-xs font-bold appearance-none cursor-pointer outline-none">
                             <option value={800}>800</option>
                             <option value={1200}>1200</option>
@@ -499,7 +499,7 @@ const UploadPage = () => {
 
             <div className="p-6 rounded-[2.5rem] bg-[var(--bg-secondary)]/20 border border-[var(--border)] space-y-3">
               <div className="flex items-center justify-between">
-                <div className="text-[12px] font-black">
+                <div className="text-[12px]  font-bold">
                   <div>Total: <span className="font-bold">
                     {Math.max(0, Math.round(selectedFiles.reduce((sum, f) => sum + (f.originalSize || 0), 0) / 1024 / 1024 * 100) / 100)} MB
                   </span></div>
@@ -511,8 +511,8 @@ const UploadPage = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button onClick={() => setAllCompressed(true)} className="px-3 py-2 rounded-xl bg-[var(--bg-secondary)]/20 font-black text-[11px]">Use Compressed</button>
-                  <button onClick={() => setAllCompressed(false)} className="px-3 py-2 rounded-xl [var(--bg-secondary)]/20 font-black text-[11px]">Use Original</button>
+                  <button onClick={() => setAllCompressed(true)} className="px-3 py-2 rounded-xl bg-[var(--bg-secondary)]/20  font-bold text-[11px]">Use Compressed</button>
+                  <button onClick={() => setAllCompressed(false)} className="px-3 py-2 rounded-xl [var(--bg-secondary)]/20  font-bold text-[11px]">Use Original</button>
                 </div>
               </div>
 
@@ -522,7 +522,7 @@ const UploadPage = () => {
                     <div style={{ width: `${uploadProgress}%` }} className="h-3 bg-green-500 transition-all" />
                   </div>
 
-                  <div className="flex items-center justify-between text-[12px] font-black">
+                  <div className="flex items-center justify-between text-[12px]  font-bold">
                     <div>{uploadProgress}% • {formatBytes(uploadedBytes)} / {formatBytes(uploadTotalBytes)}</div>
                     <div>ETA: <span className="font-bold">{uploadETA}</span></div>
                   </div>
@@ -532,7 +532,7 @@ const UploadPage = () => {
               <button 
                 onClick={handleDeploy}
                 disabled={isDeploying || compressing || uploading}
-                className="w-full py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                className="w-full py-5 rounded-[1.5rem]  font-bold uppercase tracking-[0.2em] text-[10px] shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                 style={{ backgroundColor: themeColor, color: '#000' }}
               >
                 {isDeploying || compressing || uploading ? <Loader2 className="animate-spin" size={18} /> : <CloudUpload size={18} />} 
@@ -561,8 +561,8 @@ const UploadPage = () => {
                   <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center mb-6 border border-white/10">
                     <Plus size={32} className="text-gray-400" />
                   </div>
-                  <p className="text-xs font-black uppercase tracking-widest text-gray-500">Inject Chapter Pages</p>
-                  <label className="mt-6 cursor-pointer bg-white text-black px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest inline-block">
+                  <p className="text-xs  font-bold uppercase tracking-widest text-gray-500">Inject Chapter Pages</p>
+                  <label className="mt-6 cursor-pointer bg-white text-black px-10 py-4 rounded-2xl text-[10px]  font-bold uppercase tracking-widest inline-block">
                     {compressing ? (
                       <span className="flex items-center gap-2"><Loader2 className="animate-spin" size={14} /> Compressing...</span>
                     ) : (
@@ -576,17 +576,17 @@ const UploadPage = () => {
                   {selectedFiles.map((file, idx) => (
                     <div key={file.id} className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-black shadow-2xl">
                       <img src={file.preview} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700" alt="preview" />
-                      <div className="absolute top-2 left-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg text-[8px] font-black border border-white/10">
+                      <div className="absolute top-2 left-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg text-[8px]  font-bold border border-white/10">
                         P.{idx + 1}
                       </div>
 
-                      <div className="absolute top-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg text-[9px] font-black border border-white/10">
-                        <button onClick={() => toggleFileCompress(file.id)} className={`px-2 py-1 rounded-md text-[10px] font-black ${file.compressed ? 'bg-green-500 text-black' : 'bg-white/5 text-white'}`}>
+                      <div className="absolute top-2 right-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg text-[9px]  font-bold border border-white/10">
+                        <button onClick={() => toggleFileCompress(file.id)} className={`px-2 py-1 rounded-md text-[10px]  font-bold ${file.compressed ? 'bg-green-500 text-black' : 'bg-white/5 text-white'}`}>
                           {file.compressed ? 'Compressed' : 'Original'}
                         </button>
                       </div>
 
-                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg text-[9px] font-black border border-white/10">
+                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/80 backdrop-blur-md rounded-lg text-[9px]  font-bold border border-white/10">
                         <div className="text-[9px]">
                           {file.currentFile && file.originalSize ? (
                             <>

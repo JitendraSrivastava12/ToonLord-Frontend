@@ -153,22 +153,6 @@ const Dashboard = () => {
               Welcome back. Here’s what’s happening on your platform today.
             </p>
           </div>
-
-          <div className="flex bg-white p-1 rounded-xl border border-gray-200 shadow-sm">
-            {["Weekly", "Monthly", "Yearly"].map((label) => (
-              <button
-                key={label}
-                onClick={() => setFilter(label)}
-                className={`px-5 py-2 text-sm rounded-lg transition-all ${
-                  filter === label
-                    ? "bg-blue-600 text-white shadow"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Stats */}

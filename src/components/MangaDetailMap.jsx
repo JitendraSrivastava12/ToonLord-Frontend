@@ -21,7 +21,7 @@ const MangaDetailMap = ({ manga }) => {
       {/* 1. TITLES SECTION */}
       <DetailRow label="Titles">
         <ul className="list-disc pl-5 space-y-1">
-          <li className={`font-black text-sm uppercase tracking-tighter italic ${accentText}`}>
+          <li className={`font-black text-sm uppercase  ${accentText}`}>
             {manga.title}
           </li>
           {manga.altTitles?.map((t, i) => (
