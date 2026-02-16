@@ -6,14 +6,13 @@ import ToonLordHero from '../components/ToonLordHero';
 import MangaGrid from '../components/MangaGrid';
 import CreatorCTA from '../components/CreatorCTA';
 import { AppContext } from "../UserContext";
-const API_URL = import.meta.env.VITE_API_URL;
 
 const ToonLordLanding = () => {
-  const { currentTheme } = useContext(AppContext);
+  const { currentTheme, user } = useContext(AppContext);
 
   return (
     <div className={`theme-${currentTheme} transition-colors duration-500 bg-[var(--bg-primary)] min-h-screen`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-2 md:py-12 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-12 space-y-16">
 
         {/* HERO */}
         <ToonLordHero />
@@ -57,7 +56,6 @@ const ToonLordLanding = () => {
             <MangaGrid
               category="trending"
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6"
-              itemClassName="aspect-[3/4]"
             />
           </div>
         </motion.section>
@@ -103,28 +101,29 @@ const ToonLordLanding = () => {
             <MangaGrid
               category="premium"
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6"
-              itemClassName="aspect-[3/4]"
             />
           </div>
         </motion.section>
 
         {/* SUBSCRIPTION CTA */}
-        <section className="rounded-3xl border border-[var(--border)] bg-[var(--bg-secondary)] p-8 sm:p-12 text-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--text-main)]">
-            Upgrade to ToonLord VIP
-          </h2>
-          <p className="text-sm sm:text-base text-[var(--text-dim)] mt-4 max-w-2xl mx-auto leading-relaxed">
-            Get access to exclusive comics, early releases, and premium creator content.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <Link 
-              to="/subscription" 
-              className="inline-block px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-medium hover:opacity-90 transition"
-            >
-              View subscription plans
-            </Link>
-          </div>
-        </section>
+        {!user?.isVIP && (
+          <section className="rounded-3xl border border-[var(--border)] bg-[var(--bg-secondary)] p-8 sm:p-12 text-center">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--text-main)]">
+              Upgrade to ToonLord VIP
+            </h2>
+            <p className="text-sm sm:text-base text-[var(--text-dim)] mt-4 max-w-2xl mx-auto leading-relaxed">
+              Get access to exclusive comics, early releases, and premium creator content.
+            </p>
+            <div className="mt-8 flex justify-center">
+              <Link 
+                to={user ? "/subscription" : "/loginlanding"}
+                className="inline-block px-8 py-3 rounded-xl bg-[var(--accent)] text-white font-medium hover:opacity-90 transition"
+              >
+                {user ? "View subscription plans" : "Login to upgrade"}
+              </Link>
+            </div>
+          </section>
+        )}
 
       </div>
     </div>

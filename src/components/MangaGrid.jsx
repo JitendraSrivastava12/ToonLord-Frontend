@@ -1,11 +1,13 @@
 import React, { useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Star, Zap, Loader2, ShieldAlert, Baby, Orbit, Lock } from 'lucide-react';
+import { Star, Zap, Loader2, ShieldAlert, Baby, Lock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppContext } from "../UserContext";
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
   const { isRedMode, familyMode, currentTheme } = useContext(AppContext);
 
@@ -24,14 +26,20 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
   const mangaDisplay = useMemo(() => {
     if (!mangas) return [];
 
-    let filtered = mangas.filter(m => (familyMode ? m.rating_type !== '18+' : true));
+    let filtered = mangas.filter(m =>
+      familyMode ? m.rating_type !== '18+' : true
+    );
 
     if (category === 'premium') {
       filtered = filtered.filter(m => m.isPremium === true);
     } else if (category === 'trending') {
-      filtered = [...filtered].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 12);
+      filtered = [...filtered]
+        .sort((a, b) => (b.views || 0) - (a.views || 0))
+        .slice(0, 12);
     } else if (category === 'top-rated') {
-      filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 12);
+      filtered = [...filtered]
+        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        .slice(0, 12);
     }
 
     return filtered;
@@ -39,7 +47,10 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
 
   if (isLoading) return (
     <div className="py-24 flex flex-col items-center justify-center gap-4">
-      <Loader2 className={`animate-spin ${isRedMode ? 'text-red-500' : 'text-[var(--accent)]'}`} size={40} />
+      <Loader2
+        className={`animate-spin ${isRedMode ? 'text-red-500' : 'text-[var(--accent)]'}`}
+        size={40}
+      />
       <p className="text-xs tracking-widest text-[var(--text-dim)] uppercase">
         Loading Library...
       </p>
@@ -64,7 +75,7 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
                 className="group h-full flex flex-col rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)]/30 backdrop-blur overflow-hidden transition hover:-translate-y-1 hover:shadow-xl hover:border-[var(--accent)]/40"
               >
                 {/* IMAGE */}
-                <div className="relative aspect-[3/4] overflow-hidden">
+                <div className="relative aspect-[2/3] overflow-hidden">
                   <img
                     src={manga.coverImage}
                     alt={manga.title}
@@ -73,9 +84,13 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
 
                   {/* BADGE */}
                   {manga.isPremium ? (
-                    <div className={`absolute top-2 left-2 px-2.5 py-1 rounded-full text-[10px] font-semibold flex items-center gap-1 shadow ${
-                      isRedMode ? 'bg-red-600 text-white' : 'bg-[var(--accent)] text-white'
-                    }`}>
+                    <div
+                      className={`absolute top-2 left-2 px-2.5 py-1 rounded-full text-[10px] font-semibold flex items-center gap-1 shadow ${
+                        isRedMode
+                          ? 'bg-red-600 text-white'
+                          : 'bg-[var(--accent)] text-white'
+                      }`}
+                    >
                       <Zap size={11} />
                       {manga.price > 0 ? `${manga.price} COINS` : 'VIP'}
                     </div>
@@ -103,11 +118,13 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
 
                 {/* INFO */}
                 <div className="p-3 flex flex-col gap-1">
-                  <h3 className="text-sm sm:text-base font-semibold line-clamp-2 text-[var(--text-main)] group-hover:text-[var(--accent)] transition">
+                  <h3 className="text-sm sm:text-base font-semibold line-clamp-1 text-[var(--text-main)] group-hover:text-[var(--accent)] transition">
                     {manga.title}
                   </h3>
                   <div className="text-xs text-[var(--text-dim)] flex justify-between">
-                    <span className="capitalize">{manga.status || 'ongoing'}</span>
+                    <span className="capitalize">
+                      {manga.status || 'ongoing'}
+                    </span>
                     <span>{manga.TotalChapter || 0} ch</span>
                   </div>
                 </div>
@@ -116,7 +133,7 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
           ))}
         </AnimatePresence>
 
-        {/* EMPTY */}
+        {/* EMPTY STATE */}
         {mangaDisplay.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
