@@ -4,16 +4,21 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Home, Compass, Library, LayoutDashboard, User, FileUp,
-  BarChart3, Settings as SettingsIcon, Cpu, Twitter, Github, Youtube,
+  BarChart3, Settings as SettingsIcon, Cpu, Linkedin, Github, Youtube,
   Search, ShieldAlert, Star, Loader2, LogOut, LogIn, Sparkles, Users, Layers
 } from "lucide-react";
 import NavBar from "./NavBar";
 import { AppContext } from "../UserContext";
 import { useAlert } from "../context/AlertContext";
+
 const API_URL = import.meta.env.VITE_API_URL;
-const SocialIcon = ({ icon, accent }) => (
+
+// Updated SocialIcon to accept an href prop
+const SocialIcon = ({ icon, accent, href }) => (
   <a 
-    href="#" 
+    href={href}
+    target="_blank" 
+    rel="noopener noreferrer"
     className="p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/20 transition-all hover:scale-110 active:scale-90"
     onMouseEnter={(e) => e.currentTarget.style.color = accent}
     onMouseLeave={(e) => e.currentTarget.style.color = 'inherit'}
@@ -38,7 +43,7 @@ function Layout() {
   const isLight = currentTheme === "light";
   const activeAccent = isRedMode ? '#ef4444' : 'var(--accent)';
 
-  // --- UPDATED LIVE SEARCH LOGIC ---
+  // --- LIVE SEARCH LOGIC ---
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length >= 2) {
@@ -163,7 +168,6 @@ function Layout() {
                   {searchQuery && <X size={14} className="mr-3 opacity-40 cursor-pointer" onClick={() => setSearchQuery("")} />}
                 </div>
 
-                {/* SEARCH RESULTS DROPDOWN (SIDEBAR) */}
                 <AnimatePresence>
                   {suggestions.length > 0 && (
                     <motion.div 
@@ -184,7 +188,6 @@ function Layout() {
                             }}
                             className={`flex items-center gap-3 p-3 transition-all cursor-pointer border-b last:border-0 ${themeStyles.border} ${themeStyles.itemHover}`}
                           >
-                            {/* DYNAMIC IMAGE: CIRCLE FOR USER, COVER FOR MANGA */}
                             <div className="relative shrink-0">
                                 <img 
                                   src={isUser ? (item.profilePicture || '/default.png') : item.coverImage} 
@@ -330,9 +333,22 @@ function Layout() {
               <div>
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] mb-6 opacity-30">Neural Net</h4>
                 <div className="flex gap-3">
-                  <SocialIcon icon={<Twitter size={18} />} accent={activeAccent} />
-                  <SocialIcon icon={<Github size={18} />} accent={activeAccent} />
-                  <SocialIcon icon={<Youtube size={18} />} accent={activeAccent} />
+                  {/* Updated Social Links */}
+                  <SocialIcon 
+                    icon={<Linkedin size={18} />} 
+                    accent={activeAccent} 
+                    href="https://www.linkedin.com/in/jitendra-srivastava-099b0b289/" 
+                  />
+                  <SocialIcon 
+                    icon={<Github size={18} />} 
+                    accent={activeAccent} 
+                    href="https://github.com/JitendraSrivastava12" 
+                  />
+                  <SocialIcon 
+                    icon={<Youtube size={18} />} 
+                    accent={activeAccent} 
+                    href="#" 
+                  />
                 </div>
               </div>
             </div>

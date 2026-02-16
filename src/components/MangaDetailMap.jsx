@@ -24,7 +24,7 @@ const MangaDetailMap = ({ manga }) => {
     >
       <DetailRow label="Titles">
         <ul className="list-disc pl-4 space-y-1">
-          <li className={`font-black text-sm uppercase ${accentText}`}>
+          <li className={`font-bold text-sm uppercase ${accentText}`}>
             {manga.title}
           </li>
           {manga.altTitles?.map((t, i) => (
@@ -44,7 +44,7 @@ const MangaDetailMap = ({ manga }) => {
                 : "bg-[var(--accent)] shadow-[var(--accent-glow)]"
             }`}
           />
-          <span className="font-black uppercase text-[10px] tracking-widest text-[var(--text-main)]">
+          <span className="font-bold uppercase text-[10px] tracking-widest text-[var(--text-main)]">
             {manga.status || "Ongoing"}
           </span>
         </div>
@@ -65,7 +65,7 @@ const MangaDetailMap = ({ manga }) => {
       <DetailRow label="Author">
         <div className="group cursor-default">
           {manga.authorNative && (
-            <div className="text-[var(--text-main)] font-black text-xs uppercase tracking-tight">
+            <div className="text-[var(--text-main)] font-bold text-xs uppercase tracking-tight">
               {manga.authorNative}
             </div>
           )}
@@ -82,7 +82,7 @@ const MangaDetailMap = ({ manga }) => {
           {genresToShow.slice(0, 2).map((g, i) => (
             <span
               key={i}
-              className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-default ${badgeStyle}`}
+              className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-lg border transition-all cursor-default ${badgeStyle}`}
             >
               {g}
             </span>
@@ -114,7 +114,7 @@ const DetailRow = ({ label, children }) => (
     <div
       className="w-full sm:w-32 md:w-40 px-3 sm:px-4 py-2 sm:py-4
         bg-[var(--bg-primary)]/50 text-[var(--text-dim)]
-        font-black text-[9px] uppercase tracking-[0.3em]
+        font-bold text-[9px] uppercase tracking-[0.3em]
         flex items-center border-b sm:border-b-0 sm:border-r border-[var(--border)]"
     >
       {label}

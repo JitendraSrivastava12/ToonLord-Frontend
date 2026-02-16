@@ -16,6 +16,7 @@ import ReportModal from "../components/ReportModal";
 
 const CHAPTERS_PER_PAGE = 50;
 const API_URL = import.meta.env.VITE_API_URL;
+
 const MangaDetail = () => {
   const { mangaId } = useParams();
   const navigate = useNavigate();
@@ -235,26 +236,26 @@ const MangaDetail = () => {
 
   return (
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme}`}>
-      <div className="max-w-5xl mx-auto px-4  lg:py-10 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 lg:py-10 relative z-10">
         
-        {/* HERO CARD */}
-        <section className="relative rounded-3xl p-6 lg:p-12 bg-[var(--bg-secondary)] backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
+        {/* HERO CARD - Responsive Flex logic added */}
+        <section className="relative rounded-[2rem] md:rounded-3xl p-5 md:p-8 lg:p-12 bg-[var(--bg-secondary)] backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
-            {/* COVER */}
+            {/* COVER - Adaptive sizing */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto lg:mx-0 shrink-0">
-              <img src={manga.coverImage} alt={manga.title} className="w-60 h-[380px] object-cover rounded-2xl shadow-2xl border border-white/10 " />
+              <img src={manga.coverImage} alt={manga.title} className="w-48 h-[280px] md:w-60 md:h-[380px] object-cover rounded-2xl shadow-2xl border border-white/10" />
             </motion.div>
 
             {/* HEADER TEXT */}
-            <div className="flex-1 flex flex-col justify-center space-y-6">
+            <div className="flex-1 flex flex-col justify-center text-center lg:text-left space-y-6">
               <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl lg:text-5xl font-semibold uppercase   text-[var(--text-main)] leading-none line-clamp-2">
+                <div className="flex flex-col lg:flex-row items-center gap-3">
+                  <h1 className="text-2xl md:text-3xl lg:text-5xl font-semibold uppercase text-[var(--text-main)] leading-tight line-clamp-2">
                     {manga.title}
                   </h1>
                   {manga.isPremium && (
-                    <span className="bg-yellow-500 text-black text-[9px] font-semibold px-3 py-1 rounded-full uppercase  ">Premium</span>
+                    <span className="bg-yellow-500 text-black text-[9px] font-semibold px-3 py-1 rounded-full uppercase">Premium</span>
                   )}
                 </div>
                 <p className={`text-[10px] font-semibold uppercase tracking-[0.3em] ${themeStyles.text}`}>
@@ -262,7 +263,7 @@ const MangaDetail = () => {
                 </p>
               </div>
 
-              {/* STAT GRID */}
+              {/* STAT GRID - 2 cols on mobile */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <StatBox icon={<Layers size={12}/>} label="Status" value={manga.status || "Ongoing"} accent={themeStyles.text} />
                 <StatBox icon={<BookOpen size={12}/>} label="Chapters" value={totalChapters} />
@@ -270,12 +271,12 @@ const MangaDetail = () => {
                 <StatBox icon={<Star size={12}/>} label="Rating" value={manga.rating || "5.0"} color="text-yellow-400" />
               </div>
 
-              {/* ACTION BUTTONS */}
-              <div className="flex flex-wrap gap-3 pt-2">
+              {/* ACTION BUTTONS - Full width stacking on mobile */}
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
                 <Link 
                   to={chapters.length > 0 ? `/manga/${mangaId}/${chapters[chapters.length - 1]?.chapterNumber}` : "#"} 
                   onClick={() => chapters.length > 0 && syncLibrary('Reading')}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-semibold uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button} ${chapters.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                  className={`flex-1 flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-semibold uppercase tracking-widest text-[10px] text-white transition-all transform hover:scale-105 active:scale-95 ${themeStyles.button} ${chapters.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                 >
                   <Play size={18} fill="currentColor" /> 
                   {activeStatuses.includes('Reading') ? 'In Library' : 'Read Now'}
@@ -285,60 +286,59 @@ const MangaDetail = () => {
                 {manga.isPremium && !isOwned && !isUploader && (
                   <button 
                     onClick={() => setIsPurchaseModalOpen(true)}
-                    className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 font-semibold uppercase tracking-widest text-[9px] hover:scale-105 transition-all"
+                    className="flex-1 flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 font-semibold uppercase tracking-widest text-[9px] hover:scale-105 transition-all"
                   >
                     <ShoppingBag size={16} />
                     Unlock Access ({manga.price || 0} Coins)
                   </button>
                 )}
                 
-                <button 
-                  onClick={() => syncLibrary('Favorite')}
-                  disabled={isSyncing}
-                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
-                    ${activeStatuses.includes('Favorite') 
-                      ? 'border-red-500 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
-                      : 'border-[var(--border)] text-[var(--text-dim)] hover:text-red-500'}`}
-                >
-                  <Heart size={16} fill={activeStatuses.includes('Favorite') ? "currentColor" : "none"} /> 
-                  {activeStatuses.includes('Favorite') ? 'Favorited' : 'Favorite'}
-                </button>
+                {/* Second row of smaller buttons */}
+                <div className="flex gap-2 w-full sm:w-auto">
+                    <button 
+                      onClick={() => syncLibrary('Favorite')}
+                      disabled={isSyncing}
+                      className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
+                        ${activeStatuses.includes('Favorite') 
+                          ? 'border-red-500 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]' 
+                          : 'border-[var(--border)] text-[var(--text-dim)] hover:text-red-500'}`}
+                    >
+                      <Heart size={16} fill={activeStatuses.includes('Favorite') ? "currentColor" : "none"} /> 
+                    </button>
 
-                <button 
-                  onClick={() => syncLibrary('Bookmarks')}
-                  disabled={isSyncing}
-                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
-                    ${activeStatuses.includes('Bookmarks') 
-                      ? 'border-yellow-500 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
-                      : 'border-[var(--border)] text-[var(--text-dim)] hover:text-yellow-500'}`}
-                >
-                  <Bookmark size={16} fill={activeStatuses.includes('Bookmarks') ? "currentColor" : "none"} /> 
-                  {activeStatuses.includes('Bookmarks') ? 'Waitlisted' : 'Bookmark'}
-                </button>
+                    <button 
+                      onClick={() => syncLibrary('Bookmarks')}
+                      disabled={isSyncing}
+                      className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
+                        ${activeStatuses.includes('Bookmarks') 
+                          ? 'border-yellow-500 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' 
+                          : 'border-[var(--border)] text-[var(--text-dim)] hover:text-yellow-500'}`}
+                    >
+                      <Bookmark size={16} fill={activeStatuses.includes('Bookmarks') ? "currentColor" : "none"} /> 
+                    </button>
 
-                <button 
-                  onClick={() => syncLibrary('Subscribe')}
-                  disabled={isSyncing}
-                  className={`flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
-                    ${activeStatuses.includes('Subscribe') 
-                      ? 'border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
-                      : 'border-[var(--border)] text-[var(--text-dim)] hover:text-purple-500'}`}
-                >
-                  <Bell size={16} className={activeStatuses.includes('Subscribe') ? "animate-pulse" : ""} fill={activeStatuses.includes('Subscribe') ? "currentColor" : "none"} /> 
-                  {activeStatuses.includes('Subscribe') ? 'Subscribed' : 'Subscribe'}
-                </button>
+                    <button 
+                      onClick={() => syncLibrary('Subscribe')}
+                      disabled={isSyncing}
+                      className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[var(--bg-primary)] border transition-all shadow font-semibold uppercase tracking-widest text-[9px]
+                        ${activeStatuses.includes('Subscribe') 
+                          ? 'border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
+                          : 'border-[var(--border)] text-[var(--text-dim)] hover:text-purple-500'}`}
+                    >
+                      <Bell size={16} className={activeStatuses.includes('Subscribe') ? "animate-pulse" : ""} fill={activeStatuses.includes('Subscribe') ? "currentColor" : "none"} /> 
+                    </button>
 
-                <button 
-                  onClick={() => setReportModalOpen(true)}
-                  className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] transition-all shadow font-semibold uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-red-500 hover:border-red-500/40"
-                >
-                  <ShieldAlert size={16} /> 
-                  Report
-                </button>
+                    <button 
+                      onClick={() => setReportModalOpen(true)}
+                      className="flex-1 sm:flex-none flex items-center justify-center px-4 py-3 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border)] transition-all shadow font-semibold uppercase tracking-widest text-[9px] text-[var(--text-dim)] hover:text-red-500"
+                    >
+                      <ShieldAlert size={16} /> 
+                    </button>
+                </div>
               </div>
 
               {/* LIVE INTERACTIVE RATING MODULE */}
-              <div className="flex flex-col gap-3 p-5 rounded-2xl bg-white/5 border border-white/10 w-fit">
+              <div className="flex flex-col items-center lg:items-start gap-3 p-5 rounded-2xl bg-white/5 border border-white/10 w-full lg:w-fit mx-auto lg:mx-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-40">Your Rating</p>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -369,18 +369,18 @@ const MangaDetail = () => {
           </div>
         </section>
 
-        {/* TABS MODULE */}
+        {/* TABS MODULE - Standardized padding for mobile */}
         <div className="mt-10 bg-[var(--bg-secondary)] backdrop-blur-2xl border border-[var(--border)] rounded-3xl overflow-hidden">
-          <nav className="flex border-b border-[var(--border)]">
+          <nav className="flex border-b border-[var(--border)] overflow-x-auto no-scrollbar">
             {["about", "toc", "review"].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-4 text-[9px] font-semibold uppercase tracking-[0.3em] transition-all
+                className={`flex-1 min-w-[100px] py-4 text-[9px] font-semibold uppercase tracking-[0.3em] transition-all
                   ${activeTab === tab ? 'bg-[var(--accent)] text-white shadow' : 'text-[var(--text-dim)] hover:bg-white/5'}`}>
                 {tab === "toc" ? "Chapters" : tab === "review" ? "Comments" : "Details"}
               </button>
             ))}
           </nav>
-          <div className="p-8">
+          <div className="p-5 md:p-8">
             <AnimatePresence mode="wait">
               {activeTab === "about" && (
                 <motion.div key="about-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl space-y-4">
@@ -444,7 +444,7 @@ const MangaDetail = () => {
 
                   {/* Pagination Controls */}
                   {totalPages > 1 && (
-                    <div className="flex justify-center gap-2 mt-8">
+                    <div className="flex flex-wrap justify-center gap-2 mt-8">
                       {Array.from({ length: totalPages }).map((_, i) => (
                         <button
                           key={i}
@@ -473,13 +473,13 @@ const MangaDetail = () => {
         </div>
 
         {/* INFO MAP MODULE */}
-        <div className="mt-10 p-8 lg:p-10 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--shadow-aesthetic)]">
+        <div className="mt-10 p-6 md:p-8 lg:p-10 rounded-3xl bg-[var(--bg-secondary)] border border-[var(--border)] shadow-[var(--shadow-aesthetic)]">
           <MangaDetailMap manga={manga} />
         </div>
 
       </div>
 
-      {/* --- PROFESSIONAL PURCHASE MODAL --- */}
+      {/* --- PURCHASE MODAL --- */}
       <AnimatePresence>
         {isPurchaseModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

@@ -321,10 +321,10 @@ const ProfilePage = () => {
 
           <div className="flex gap-3">
             <button onClick={() => setIsEditing(!isEditing)} className={`px-5 py-2.5 rounded-xl bg-[var(--text-main)]/[0.05] border ${theme.dynamicBorder} text-sm font-bold hover:bg-[var(--text-main)]/[0.08] transition-all flex items-center gap-2`}>
-              <Edit3 size={16} /> {isEditing ? "Cancel" : "Edit Profile"}
+              <Edit3 size={16} /> {isEditing ? "Cancel" : "Edit"}
             </button>
             <button className={`px-5 py-2.5 rounded-xl ${theme.button} text-white text-sm font-bold shadow-lg transition-all`}>
-              Share Profile
+              Share
             </button>
           </div>
         </div>
