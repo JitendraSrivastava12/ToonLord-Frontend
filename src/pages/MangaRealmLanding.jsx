@@ -73,7 +73,7 @@ const MangaRealmLanding = () => {
           <PortalCard 
             title="Admin Panel"
             icon={<ShieldCheck size={22} />}
-            desc="Manage content, users, and platform operations."
+            desc="Manage content, users, and platform operations and manage user reports and premium requests."
             features={[
               "Content Moderation",
               "User Management",

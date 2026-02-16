@@ -295,14 +295,12 @@ const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
       name={name}
       value={value}
       onChange={onChange}
-      placeholder=" "
-      className="w-full bg-white/[0.08] border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition"
+      placeholder={value ? "" : label} // <-- placeholder disappears when typing
+      className="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
     />
-    <label className="absolute left-12 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none transition-all">
-      {label}
-    </label>
   </div>
 );
+
 
 const SocialButton = ({ icon, label, onClick }) => (
   <button type="button" onClick={onClick}
