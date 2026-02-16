@@ -3,12 +3,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   ArrowLeft, Github, Chrome, Eye, EyeOff,
-  Mail, Lock, User, Phone, KeyRound, ShieldCheck, RefreshCcw
+  Mail, Lock, User, Phone, KeyRound, RefreshCcw
 } from "lucide-react";
 import mangaCoverPlaceholder from "../assets/Background/LoginBackground.png";
 import { AppContext } from "../UserContext"; 
 import { useAlert } from "../context/AlertContext";
-import { motion } from "framer-motion";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -40,6 +39,11 @@ const AuthScreen = () => {
         client_id: GOOGLE_CLIENT_ID,
         callback: handleGoogleResponse,
       });
+      // Render the Google button in the placeholder div
+      google.accounts.id.renderButton(
+        document.getElementById("googleSignInDiv"),
+        { theme: "outline", size: "large", width: "100%" }
+      );
     }
   }, []);
 
@@ -270,8 +274,9 @@ const AuthScreen = () => {
           {(isLogin || (!isLogin && signupStep === 1)) && !isResetMode && (
             <div className="mt-10">
               <div className="flex gap-4">
-                <SocialButton onClick={triggerGoogleLogin} icon={<Chrome size={20} />} label="Google" />
-                <SocialButton icon={<Github size={20} />} label=" GitHub" />
+                {/* Google Button will render here */}
+                <div id="googleSignInDiv" className="p-1 flex-1 rounded-full "></div>
+                <SocialButton icon={<Github size={20} />} label="GitHub" />
               </div>
             </div>
           )}
@@ -293,7 +298,7 @@ const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
       placeholder=" "
       className="w-full bg-white/[0.08] border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600 transition"
     />
-    <label className="absolute left-12 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-xs peer-focus:-top-2 peer-focus:text-red-600 peer-focus:text-xs">
+    <label className="absolute left-12 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none transition-all">
       {label}
     </label>
   </div>
