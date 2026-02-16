@@ -242,11 +242,17 @@ const AuthScreen = () => {
                   </div>
                 )}
 
-                <button disabled={isLoading} type="submit"
-                  className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-2xl">
-                  {isLoading ? <RefreshCcw className="animate-spin" size={18} /> :
-                    isLogin ? "Login" : signupStep === 1 ? "Create Account" : "Verify Account"}
-                </button>
+                <button 
+  disabled={isLoading} 
+  type="submit"
+  className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-2xl flex items-center justify-center"
+>
+  {isLoading ? (
+    <RefreshCcw className="animate-spin" size={18} />
+  ) : (
+    isLogin ? "Login" : signupStep === 1 ? "Create Account" : "Verify Account"
+  )}
+</button>
               </form>
             </>
           ) : (
