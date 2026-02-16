@@ -35,7 +35,7 @@ function NavBar({ setIsSidebarOpen }) {
 
   const handleProtectedNavigation = (path) => {
     if (!isLoggedIn) {
-      showAlert("Neural Access Denied. Please login to access this sector.", "error");
+      showAlert("Access Denied. Please login to access this feature.", "error");
       navigate("/loginlanding");
     } else {
       navigate(path);
