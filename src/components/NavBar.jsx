@@ -8,11 +8,15 @@ import {
   Wallet, Users, Crown
 } from "lucide-react";
 import { AppContext } from "../UserContext";
+import { useAlert } from "../context/AlertContext"; 
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 function NavBar({ setIsSidebarOpen }) {
   const navigate = useNavigate();
   const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user } = useContext(AppContext);
+  const { showAlert } = useAlert(); 
   
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -28,6 +32,15 @@ function NavBar({ setIsSidebarOpen }) {
   const searchRef = useRef(null);
   const searchInputRef = useRef(null);
   const { scrollY } = useScroll();
+
+  const handleProtectedNavigation = (path) => {
+    if (!isLoggedIn) {
+      showAlert("Neural Access Denied. Please login to access this sector.", "error");
+      navigate("/loginlanding");
+    } else {
+      navigate(path);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -206,7 +219,7 @@ function NavBar({ setIsSidebarOpen }) {
                         </span>
                         <div className="flex items-center gap-2">
                            <span className="text-[7px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border border-white/5" 
-                                 style={{ backgroundColor: isUser ? '#3b82f620' : `${activeAccent}20`, color: isUser ? '#3b82f6' : activeAccent }}>
+                                   style={{ backgroundColor: isUser ? '#3b82f620' : `${activeAccent}20`, color: isUser ? '#3b82f6' : activeAccent }}>
                             {isUser ? 'User Profile' : (item.status || 'Ongoing')}
                           </span>
                           {isUser && item.role === 'author' && <span className="text-[7px] text-amber-500 font-bold uppercase tracking-widest">[AUTHOR]</span>}
@@ -251,15 +264,16 @@ function NavBar({ setIsSidebarOpen }) {
             <AnimatePresence>
               {isBellOpen && (
                 <motion.div initial={{ opacity: 0, y: 15, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                  className={`absolute right-0 mt-4 w-[280px] md:w-[340px] rounded-[2rem] md:rounded-[2.5rem] border overflow-hidden shadow-2xl backdrop-blur-3xl z-50 ${themeStyles.dropdown}`}
+                  // Fixed Mobile Alignment: Shifted right and narrowed width for mobile
+                  className={`absolute right-[-10px] md:right-0 mt-4 w-[260px] md:w-[340px] rounded-[1.5rem] md:rounded-[2.5rem] border overflow-hidden shadow-2xl backdrop-blur-3xl z-50 ${themeStyles.dropdown}`}
                 >
                   <div className="p-4 md:p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                    <h3 className={`text-[9px] md:text-[10px]  font-bold uppercase tracking-[0.3em] ${themeStyles.subtext}`}>Registry: Logs</h3>
+                    <h3 className={`text-[10px] font-bold uppercase tracking-widest ${themeStyles.subtext}`}>Activity Log</h3>
                     {unreadCount > 0 && (
                       <button onClick={handleMarkAllRead} className="group flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border"
                               style={{ backgroundColor: `${activeAccent}15`, borderColor: `${activeAccent}30` }}>
                         <CheckCheck size={10} style={{ color: activeAccent }} />
-                        <span className="text-[8px] md:text-[9px]  font-bold uppercase" style={{ color: activeAccent }}>Clear</span>
+                        <span className="text-[9px] font-bold uppercase" style={{ color: activeAccent }}>Clear</span>
                       </button>
                     )}
                   </div>
@@ -268,20 +282,20 @@ function NavBar({ setIsSidebarOpen }) {
                     {previewNotifications.length > 0 ? (
                       previewNotifications.map((notif, idx) => (
                         <div key={notif._id || idx} onClick={() => { navigate("/notifications"); setIsBellOpen(false); }}
-                          className={`group p-4 md:p-5 transition-all border-b border-white/[0.02] cursor-pointer flex gap-4 items-start ${!notif.isRead ? 'bg-white/[0.03]' : 'hover:bg-white/[0.02]'}`}
+                          className={`group p-4 md:p-5 transition-all border-b border-white/[0.02] cursor-pointer flex gap-3 md:gap-4 items-start ${!notif.isRead ? 'bg-white/[0.03]' : 'hover:bg-white/[0.02]'}`}
                         >
-                          <div className={`shrink-0 p-2 md:p-2.5 rounded-xl md:rounded-2xl border transition-colors ${!notif.isRead ? 'bg-white/5' : 'bg-white/5 border-white/5'}`}
+                          <div className={`shrink-0 p-2 rounded-lg md:rounded-2xl border transition-colors ${!notif.isRead ? 'bg-white/5' : 'bg-white/5 border-white/5'}`}
                                style={{ borderColor: !notif.isRead ? `${activeAccent}40` : 'transparent' }}>
                             {getNotificationIcon(notif.category, notif.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[12px] md:text-[13px] leading-snug mb-1 ${themeStyles.text} ${!notif.isRead ? 'font-medium' : 'opacity-60'}`}>
-                              <span className={` font-bold italic mr-1`} style={{ color: notif.category === 'system' ? '#ef4444' : activeAccent }}>
-                                {notif.category === 'system' ? '[SYSTEM]' : (notif.originator?.username || "CREATOR")}
+                            <p className={`text-[11px] md:text-[13px] leading-snug mb-1 ${themeStyles.text} ${!notif.isRead ? 'font-medium' : 'opacity-70'}`}>
+                              <span className="font-bold mr-1" style={{ color: notif.category === 'system' ? '#ef4444' : activeAccent }}>
+                                {notif.category === 'system' ? 'SYSTEM' : (notif.originator?.username || "CREATOR")}
                               </span> 
                               {notif.description}
                             </p>
-                            <span className="text-[8px] md:text-[9px] font-mono font-bold opacity-30 uppercase">
+                            <span className="text-[8px] md:text-[9px] font-mono opacity-40 uppercase tracking-tighter">
                               {new Date(notif.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
@@ -290,29 +304,33 @@ function NavBar({ setIsSidebarOpen }) {
                     ) : (
                       <div className="py-12 md:py-16 flex flex-col items-center justify-center opacity-20">
                         <BellOff size={40} className="mb-4" />
-                        <p className="text-[10px]  font-bold uppercase tracking-[0.3em]">No Priority Logs</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest">No New Alerts</p>
                       </div>
                     )}
                   </div>
                   <button onClick={() => { navigate("/notifications"); setIsBellOpen(false); }} 
-                          className={`w-full py-5 md:py-6 text-[9px] md:text-[10px]  font-bold uppercase tracking-[0.4em] transition-all flex items-center justify-center gap-3 border-t border-white/5 hover:text-white ${themeStyles.text}`}
+                          className={`w-full py-4 md:py-6 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border-t border-white/5 hover:text-white ${themeStyles.text}`}
                           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = activeAccent}
                           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                    View All Activity <ChevronRight size={14} />
+                    View History <ChevronRight size={14} />
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          <Link to="/wallet" className={`w-9 h-9 md:w-11 md:h-11 overflow-hidden rounded-xl md:rounded-2xl flex items-center justify-center border transition-all hover:scale-105 active:scale-95 ${themeStyles.input} ${themeStyles.text}`}>
+          <button 
+            onClick={() => handleProtectedNavigation("/wallet")} 
+            className={`w-9 h-9 md:w-11 md:h-11 overflow-hidden rounded-xl md:rounded-2xl flex items-center justify-center border transition-all hover:scale-105 active:scale-95 ${themeStyles.input} ${themeStyles.text}`}
+          >
             <Wallet size={22} />
-          </Link>
+          </button>
 
-          {/* --- User Profile Link (Circular Border logic) --- */}
-          <Link to="/profile" className="relative group flex items-center justify-center">
+          <button 
+            onClick={() => handleProtectedNavigation("/profile")} 
+            className="relative group flex items-center justify-center"
+          >
             {user?.vipStatus?.isVip ? (
-              /* STATIC VIP CIRCULAR BORDER */
               <div className="p-[2px] rounded-full bg-gradient-to-tr from-amber-400 via-amber-600 to-amber-300 shadow-[0_0_15px_rgba(217,119,6,0.2)]">
                 <div className={`w-8 h-8 md:w-10 md:h-10 overflow-hidden rounded-full flex items-center justify-center ${isLight ? 'bg-white' : 'bg-black'}`}>
                   {user?.profilePicture ? (
@@ -323,7 +341,6 @@ function NavBar({ setIsSidebarOpen }) {
                 </div>
               </div>
             ) : (
-              /* STANDARD PROFILE BOX */
               <div className={`w-9 h-9 md:w-11 md:h-11 overflow-hidden rounded-xl md:rounded-2xl flex items-center justify-center border transition-all hover:scale-105 active:scale-95 ${themeStyles.input} ${themeStyles.text}`}>
                 {user?.profilePicture ? (
                   <img src={user.profilePicture} alt="User" className="w-full h-full object-cover" />
@@ -333,13 +350,12 @@ function NavBar({ setIsSidebarOpen }) {
               </div>
             )}
 
-            {/* VIP Status Badge Overlay */}
             {user?.vipStatus?.isVip && (
               <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-0.5 border border-black z-10">
                 <Crown size={8} className="text-white fill-current" />
               </div>
             )}
-          </Link>
+          </button>
 
           <button onClick={() => isLoggedIn ? logout() : navigate("/loginlanding")}
             className={`hidden md:flex p-3 rounded-2xl transition-all shadow-sm border ${isLoggedIn ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white' : `${themeStyles.input} ${themeStyles.text}`}`}

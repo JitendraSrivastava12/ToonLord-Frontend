@@ -146,7 +146,7 @@ const MangaDetail = () => {
   const syncLibrary = async (status) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      showAlert("Authentication Required", "error");
+      showAlert("Login for building your library", "error");
       return navigate('/login');
     }
 
