@@ -7,6 +7,7 @@ import MangaGrid from '../components/MangaGrid';
 import CreatorCTA from '../components/CreatorCTA';
 import { AppContext } from "../UserContext";
 const API_URL = import.meta.env.VITE_API_URL;
+
 const ToonLordLanding = () => {
   const { currentTheme } = useContext(AppContext);
 
@@ -42,21 +43,20 @@ const ToonLordLanding = () => {
           viewport={{ once: true }}
         >
           <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5">
-  <div>
-    <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-main)]">
-      Trending Series
-    </h2>
-    <p className="text-sm text-[var(--text-dim)] mt-1">
-      Popular titles readers are enjoying right now
-    </p>
-  </div>
-</header>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-main)]">
+                Trending Series
+              </h2>
+              <p className="text-sm text-[var(--text-dim)] mt-1">
+                Popular titles readers are enjoying right now
+              </p>
+            </div>
+          </header>
 
-
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-4 sm:p-6">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-2 sm:p-6">
             <MangaGrid
               category="trending"
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6"
               itemClassName="aspect-[3/4]"
             />
           </div>
@@ -83,9 +83,6 @@ const ToonLordLanding = () => {
           ))}
         </section>
 
-        {/* CREATOR CTA */}
-      
-
         {/* PREMIUM */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -102,10 +99,10 @@ const ToonLordLanding = () => {
             </p>
           </header>
 
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-4 sm:p-6">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-2 sm:p-6">
             <MangaGrid
               category="premium"
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6"
               itemClassName="aspect-[3/4]"
             />
           </div>
