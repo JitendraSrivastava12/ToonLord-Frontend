@@ -2,11 +2,20 @@ import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
-  ArrowLeft, Github, Chrome, Eye, EyeOff,
-  Mail, Lock, User, Phone, KeyRound, RefreshCcw
+  ArrowLeft,
+  Github,
+  Chrome,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  KeyRound,
+  RefreshCcw,
 } from "lucide-react";
 import mangaCoverPlaceholder from "../assets/Background/LoginBackground.png";
-import { AppContext } from "../UserContext"; 
+import { AppContext } from "../UserContext";
 import { useAlert } from "../context/AlertContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -16,10 +25,10 @@ const AuthScreen = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
-  const [resetStep, setResetStep] = useState(1); 
-  const [signupStep, setSignupStep] = useState(1); 
+  const [resetStep, setResetStep] = useState(1);
+  const [signupStep, setSignupStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const { login } = useContext(AppContext);
   const { showAlert } = useAlert();
@@ -42,7 +51,7 @@ const AuthScreen = () => {
       // Render the Google button in the placeholder div
       google.accounts.id.renderButton(
         document.getElementById("googleSignInDiv"),
-        { theme: "outline", size: "large", width: "100%" }
+        { theme: "outline", size: "large", width: "100%" },
       );
     }
   }, []);
@@ -87,7 +96,7 @@ const AuthScreen = () => {
       try {
         const res = await axios.post(`${API_URL}/api/users/login`, {
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         });
 
         if (res.data.token) {
@@ -108,7 +117,7 @@ const AuthScreen = () => {
       if (signupStep === 1) {
         await axios.post(`${API_URL}/api/users/request-signup-otp`, {
           email: formData.email,
-          username: formData.name
+          username: formData.name,
         });
         showAlert("Verification code sent to your email.", "success");
         setSignupStep(2);
@@ -118,7 +127,7 @@ const AuthScreen = () => {
           mobile: formData.mobile,
           email: formData.email,
           password: formData.password,
-          otp: formData.otp
+          otp: formData.otp,
         });
 
         if (res.data.token) {
@@ -141,14 +150,16 @@ const AuthScreen = () => {
 
     try {
       if (resetStep === 1) {
-        await axios.post(`${API_URL}/api/users/forgot-password`, { email: formData.email });
+        await axios.post(`${API_URL}/api/users/forgot-password`, {
+          email: formData.email,
+        });
         showAlert("Password reset code sent to your email.", "success");
         setResetStep(2);
       } else {
-        await axios.post(`${API_URL}/api/users/reset-password`, { 
-          email: formData.email, 
-          otp: formData.otp, 
-          newPassword: formData.password 
+        await axios.post(`${API_URL}/api/users/reset-password`, {
+          email: formData.email,
+          otp: formData.otp,
+          newPassword: formData.password,
         });
 
         showAlert("Password updated successfully.", "success");
@@ -157,7 +168,10 @@ const AuthScreen = () => {
         setIsLogin(true);
       }
     } catch (err) {
-      showAlert(err.response?.data?.message || "Password reset failed", "error");
+      showAlert(
+        err.response?.data?.message || "Password reset failed",
+        "error",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -165,10 +179,9 @@ const AuthScreen = () => {
 
   return (
     <div className="relative min-h-screen bg-[#050505] text-white flex flex-col items-center md:items-end justify-center overflow-hidden font-sans md:pr-12 lg:pr-32 py-12 md:py-28">
-
       {/* BACKGROUND */}
       <div className="absolute inset-0 z-0">
-        <div 
+        <div
           className="absolute inset-0 bg-no-repeat bg-cover bg-center md:bg-[20%_center] opacity-40 md:opacity-100"
           style={{ backgroundImage: `url('${mangaCoverPlaceholder}')` }}
         />
@@ -181,9 +194,14 @@ const AuthScreen = () => {
         <button
           className="group flex items-center gap-2 text-white/90 hover:text-red-500 text-xs font-bold uppercase bg-white/5 px-4 py-2 rounded-full border border-white/10"
           onClick={() => {
-            if (isResetMode) { setIsResetMode(false); setResetStep(1); }
-            else if (!isLogin && signupStep === 2) { setSignupStep(1); }
-            else { navigate(-1); }
+            if (isResetMode) {
+              setIsResetMode(false);
+              setResetStep(1);
+            } else if (!isLogin && signupStep === 2) {
+              setSignupStep(1);
+            } else {
+              navigate(-1);
+            }
           }}
         >
           <ArrowLeft size={16} />
@@ -193,17 +211,23 @@ const AuthScreen = () => {
 
       <div className="relative w-full max-w-[460px] px-4 md:px-0 z-20">
         <div className="w-full px-6 md:px-10 py-10 md:py-12 bg-black/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-xl">
-
           {!isResetMode ? (
             <>
               {signupStep === 1 && (
                 <div className="flex gap-10 mb-10 border-b border-white/5">
-                  <button onClick={() => { setIsLogin(true); setSignupStep(1); }}
-                    className={`pb-4 text-xs font-bold uppercase ${isLogin ? "text-red-600 border-b-2 border-red-600" : "text-gray-500"}`}>
+                  <button
+                    onClick={() => {
+                      setIsLogin(true);
+                      setSignupStep(1);
+                    }}
+                    className={`pb-4 text-xs font-bold uppercase ${isLogin ? "text-red-600 border-b-2 border-red-600" : "text-gray-500"}`}
+                  >
                     Login
                   </button>
-                  <button onClick={() => setIsLogin(false)}
-                    className={`pb-4 text-xs font-bold uppercase ${!isLogin ? "text-red-600 border-b-2 border-red-600" : "text-gray-500"}`}>
+                  <button
+                    onClick={() => setIsLogin(false)}
+                    className={`pb-4 text-xs font-bold uppercase ${!isLogin ? "text-red-600 border-b-2 border-red-600" : "text-gray-500"}`}
+                  >
                     Sign Up
                   </button>
                 </div>
@@ -212,23 +236,62 @@ const AuthScreen = () => {
               <form className="space-y-5" onSubmit={handleSubmit}>
                 {!isLogin && signupStep === 1 && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FloatingInput icon={<User size={16} />} label="Full Name" type="text" name="name" value={formData.name} onChange={handleChange} />
-                    <FloatingInput icon={<Phone size={16} />} label="Phone Number" type="tel" name="mobile" value={formData.mobile} onChange={handleChange} />
+                    <FloatingInput
+                      icon={<User size={16} />}
+                      label="Full Name"
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
+                    <FloatingInput
+                      icon={<Phone size={16} />}
+                      label="Phone Number"
+                      type="tel"
+                      name="mobile"
+                      value={formData.mobile}
+                      onChange={handleChange}
+                    />
                   </div>
                 )}
 
                 {(isLogin || signupStep === 1) && (
-                  <FloatingInput icon={<Mail size={18} />} label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} />
+                  <FloatingInput
+                    icon={<Mail size={18} />}
+                    label="Email Address"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
                 )}
 
                 {!isLogin && signupStep === 2 && (
-                  <FloatingInput icon={<KeyRound size={18} />} label="Verification Code" type="text" name="otp" value={formData.otp} onChange={handleChange} />
+                  <FloatingInput
+                    icon={<KeyRound size={18} />}
+                    label="Verification Code"
+                    type="text"
+                    name="otp"
+                    value={formData.otp}
+                    onChange={handleChange}
+                  />
                 )}
 
                 {(isLogin || signupStep === 1) && (
                   <div className="relative">
-                    <FloatingInput icon={<Lock size={18} />} label="Password" type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange} />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <FloatingInput
+                      icon={<Lock size={18} />}
+                      label="Password"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2"
+                    >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
@@ -236,42 +299,79 @@ const AuthScreen = () => {
 
                 {isLogin && (
                   <div className="flex justify-end">
-                    <button type="button" onClick={() => setIsResetMode(true)} className="text-xs text-gray-400 hover:text-red-500">
+                    <button
+                      type="button"
+                      onClick={() => setIsResetMode(true)}
+                      className="text-xs text-gray-400 hover:text-red-500"
+                    >
                       Forgot password?
                     </button>
                   </div>
                 )}
 
-                <button 
-  disabled={isLoading} 
-  type="submit"
-  className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-2xl flex items-center justify-center"
->
-  {isLoading ? (
-    <RefreshCcw className="animate-spin" size={18} />
-  ) : (
-    isLogin ? "Login" : signupStep === 1 ? "Create Account" : "Verify Account"
-  )}
-</button>
+                <button
+                  disabled={isLoading}
+                  type="submit"
+                  className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-2xl flex items-center justify-center"
+                >
+                  {isLoading ? (
+                    <RefreshCcw className="animate-spin" size={18} />
+                  ) : isLogin ? (
+                    "Login"
+                  ) : signupStep === 1 ? (
+                    "Create Account"
+                  ) : (
+                    "Verify Account"
+                  )}
+                </button>
               </form>
             </>
           ) : (
             <>
               <h3 className="text-xl font-bold mb-4">Reset Password</h3>
               <form className="space-y-5" onSubmit={handleResetPassword}>
-                <FloatingInput icon={<Mail size={18} />} label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} />
+                <FloatingInput
+                  icon={<Mail size={18} />}
+                  label="Email Address"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
 
                 {resetStep === 2 && (
                   <>
-                    <FloatingInput icon={<KeyRound size={18} />} label="Reset Code" type="text" name="otp" value={formData.otp} onChange={handleChange} />
-                    <FloatingInput icon={<Lock size={18} />} label="New Password" type="password" name="password" value={formData.password} onChange={handleChange} />
+                    <FloatingInput
+                      icon={<KeyRound size={18} />}
+                      label="Reset Code"
+                      type="text"
+                      name="otp"
+                      value={formData.otp}
+                      onChange={handleChange}
+                    />
+                    <FloatingInput
+                      icon={<Lock size={18} />}
+                      label="New Password"
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                    />
                   </>
                 )}
 
-                <button disabled={isLoading} type="submit"
-                  className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-2xl">
-                  {isLoading ? <RefreshCcw className="animate-spin" size={18} /> :
-                    resetStep === 1 ? "Send Code" : "Update Password"}
+                <button
+                  disabled={isLoading}
+                  type="submit"
+                  className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded-2xl"
+                >
+                  {isLoading ? (
+                    <RefreshCcw className="animate-spin" size={18} />
+                  ) : resetStep === 1 ? (
+                    "Send Code"
+                  ) : (
+                    "Update Password"
+                  )}
                 </button>
               </form>
             </>
@@ -281,12 +381,14 @@ const AuthScreen = () => {
             <div className="mt-10">
               <div className="flex gap-4">
                 {/* Google Button will render here */}
-                <div id="googleSignInDiv" className="p-1 flex-1 rounded-full "></div>
+                <div
+                  id="googleSignInDiv"
+                  className="p-1 flex-1 rounded-full "
+                ></div>
                 <SocialButton icon={<Github size={20} />} label="GitHub" />
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>
@@ -295,7 +397,9 @@ const AuthScreen = () => {
 
 const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
   <div className="relative w-full">
-    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">{icon}</div>
+    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+      {icon}
+    </div>
     <input
       type={type}
       name={name}
@@ -307,10 +411,12 @@ const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
   </div>
 );
 
-
 const SocialButton = ({ icon, label, onClick }) => (
-  <button type="button" onClick={onClick}
-    className="flex-1 flex items-center justify-center gap-3 py-4 bg-white/[0.05] border border-white/10 rounded-2xl text-xs font-bold uppercase hover:bg-white/[0.15] transition">
+  <button
+    type="button"
+    onClick={onClick}
+    className="flex-1 flex items-center justify-center gap-3 py-4 bg-white/[0.05] border border-white/10 rounded-2xl text-xs font-bold uppercase hover:bg-white/[0.15] transition"
+  >
     {icon} <span>{label}</span>
   </button>
 );

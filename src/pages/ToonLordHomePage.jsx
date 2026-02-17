@@ -123,14 +123,14 @@ const ToonLordHome = () => {
       {/* SECTIONS */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-14">
         <ArchiveSection
-          title="Recently updated"
+          title="Recently Updated"
           icon={<ClockIcon className="w-5 h-5" />}
           mangas={processedData.latest}
           badge="Updated"
         />
 
         <ArchiveSection
-          title="Most read"
+          title="Most Read"
           icon={<FireIcon className="w-5 h-5" />}
           mangas={processedData.trending}
           badge="Popular"
@@ -179,7 +179,7 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
             </div>
 
             <div className="mt-2 space-y-1">
-              <h3 className="text-sm font-medium line-clamp-2 group-hover:text-[var(--accent)] transition">
+              <h3 className="text-sm font-medium line-clamp-1 group-hover:text-[var(--accent)] transition">
                 {manga.title}
               </h3>
               <div className="flex items-center justify-between text-xs text-[var(--text-dim)]">

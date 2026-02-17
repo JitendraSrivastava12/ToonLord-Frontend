@@ -12,7 +12,7 @@ const ToonLordLanding = () => {
 
   return (
     <div className={`theme-${currentTheme} transition-colors duration-500 bg-[var(--bg-primary)] min-h-screen`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-12 space-y-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-1 sm:py-12 space-y-16">
 
         {/* HERO */}
         <ToonLordHero />
@@ -43,7 +43,7 @@ const ToonLordLanding = () => {
         >
           <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5">
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-main)]">
+              <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-main)]">
                 Trending Series
               </h2>
               <p className="text-sm text-[var(--text-dim)] mt-1">
@@ -89,7 +89,7 @@ const ToonLordLanding = () => {
           viewport={{ once: true }}
         >
           <header className="mb-5">
-            <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-main)]">
+            <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-main)]">
               Premium Series
             </h2>
             <p className="text-sm text-[var(--text-dim)] mt-1">
@@ -108,7 +108,7 @@ const ToonLordLanding = () => {
         {/* SUBSCRIPTION CTA */}
         {!user?.isVIP && (
           <section className="rounded-3xl border border-[var(--border)] bg-[var(--bg-secondary)] p-8 sm:p-12 text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--text-main)]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-main)]">
               Upgrade to ToonLord VIP
             </h2>
             <p className="text-sm sm:text-base text-[var(--text-dim)] mt-4 max-w-2xl mx-auto leading-relaxed">

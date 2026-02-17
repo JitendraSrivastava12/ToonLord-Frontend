@@ -269,7 +269,7 @@ function Layout() {
                     <ShieldAlert size={18} className={isRedMode ? 'text-red-500 animate-pulse' : 'text-slate-500 group-hover:text-white transition-colors'} />
                     <div className="flex flex-col items-start">
                       <span className={`text-[9px] font-bold uppercase tracking-tighter ${isRedMode ? 'text-red-500' : 'text-slate-400'}`}>
-                        {isRedMode ? 'Protocol Red' : 'Secure Mode'}
+                        {isRedMode ? 'Red Mode' : 'Family Mode'}
                       </span>
                       <span className="text-[7px] font-bold opacity-30 uppercase">System Status</span>
                     </div>
@@ -302,7 +302,7 @@ function Layout() {
       {/* MAIN CONTENT */}
       <div className="flex flex-col min-h-screen">
         <NavBar setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="flex-1 pt-24 pb-12 px-3 sm:px-6">
+        <main className="flex-1 pt-18 md:pt-24 pb-12 px-3 sm:px-6">
           <Outlet context={[isRedMode, currentTheme]} key={location.pathname} />
         </main>
 
