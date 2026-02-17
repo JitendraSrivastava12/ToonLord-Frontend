@@ -39,6 +39,9 @@ import VisitorProfile from '../pages/Profile2'
 import Subscription from '../pages/Subscription'
 import NotFound from '../pages/NotFound'
 import LogsPage from '../AdminPages/LogPage'
+import UserSafety from '../pages/Safety'
+import PrivacyPolicy from '../pages/Privacy'
+import TermsOfService from '../pages/Terms'
 function AppRoutes({ currentTheme, setTheme }) {
   return (
     <Routes>
@@ -68,6 +71,9 @@ function AppRoutes({ currentTheme, setTheme }) {
           <Route path="/edit-chapter/:mangaId/:chapterId" element={<EditChapterPage/>} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/subscription" element={<Subscription />} />
+          <Route path="/safety" element={<UserSafety/>} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
         
         {/* Optional: You can reuse CoinShopPage for cancels or make a custom one */}
         <Route path="/payment-cancel" element={<CoinShopPage />} />

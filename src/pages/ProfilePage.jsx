@@ -242,7 +242,7 @@ const ProfilePage = () => {
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pb-20 font-sans selection:bg-emerald-500/30 theme-${currentTheme}`}>
       
       {/* 1. HEADER SECTION */}
-      <div className="max-w-7xl mx-auto px-6 md:pt-10">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 pt-2 md:pt-10">
         <div className={`${theme.card} rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center gap-8 border ${theme.dynamicBorder}`}>
           
           {/* PROFILE IMAGE WITH VIP LOGIC */}
@@ -302,7 +302,7 @@ const ProfilePage = () => {
             </div>
             
             {/* FOLLOWER STATS */}
-            <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-4">
+            <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-2">
                <div className="flex flex-col cursor-pointer hover:opacity-70 transition-opacity" onClick={() => setActiveTab('Followers')}>
                   <span className={`text-lg  font-bold font-mono leading-none ${theme.text}`}>{user?.followers?.length || 0}</span>
                   <span className="text-[10px] font-bold uppercase text-[var(--text-muted)] tracking-widest">Followers</span>
@@ -345,7 +345,7 @@ const ProfilePage = () => {
       </div>
 
       {/* 2. MAIN CONTENT */}
-      <div className="max-w-7xl mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* LEFT AREA */}
         <div className="lg:col-span-8 space-y-8">
@@ -849,7 +849,7 @@ const UserCard = ({ targetUser, theme, onNavigate }) => {
 
       <div className="w-full">
         <div className="flex flex-col items-center gap-1 mb-2">
-          <p className={`text-sm  font-bold uppercase tracking-tight truncate w-full ${isVip ? 'text-amber-600' : ''}`}>
+          <p className={`text-sm  font-bold uppercase tracking-tight truncate w-full line-clamp-1 ${isVip ? 'text-amber-600' : ''}`}>
             {targetUser.username}
           </p>
           <span className={`text-[8px] px-2 py-0.5 rounded-full border ${theme.dynamicBorder} font-bold uppercase opacity-60 tracking-widest bg-[var(--text-main)]/5`}>

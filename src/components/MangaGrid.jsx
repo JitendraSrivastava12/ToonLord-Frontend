@@ -70,7 +70,7 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
                 {/* BALANCED COVER IMAGE:
                     - aspect-[2/3] ensures the image doesn't look stretched or squashed.
                 */}
-                <div className="relative aspect-[2/3] overflow-hidden bg-[var(--bg-primary)]">
+                <div className="relative aspect-[3/4] overflow-hidden bg-[var(--bg-primary)]">
                   <img
                     src={manga.coverImage}
                     alt={manga.title}

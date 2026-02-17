@@ -144,7 +144,7 @@ const VisitorProfile = () => {
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] pb-20 font-sans theme-${currentTheme}`}>
       
       {/* 1. PROFILE HEADER */}
-      <div className="max-w-7xl mx-auto px-6 md:pt-10">
+      <div className="max-w-7xl mx-auto px-2 md-px-6 md:pt-10">
         <div className={`${theme.card} rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center gap-8`}>
           
           {/* PROFILE IMAGE WITH VIP LOGIC */}
@@ -240,7 +240,7 @@ const VisitorProfile = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         {/* MAIN CONTENT AREA */}
         <div className="lg:col-span-8 space-y-8">
@@ -456,7 +456,7 @@ const UserCard = ({ targetUser, theme, onNavigate }) => {
       </div>
 
       <div className="w-full">
-        <p className={`text-sm   font-semibold uppercase tracking-tight truncate w-full ${isVip ? 'text-amber-600' : ''}`}>
+        <p className={`text-sm   font-semibold uppercase tracking-tight truncate w-full line-clamp-1 ${isVip ? 'text-amber-600' : ''}`}>
           {targetUser.username}
         </p>
         <span className={`text-[8px] px-2 py-0.5 rounded-full border ${theme.dynamicBorder}  font-semibold uppercase opacity-60 tracking-widest bg-[var(--text-main)]/5 mt-1 inline-block`}>
