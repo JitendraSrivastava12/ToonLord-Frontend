@@ -125,7 +125,7 @@ const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraD
               <Loader2 className="animate-spin" size={18}/>
             ) : (
               <>
-                Submit Terminal Report
+                Submit Report
                 <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse group-hover:bg-black transition-colors" />
               </>
             )}

@@ -40,7 +40,8 @@ const ToonLordHero = () => {
         style={{ backgroundColor: accent }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 grid lg:grid-cols-2 gap-14 items-center relative z-10">
+      {/* Removed px-4 sm:px-6 lg:px-12 to eliminate side padding */}
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-14 items-center relative z-10">
 
         {/* LEFT */}
         <motion.div

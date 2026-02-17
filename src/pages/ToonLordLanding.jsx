@@ -12,7 +12,8 @@ const ToonLordLanding = () => {
 
   return (
     <div className={`theme-${currentTheme} transition-colors duration-500 bg-[var(--bg-primary)] min-h-screen`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-1 sm:py-12 space-y-16">
+      {/* Removed px-4 sm:px-8 lg:px-12 to match the new Hero padding-less style */}
+      <div className="max-w-7xl mx-auto py-1 sm:py-12 space-y-16">
 
         {/* HERO */}
         <ToonLordHero />

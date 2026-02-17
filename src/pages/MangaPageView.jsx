@@ -370,7 +370,7 @@ const MangaReader = () => {
 
         {!lockStatus.isLocked && (
           <div className="mt-16 px-4">
-            <CommentSection mangaId={id} />
+            <CommentSection targetId={chapterData?._id} targetType="chapter" />
           </div>
         )}
       </div>

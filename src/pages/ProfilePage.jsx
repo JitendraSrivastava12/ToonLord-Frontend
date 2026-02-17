@@ -148,7 +148,7 @@ const ProfilePage = () => {
       setReportsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`${API_URL}/api/reports/my-reports`, {
+        const res = await axios.get(`${API_URL}/reports/my-reports`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMyReports(res.data);

@@ -6,7 +6,9 @@ import { motion } from "framer-motion";
 import { FireIcon, ClockIcon, StarIcon } from "@heroicons/react/24/solid";
 import { FaCrown } from "react-icons/fa";
 import { AppContext } from "../UserContext";
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 const ToonLordHome = () => {
   const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
 
@@ -52,13 +54,13 @@ const ToonLordHome = () => {
 
   return (
     <div className={`min-h-screen pb-20 theme-${currentTheme}`}>
-      {/* HERO FEATURED */}
+      {/* HERO FEATURED - Removed max-w-7xl and px constraints */}
       {processedData.spotlight && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-1 md:pt-8 pb-16">
+        <section className="pt-1 md:pt-8 pb-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative rounded-[2.5rem] bg-[var(--bg-secondary)]/30 backdrop-blur-xl border border-[var(--border)] shadow-lg flex flex-col lg:flex-row items-center overflow-hidden min-h-[360px] sm:min-h-[420px]"
+            className="relative rounded-none lg:rounded-[2.5rem] bg-[var(--bg-secondary)]/30 backdrop-blur-xl border-y lg:border border-[var(--border)] shadow-lg flex flex-col lg:flex-row items-center overflow-hidden min-h-[360px] sm:min-h-[420px]"
           >
             {/* BACKGROUND BLUR */}
             <div className="absolute inset-0 opacity-10">
@@ -120,8 +122,8 @@ const ToonLordHome = () => {
         </section>
       )}
 
-      {/* SECTIONS */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-14">
+      {/* SECTIONS - Removed max-w-7xl and px-4 constraints */}
+      <div className="w-full space-y-14 px-4 sm:px-0">
         <ArchiveSection
           title="Recently Updated"
           icon={<ClockIcon className="w-5 h-5" />}
@@ -142,7 +144,7 @@ const ToonLordHome = () => {
 
 const ArchiveSection = ({ title, icon, mangas, badge }) => (
   <section className="space-y-6">
-    <header className="flex items-center justify-between">
+    <header className="flex items-center justify-between px-4 sm:px-0">
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-[var(--bg-secondary)] text-[var(--accent)]">
           {icon}
@@ -154,7 +156,8 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
       </button>
     </header>
 
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    {/* Grid now flows edge to edge on larger screens */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
       {mangas.map((manga, i) => (
         <motion.div
           key={manga._id}
@@ -178,7 +181,7 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
               </span>
             </div>
 
-            <div className="mt-2 space-y-1">
+            <div className="mt-2 space-y-1 px-1">
               <h3 className="text-sm font-medium line-clamp-1 group-hover:text-[var(--accent)] transition">
                 {manga.title}
               </h3>
