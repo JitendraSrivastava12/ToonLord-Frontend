@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   ArrowLeft,
-  Github,
-  Chrome,
   Eye,
   EyeOff,
   Mail,
@@ -12,7 +10,7 @@ import {
   User,
   Phone,
   KeyRound,
-  RefreshCcw,
+  RefreshCcw,Chrome
 } from "lucide-react";
 import mangaCoverPlaceholder from "../assets/Background/LoginBackground.png";
 import { AppContext } from "../UserContext";
@@ -73,14 +71,6 @@ const AuthScreen = () => {
       showAlert(err.response?.data?.message || "Google login failed", "error");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const triggerGoogleLogin = () => {
-    if (window.google) {
-      google.accounts.id.prompt();
-    } else {
-      showAlert("Google service not available. Please refresh.", "error");
     }
   };
 
@@ -378,14 +368,29 @@ const AuthScreen = () => {
           )}
 
           {(isLogin || (!isLogin && signupStep === 1)) && !isResetMode && (
-            <div className="mt-10">
-              <div className="flex gap-4">
-                {/* Google Button will render here */}
-                <div
-                  id="googleSignInDiv"
-                  className="p-1 flex-1 rounded-full "
-                ></div>
-                <SocialButton icon={<Github size={20} />} label="GitHub" />
+            <div className="mt-8 flex flex-col items-center">
+              {/* Decorative "Or" divider */}
+              <div className="flex items-center w-full mb-4 gap-4">
+                <div className="h-[1px] flex-1 bg-white/10"></div>
+                <span className="text-[10px] font-bold uppercase text-gray-500 tracking-widest">
+                  Digital ID
+                </span>
+                <div className="h-[1px] flex-1 bg-white/10"></div>
+              </div>
+
+              {/* The Styled Container */}
+              <div className="relative w-full group">
+                {/* Matching the icon placement of FloatingInput */}
+                  <div
+                    id="googleSignInDiv"
+                    className="w-full flex justify-center py-2 opacity-80 hover:opacity-100 transition-opacity"
+                    style={{
+                      // This centers the internal Google iframe
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                </div>
               </div>
             </div>
           )}
@@ -405,20 +410,10 @@ const FloatingInput = ({ icon, label, type, name, value, onChange }) => (
       name={name}
       value={value}
       onChange={onChange}
-      placeholder={value ? "" : label} // <-- placeholder disappears when typing
+      placeholder={value ? "" : label}
       className="w-full bg-white/5 border border-white/20 rounded-2xl pl-12 pr-4 py-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
     />
   </div>
-);
-
-const SocialButton = ({ icon, label, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="flex-1 flex items-center justify-center gap-3 py-4 bg-white/[0.05] border border-white/10 rounded-2xl text-xs font-bold uppercase hover:bg-white/[0.15] transition"
-  >
-    {icon} <span>{label}</span>
-  </button>
 );
 
 export default AuthScreen;

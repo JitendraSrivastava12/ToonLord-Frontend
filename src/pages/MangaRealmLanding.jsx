@@ -28,7 +28,7 @@ const MangaRealmLanding = () => {
       <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-blue-500/5 rounded-full blur-[160px] pointer-events-none" />
 
       {/* HERO */}
-      <main className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-2 md:pt-14 pb-16 text-center z-10">
+      <main className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-2 md:pt-10 pb-16 text-center z-10">
         
         <motion.h1 
           initial={{ opacity: 0, y: 10 }}
@@ -87,7 +87,7 @@ const MangaRealmLanding = () => {
       </main>
 
       {/* STATS */}
-      <section className="relative bg-[var(--bg-secondary)]/40 backdrop-blur-xl py-12 md:py-16">
+      <section className="relative bg-[var(--bg-secondary)]/40 backdrop-blur-xl py-12 md:py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
           <StatItem label="Total Series" value="12k+" icon={<Globe size={14}/>} />
           <StatItem label="Active Users" value="850k" icon={<Activity size={14}/>}/>
