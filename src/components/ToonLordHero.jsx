@@ -1,40 +1,48 @@
 import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import { Zap, Play, ChevronRight, ShieldAlert } from 'lucide-react';
 import { AppContext } from "../UserContext"; 
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-/* Asset loader */
-const getAssetsByFolder = (folderName) => {
-  try {
-    const allAssets = import.meta.glob('../assets/**/*.{jpg,jpeg,png,webp,avif,jfif}', { eager: true });
-    return Object.keys(allAssets)
-      .filter(path => path.includes(`/${folderName}/`))
-      .map(path => allAssets[path].default || allAssets[path]);
-  } catch {
-    return [];
-  }
-};
-
-const mangaImages = getAssetsByFolder('Mangas');
-const pornwahImages = getAssetsByFolder('Pornwahs');
-
 const ToonLordHero = () => {
   const { isRedMode, currentTheme } = useContext(AppContext);
+  const [allHeroes, setAllHeroes] = useState([]); 
   const [displayGrid, setDisplayGrid] = useState([]);
 
   useEffect(() => {
-    let pool = isRedMode ? pornwahImages : mangaImages;
-    if (!pool.length) pool = mangaImages;
-    const shuffled = [...pool].sort(() => 0.5 - Math.random());
-    setDisplayGrid(shuffled.slice(0, 6));
+    const loadHeroData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/mangas/hero-all');
+        const data = response.data;
+        setAllHeroes(data);
+
+        const initialFiltered = data.filter(manga => manga.isAdult === isRedMode);
+        const initialShuffled = [...initialFiltered]
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 6);
+
+        setDisplayGrid(initialShuffled);
+      } catch (err) {
+        console.error("Axios fetch error:", err.message);
+      }
+    };
+    loadHeroData();
+  }, []);
+
+  useEffect(() => {
+    if (allHeroes.length > 0) {
+      const filtered = allHeroes.filter(manga => manga.isAdult === isRedMode);
+      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+      setDisplayGrid(shuffled.slice(0, 6));
+    }
   }, [isRedMode]);
 
   const accent = isRedMode ? '#ef4444' : 'var(--accent)';
 
   return (
-    <section className={`relative theme-${currentTheme}`}>
-      {/* very soft background accent */}
+    <section className={`relative theme-${currentTheme} `}>
+      {/* background blob */}
       <div 
         className="absolute -top-40 -left-40 w-[420px] h-[420px] rounded-full blur-[160px] opacity-10"
         style={{ backgroundColor: accent }}
@@ -96,20 +104,25 @@ const ToonLordHero = () => {
         {/* RIGHT */}
         <div className="relative">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-4">
-            <AnimatePresence>
-              {displayGrid.map((src, i) => (
+            <AnimatePresence mode="popLayout">
+              {displayGrid.map((manga, i) => (
                 <motion.div
-                  key={src}
+                  key={manga._id}
+                  layout
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ delay: i * 0.05 }}
                   className="aspect-[3/4] rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)]"
                 >
-                  <img 
-                    src={src} 
-                    alt="cover" 
-                    className="w-full h-full object-cover" 
-                  />
+                  <Link to={`/manga/${manga._id}`}>
+                    <img 
+                      src={manga.coverImage} 
+                      alt={manga.title} 
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { e.target.src = '/fallback-cover.jpg'; }}
+                    />
+                  </Link>
                 </motion.div>
               ))}
             </AnimatePresence>
