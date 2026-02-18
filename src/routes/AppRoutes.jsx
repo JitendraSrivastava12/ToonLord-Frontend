@@ -42,6 +42,7 @@ import LogsPage from '../AdminPages/LogPage'
 import UserSafety from '../pages/Safety'
 import PrivacyPolicy from '../pages/Privacy'
 import TermsOfService from '../pages/Terms'
+import AdminSettings from '../AdminComponents/AdminSetting'
 function AppRoutes({ currentTheme, setTheme }) {
   return (
     <Routes>
@@ -94,6 +95,7 @@ function AppRoutes({ currentTheme, setTheme }) {
           {/* This renders at /admin */}
           <Route index element={<AdminDashboard />} />
           <Route path='/admin/request' element={<AsdminPremiumRequest/>}/>
+          <Route path='/admin/settings' element={<AdminSettings/>}/>
           <Route path='/admin/reports' element={<ReportsManagement/>}/>
           
           <Route path='/admin/contracts' element={<ContractManagement/>}/>

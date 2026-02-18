@@ -5,6 +5,7 @@ import {
   MoreHorizontal, Calendar, BookOpen, Heart,
   Loader2, AlertCircle
 } from 'lucide-react';
+import { useAlert } from '../context/AlertContext';
 const API_URL = import.meta.env.VITE_API_URL;
 const CreatorComments = () => {
   const [comments, setComments] = useState([]);
@@ -12,7 +13,7 @@ const CreatorComments = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all"); 
   const [replyText, setReplyText] = useState({});
-
+  const {showAlert}=useAlert();
   const fetchComments = async () => {
     setLoading(true);
     const token = localStorage.getItem('token');
@@ -53,7 +54,7 @@ const CreatorComments = () => {
       setComments(prev => prev.filter(c => c._id !== id));
     } catch (err) { 
         console.error(err);
-        alert("Delete failed"); 
+        showAlert("Delete failed",'error'); 
     }
   };
 
@@ -69,11 +70,11 @@ const CreatorComments = () => {
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       setReplyText({ ...replyText, [parentId]: "" });
-      alert("Reply posted!");
+      showAlert("Reply posted!",'success');
       fetchComments();
     } catch (err) { 
         console.error(err);
-        alert("Reply failed"); 
+        showAlert("Reply failed",'error'); 
     }
   };
 

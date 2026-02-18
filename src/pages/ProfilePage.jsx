@@ -7,6 +7,7 @@ import {
   CheckCircle2, ChevronRight, X, ScrollText, MessageSquare, Heart,
   Star, History, ShieldCheck, AlertTriangle, FileUp, Trash2, Plus, Cpu, Scale, Fingerprint, Users, UserPlus, Globe, Trophy, Search, Crown
 } from 'lucide-react';
+import { useAlert } from '../context/AlertContext';
 import axios from 'axios';
 import { AppContext } from "../UserContext";
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +19,7 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  
+  const {showAlert}=useAlert();
   // Data States
   const [myMangas, setMyMangas] = useState([]);
   const [myComments, setMyComments] = useState([]);
@@ -194,7 +195,7 @@ const ProfilePage = () => {
         setIsEditing(false);
       }
     } catch (err) {
-      alert("Failed to update profile");
+      showAlert("Failed to update profile",'error');
     } finally {
       setLoading(false);
     }
@@ -209,7 +210,7 @@ const ProfilePage = () => {
       setUser({ ...user, authorRequestPending: true });
       setIsContractOpen(false);
     } catch (err) { 
-        alert("Error submitting request."); 
+        showAlert("Error submitting request.",'error'); 
     } finally { 
         setLoading(false); 
     }
@@ -224,7 +225,7 @@ const ProfilePage = () => {
       });
       setMyComments(prev => prev.filter(c => c._id !== id));
     } catch (err) {
-      alert("Failed to delete comment");
+      showAlert("Failed to delete comment",'error');
     }
   };
 

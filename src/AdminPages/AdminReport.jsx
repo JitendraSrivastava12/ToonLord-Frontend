@@ -9,7 +9,7 @@ import {
   AlertCircle,
   X,
 } from "lucide-react";
-
+import { useAlert } from "../context/AlertContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ReportsManagement = () => {
@@ -18,7 +18,7 @@ const ReportsManagement = () => {
   const [isPurgeModalOpen, setIsPurgeModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-
+  const {showAlert}=useAlert();
   const fetchReports = async () => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -49,7 +49,7 @@ const ReportsManagement = () => {
       await fetchReports();
       setSelectedReport(null);
     } catch {
-      alert("Action failed");
+      showAlert("Action failed",'error');
     } finally {
       setActionLoading(false);
     }
@@ -65,7 +65,7 @@ const ReportsManagement = () => {
       await fetchReports();
       setIsPurgeModalOpen(false);
     } catch {
-      alert("System error");
+      showAlert("System error",'error');
     } finally {
       setActionLoading(false);
     }

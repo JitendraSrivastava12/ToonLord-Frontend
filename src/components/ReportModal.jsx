@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import useAlert from '../ui/Alert';
+import { useAlert } from "../context/AlertContext";
 const API_URL = import.meta.env.VITE_API_URL;
-const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraData,showAlert}) => {
+const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraData}) => {
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
   // Match these exactly with your Mongoose Schema Enum
+  const {showAlert}=useAlert();
   const chapterReasons = [
     { label: "Broken Images/Pages", value: "Broken Images" },
     { label: "Wrong Chapter Order", value: "Wrong Chapter Order" },
@@ -27,7 +28,7 @@ const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraD
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!reason) return alert("Please select a reason", "error");
+    if (!reason) return showAlert("Please select a reason", "error");
 
     setLoading(true);
     try {
@@ -45,13 +46,13 @@ const ReportModal = ({ isOpen, onClose, targetId, targetType, targetUser, extraD
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      alert("Report submitted successfully");
+      showAlert("Report submitted successfully","success");
       onClose();
       // Reset form
       setReason("");
       setDetails("");
     } catch (err) {
-       alert(err.response?.data?.message || "Failed to submit report");
+       showAlert(err.response?.data?.message || "Failed to submit report","error");
     } finally {
       setLoading(false);
     }

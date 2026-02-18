@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Zap, Star, Crown, ShieldCheck, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from "../UserContext";
-
+import { useAlert } from '../context/AlertContext';
 const OFFERS = [
   { id: 'starter', coins: 100, price: 99, bonus: 0, icon: <Zap />, tag: 'Starter' },
   { id: 'popular', coins: 500, price: 449, bonus: 50, icon: <Star />, tag: 'Most Popular', highlight: true },
@@ -14,7 +14,7 @@ const CoinShopPage = () => {
   const navigate = useNavigate();
   const { isRedMode, user } = useContext(AppContext);
   const [loadingId, setLoadingId] = useState(null);
-
+  const {showAlert}=useAlert();
   const accentText = isRedMode ? 'text-red-500' : 'text-blue-500';
   const accentBg = isRedMode ? 'bg-red-600' : 'bg-blue-600';
   const accentBorder = isRedMode ? 'border-red-500/50' : 'border-blue-500/50';
@@ -41,11 +41,11 @@ const CoinShopPage = () => {
         window.location.href = data.url;
       } else {
         console.error("Session creation failed", data);
-        alert(data.error || "Payment failed to initialize.");
+        showAlert(data.error || "Payment failed to initialize.",'error');
       }
     } catch (err) {
       console.error("Backend connection failed:", err);
-      alert("Vault connection offline. Please try again later.");
+      showAlert("Vault connection offline. Please try again later.",'error');
     } finally {
       setLoadingId(null);
     }

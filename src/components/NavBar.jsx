@@ -15,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function NavBar({ setIsSidebarOpen }) {
   const navigate = useNavigate();
-  const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user } = useContext(AppContext);
+  const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user,isRedModeDisabledByAdmin } = useContext(AppContext);
   const { showAlert } = useAlert(); 
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -236,17 +236,23 @@ function NavBar({ setIsSidebarOpen }) {
 
         {/* RIGHT: ACTIONS */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 z-20 relative">
-          <button onClick={() => toggleRedMode()}
-            className="hidden lg:flex relative px-6 py-3 rounded-2xl transition-all active:scale-95 shadow-lg group overflow-hidden"
-            style={{ backgroundColor: activeAccent }}
-          >
-            <div className="relative z-10 flex items-center gap-2">
-              {isRedMode ? <ShieldAlert size={16} color="white" className="animate-pulse" /> : <Sparkles size={16} className={isLight ? 'text-white' : 'text-black'} />}
-              <span className={`text-[11px]  font-bold uppercase tracking-tighter ${isLight || isRedMode ? 'text-white' : 'text-black'}`}>
-                {isRedMode ? ' Red Mode' : 'Friendly Mode'}
-              </span>
-            </div>
-          </button>
+        {!isRedModeDisabledByAdmin && (
+    <button onClick={() => toggleRedMode()}
+      className="hidden lg:flex relative px-6 py-3 rounded-2xl transition-all active:scale-95 shadow-lg group overflow-hidden"
+      style={{ backgroundColor: activeAccent }}
+    >
+      <div className="relative z-10 flex items-center gap-2">
+        {isRedMode ? (
+          <ShieldAlert size={16} color="white" className="animate-pulse" />
+        ) : (
+          <Sparkles size={16} className={isLight ? 'text-white' : 'text-black'} />
+        )}
+        <span className={`text-[11px] font-bold uppercase tracking-tighter ${isLight || isRedMode ? 'text-white' : 'text-black'}`}>
+          {isRedMode ? ' Red Mode' : 'Friendly Mode'}
+        </span>
+      </div>
+    </button>
+  )}
           
           <div className="relative" ref={bellRef}>
             <button onClick={() => setIsBellOpen(!isBellOpen)}

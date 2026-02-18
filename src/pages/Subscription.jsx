@@ -2,11 +2,11 @@ import axios from 'axios';
 import React, { useState, useContext } from 'react';
 import { LuCheck, LuZap, LuShieldCheck, LuCrown, LuInfo, LuLoader } from "react-icons/lu";
 import { AppContext } from "../UserContext";
-
+import { useAlert } from "../context/AlertContext";
 export default function Subscription() {
   const { isRedMode, currentTheme, user } = useContext(AppContext);
   const [processingId, setProcessingId] = useState(null);
-
+  const {showAlert}=useAlert();
   // --- INTERNAL HEADER HELPER ---
   const getHeaders = () => {
     const token = localStorage.getItem('token');
@@ -68,7 +68,7 @@ export default function Subscription() {
 
   const handleSubscription = async (planId) => {
     if (!user) {
-      alert("Please login to initialize VIP protocol.");
+      showAlert("Please login to unlock VIP plans.",'info');
       return;
     }
 
@@ -91,7 +91,7 @@ export default function Subscription() {
       }
     } catch (e) {
       console.error("Subscription Error:", e);
-      alert("Neural link failed. Please try again.");
+      showAlert("Transaction failed. Please try again.","error");
       setProcessingId(null);
     }
   };

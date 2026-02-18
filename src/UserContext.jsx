@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios'; // Added axios for the heartbeat
+import axios from 'axios'; 
 const API_URL = import.meta.env.VITE_API_URL;
 export const AppContext = createContext();
 
@@ -18,6 +18,9 @@ export function AppProvider({ children }) {
   const [isRedMode, setIsRedMode] = useState(localStorage.getItem("red-mode") === "true");
   const [familyMode, setFamilyMode] = useState(localStorage.getItem("family-mode") === "true");
 
+  // --- NEW: ADMIN FEATURE FLAG STATE ---
+  const [isRedModeDisabledByAdmin, setIsRedModeDisabledByAdmin] = useState(false);
+
   // --- 1. THE HEARTBEAT (Real-time Sync) ---
   useEffect(() => {
     let interval;
@@ -31,24 +34,38 @@ export function AppProvider({ children }) {
           headers: { Authorization: `Bearer ${token}` }
         });
         
-        // Update both state and localStorage with fresh notification/user data
         const updatedUser = res.data.user || res.data;
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
       } catch (err) {
         console.error("Heartbeat sync failed:", err);
-        // If the token is invalid/expired, log them out
         if (err.response?.status === 401) logout();
       }
     };
 
     if (isLoggedIn) {
-      syncIdentity(); // Initial run
-      interval = setInterval(syncIdentity, 30000); // Sync every 30 seconds
+      syncIdentity(); 
+      interval = setInterval(syncIdentity, 30000); 
     }
 
     return () => clearInterval(interval);
   }, [isLoggedIn]);
+
+  // --- NEW: FETCH GLOBAL SETTINGS ---
+  useEffect(() => {
+    const fetchGlobalSettings = async () => {
+      try {
+        // We use the new admin endpoint you created
+        const res = await axios.get(`${API_URL}/admin/red-mode`);
+        // If your backend returns { value: true } for disabled, use res.data.value
+        setIsRedModeDisabledByAdmin(res.data.isDisabled); 
+      } catch (err) {
+        console.error("Failed to fetch global settings:", err);
+      }
+    };
+
+    fetchGlobalSettings();
+  }, []); // Runs once on load
 
   // --- 2. THEME INITIALIZATION ---
   useEffect(() => {
@@ -124,7 +141,8 @@ export function AppProvider({ children }) {
       isLoggedIn, user, setUser, login, logout, 
       currentTheme, setTheme: updateTheme, 
       isRedMode, toggleRedMode, 
-      familyMode, toggleFamilyMode 
+      familyMode, toggleFamilyMode,
+      isRedModeDisabledByAdmin // EXPORTED TO NAVBAR
     }}>
       {children}
     </AppContext.Provider>

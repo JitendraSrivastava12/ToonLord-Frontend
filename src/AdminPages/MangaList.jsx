@@ -10,7 +10,7 @@ import {
   Loader2,
   X
 } from "lucide-react";
-
+import { useAlert } from "../context/AlertContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function MangaList() {
@@ -18,10 +18,12 @@ export default function MangaList() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [loading, setLoading] = useState(false);
-
+ 
   const [selectedManga, setSelectedManga] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isAddMode, setIsAddMode] = useState(false);
+
+  const {showAlert}=useAlert();
 
   const initialForm = {
     title: "",
@@ -96,7 +98,7 @@ export default function MangaList() {
       );
       setMangas((prev) => prev.filter((m) => m._id !== id));
     } catch (err) {
-      alert("Delete failed");
+      showAlert("Delete failed",'error');
     }
   };
 
@@ -137,7 +139,7 @@ export default function MangaList() {
 
       closeModals();
     } catch (err) {
-      alert(err.response?.data?.message || "Save failed");
+      showAlert(err.response?.data?.message || "Save failed",'error');
     }
   };
 

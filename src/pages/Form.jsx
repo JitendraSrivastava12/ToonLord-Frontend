@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useAlert } from '../context/AlertContext';
 const API_URL = import.meta.env.VITE_API_URL;
 export default function MangaForm() {
+  const {showAlert}=useAlert();
   const [formData, setFormData] = useState({
     title: '',
     mangaId: '',
@@ -41,9 +43,9 @@ export default function MangaForm() {
 
       const result = await response.json();
       if (response.ok) {
-        alert('Manga added successfully!');
+        showAlert('Manga added successfully!','success');
       } else {
-        alert(`Error: ${result.message || 'Server Error'}`);
+        showAlert(`Error: ${result.message || 'Server Error'}`,'error');
       }
     } catch (error) {
       console.error('Submission error:', error);

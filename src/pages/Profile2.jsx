@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { AppContext } from "../UserContext";
+import { useAlert } from '../context/AlertContext';
 
 const VisitorProfile = () => {
   const { id } = useParams(); 
@@ -23,6 +24,7 @@ const VisitorProfile = () => {
   const [targetComments, setTargetComments] = useState([]); 
   
   // Connection Lists
+  const {showAlert}=useAlert();
   const [followersList, setFollowersList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
   const [connectionsLoading, setConnectionsLoading] = useState(false);
@@ -115,7 +117,7 @@ const VisitorProfile = () => {
         followersCount: res.data.isFollowing ? (prev.followersCount + 1) : (prev.followersCount - 1)
       }));
     } catch (err) {
-      alert("Synchronization failed.");
+      showAlert("Synchronization failed.",'error');
     } finally {
       setActionLoading(false);
     }

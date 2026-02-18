@@ -489,26 +489,29 @@ const UserManagement = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              className="bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-5"
-            >
-              <div
-                className={`p-4 rounded-2xl ${stat.bg} ${stat.text} shrink-0`}
-              >
-                {stat.icon}
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  {stat.label}
-                </p>
-                <p className="text-2xl font-bold text-slate-900">{stat.count}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+  {stats.map((stat, i) => (
+    <div
+      key={i}
+      className="bg-white p-5 sm:p-6 rounded-[1.5rem] border border-slate-100 shadow-sm flex items-center gap-4 sm:gap-5"
+    >
+      <div
+        className={`p-3.5 sm:p-4 rounded-2xl ${stat.bg} ${stat.text} shrink-0`}
+      >
+        {/* Cloning the icon to ensure it stays a consistent size */}
+        {React.cloneElement(stat.icon, { size: 20 })}
+      </div>
+      <div className="space-y-0.5 min-w-0"> {/* min-w-0 prevents text overflow */}
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate">
+          {stat.label}
+        </p>
+        <p className="text-xl sm:text-2xl font-bold text-slate-900">
+          {stat.count}
+        </p>
+      </div>
+    </div>
+  ))}
+</div>
 
         {/* Content Table Container */}
         <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden">

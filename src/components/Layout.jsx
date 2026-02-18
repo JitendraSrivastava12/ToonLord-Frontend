@@ -24,8 +24,9 @@ import {
   LogIn,
   Sparkles,
   Users,
-  Layers,Mail,
-  MailIcon
+  Layers,
+  Mail,
+  MailIcon,
 } from "lucide-react";
 import NavBar from "./NavBar";
 import { AppContext } from "../UserContext";
@@ -49,8 +50,15 @@ const SocialIcon = ({ icon, accent, href }) => (
 
 function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user } =
-    useContext(AppContext);
+  const {
+    isLoggedIn,
+    logout,
+    isRedMode,
+    toggleRedMode,
+    currentTheme,
+    user,
+    isRedModeDisabledByAdmin,
+  } = useContext(AppContext);
   const { showAlert } = useAlert();
   const navigate = useNavigate();
   const location = useLocation();
@@ -366,43 +374,45 @@ function Layout() {
 
               {/* FOOTER CONTROLS */}
               <div className="md:hidden p-5 border-t border-white/5 bg-black/10 space-y-3">
-                <button
-                  onClick={() => toggleRedMode()}
-                  className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all border group ${
-                    isRedMode
-                      ? "bg-red-500/10 border-red-500/20"
-                      : themeStyles.input
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <ShieldAlert
-                      size={18}
-                      className={
-                        isRedMode
-                          ? "text-red-500 animate-pulse"
-                          : "text-slate-500 group-hover:text-white transition-colors"
-                      }
-                    />
-                    <div className="flex flex-col items-start">
-                      <span
-                        className={`text-[9px] font-bold uppercase tracking-tighter ${isRedMode ? "text-red-500" : "text-slate-400"}`}
-                      >
-                        {isRedMode ? "Red Mode" : "Family Mode"}
-                      </span>
-                      <span className="text-[7px] font-bold opacity-30 uppercase">
-                        System Status
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    className={`w-9 h-5 rounded-full relative transition-all ${isRedMode ? "bg-red-500" : "bg-slate-700"}`}
+                {!isRedModeDisabledByAdmin && (
+                  <button
+                    onClick={() => toggleRedMode()}
+                    className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all border group ${
+                      isRedMode
+                        ? "bg-red-500/10 border-red-500/20"
+                        : themeStyles.input
+                    }`}
                   >
-                    <motion.div
-                      animate={{ x: isRedMode ? 18 : 4 }}
-                      className="absolute top-1 w-3 h-3 rounded-full bg-white shadow-sm"
-                    />
-                  </div>
-                </button>
+                    <div className="flex items-center gap-3">
+                      <ShieldAlert
+                        size={18}
+                        className={
+                          isRedMode
+                            ? "text-red-500 animate-pulse"
+                            : "text-slate-500 group-hover:text-white transition-colors"
+                        }
+                      />
+                      <div className="flex flex-col items-start">
+                        <span
+                          className={`text-[9px] font-bold uppercase tracking-tighter ${isRedMode ? "text-red-500" : "text-slate-400"}`}
+                        >
+                          {isRedMode ? "Red Mode" : "Family Mode"}
+                        </span>
+                        <span className="text-[7px] font-bold opacity-30 uppercase">
+                          System Status
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      className={`w-9 h-5 rounded-full relative transition-all ${isRedMode ? "bg-red-500" : "bg-slate-700"}`}
+                    >
+                      <motion.div
+                        animate={{ x: isRedMode ? 18 : 4 }}
+                        className="absolute top-1 w-3 h-3 rounded-full bg-white shadow-sm"
+                      />
+                    </div>
+                  </button>
+                )}
 
                 <button
                   onClick={() => {
@@ -424,7 +434,7 @@ function Layout() {
                     </>
                   ) : (
                     <>
-                      <Sparkles size={16} /> Enter Net
+                      <Sparkles size={16} /> Login
                     </>
                   )}
                 </button>
@@ -441,93 +451,144 @@ function Layout() {
           <Outlet context={[isRedMode, currentTheme]} key={location.pathname} />
         </main>
 
-      <footer className={`mt-auto border-t ${themeStyles.border} bg-[var(--bg-secondary)] w-full overflow-hidden`}>
-  {/* 1. Added overflow-hidden to the footer to prevent accidental horizontal shifts.
+        <footer
+          className={`mt-auto border-t ${themeStyles.border} bg-[var(--bg-secondary)] w-full overflow-hidden`}
+        >
+          {/* 1. Added overflow-hidden to the footer to prevent accidental horizontal shifts.
       2. py-12 on mobile, py-24 on desktop for better breathing room.
   */}
-  <div className="w-full max-w-[1440px] mx-auto px-4 md:px-12 py-12 md:py-24">
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-20">
-      
-      {/* BRAND SECTION */}
-      <div className="col-span-1 md:col-span-2 space-y-6">
-        <div className="flex items-center gap-4">
-          <Cpu size={28} style={{ color: activeAccent }} />
-          <span className="font-bold tracking-tighter text-xl md:text-2xl uppercase italic">
-            Toon<span style={{ color: activeAccent }}>Lord</span>
-          </span>
-        </div>
-        <p className="text-[10px] md:text-[11px] leading-relaxed font-bold uppercase tracking-tight opacity-60 max-w-sm">
-          The next generation of digital storytelling. Build, read, and
-          explore in the Manga realm.
-        </p>
-      </div>
+          <div className="w-full max-w-[1440px] mx-auto px-4 md:px-12 py-12 md:py-24">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-20">
+              {/* BRAND SECTION */}
+              <div className="col-span-1 md:col-span-2 space-y-6">
+                <div className="flex items-center gap-4">
+                  <Cpu size={28} style={{ color: activeAccent }} />
+                  <span className="font-bold tracking-tighter text-xl md:text-2xl uppercase italic">
+                    Toon<span style={{ color: activeAccent }}>Lord</span>
+                  </span>
+                </div>
+                <p className="text-[10px] md:text-[11px] leading-relaxed font-bold uppercase tracking-tight opacity-60 max-w-sm">
+                  The next generation of digital storytelling. Build, read, and
+                  explore in the Manga realm.
+                </p>
+              </div>
 
-      {/* LINKS SECTION - Changed gap to 4 on mobile to prevent overflow */}
-      <div className="grid grid-cols-2 gap-4 md:gap-12">
-        <div className="space-y-4 md:space-y-6">
-          <h4 className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-30">
-            Platform
-          </h4>
-          <ul className="space-y-3 md:space-y-4 text-[10px] md:text-[11px] font-bold uppercase tracking-wider">
-            <li><Link to="/browse" className="hover:text-[var(--accent)] transition-colors">Browse</Link></li>
-            <li><Link to="/library" className="hover:text-[var(--accent)] transition-colors">Library</Link></li>
-            <li><Link to="/dashboard" className="hover:text-[var(--accent)] transition-colors">Creator</Link></li>
-          </ul>
-        </div>
-        <div className="space-y-4 md:space-y-6">
-          <h4 className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-30">
-            Legal
-          </h4>
-          <ul className="space-y-3 md:space-y-4 text-[10px] md:text-[11px] font-bold uppercase tracking-wider">
-            <li><Link to="/terms" className="hover:text-[var(--accent)] transition-colors">Terms</Link></li>
-            <li><Link to="/privacy" className="hover:text-[var(--accent)] transition-colors">Privacy</Link></li>
-            <li><Link to="/safety" className="hover:text-[var(--accent)] transition-colors">Safety</Link></li>
-          </ul>
-        </div>
-      </div>
+              {/* LINKS SECTION - Changed gap to 4 on mobile to prevent overflow */}
+              <div className="grid grid-cols-2 gap-4 md:gap-12">
+                <div className="space-y-4 md:space-y-6">
+                  <h4 className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-30">
+                    Platform
+                  </h4>
+                  <ul className="space-y-3 md:space-y-4 text-[10px] md:text-[11px] font-bold uppercase tracking-wider">
+                    <li>
+                      <Link
+                        to="/browse"
+                        className="hover:text-[var(--accent)] transition-colors"
+                      >
+                        Browse
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/library"
+                        className="hover:text-[var(--accent)] transition-colors"
+                      >
+                        Library
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/dashboard"
+                        className="hover:text-[var(--accent)] transition-colors"
+                      >
+                        Creator
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+                <div className="space-y-4 md:space-y-6">
+                  <h4 className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-30">
+                    Legal
+                  </h4>
+                  <ul className="space-y-3 md:space-y-4 text-[10px] md:text-[11px] font-bold uppercase tracking-wider">
+                    <li>
+                      <Link
+                        to="/terms"
+                        className="hover:text-[var(--accent)] transition-colors"
+                      >
+                        Terms
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/privacy"
+                        className="hover:text-[var(--accent)] transition-colors"
+                      >
+                        Privacy
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/safety"
+                        className="hover:text-[var(--accent)] transition-colors"
+                      >
+                        Safety
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </div>
 
-      {/* SOCIAL SECTION */}
-      <div className="flex flex-col space-y-6">
-        <h4 className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-30">
-          Contact
-        </h4>
-        <div className="flex flex-wrap gap-3">
-          {[
-            { icon: <Linkedin size={18} />, href: "https://www.linkedin.com/in/jitendra-srivastava-099b0b289/" },
-            { icon: <Github size={18} />, href: "https://github.com/JitendraSrivastava12" },
-            { 
-  icon: <MailIcon size={18} />, 
-  // Notice the 'mailto:' prefix added here
-  href: "mailto:toonlord981@gmail.com?subject=Contacting ToonLord Support"
-}
-          ].map((social, i) => (
-            <a
-              key={i}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`p-2.5 rounded-xl border ${themeStyles.border} bg-[var(--bg-primary)] hover:border-[var(--accent)] transition-all`}
+              {/* SOCIAL SECTION */}
+              <div className="flex flex-col space-y-6">
+                <h4 className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] opacity-30">
+                  Contact
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    {
+                      icon: <Linkedin size={18} />,
+                      href: "https://www.linkedin.com/in/jitendra-srivastava-099b0b289/",
+                    },
+                    {
+                      icon: <Github size={18} />,
+                      href: "https://github.com/JitendraSrivastava12",
+                    },
+                    {
+                      icon: <MailIcon size={18} />,
+                      // Notice the 'mailto:' prefix added here
+                      href: "mailto:toonlord981@gmail.com?subject=Contacting ToonLord Support",
+                    },
+                  ].map((social, i) => (
+                    <a
+                      key={i}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`p-2.5 rounded-xl border ${themeStyles.border} bg-[var(--bg-primary)] hover:border-[var(--accent)] transition-all`}
+                    >
+                      {social.icon}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* BOTTOM BAR - Fixed mobile centering and wrapping */}
+            <div
+              className={`mt-12 md:mt-20 pt-8 border-t ${themeStyles.border} flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left`}
             >
-              {social.icon}
-            </a>
-          ))}
-        </div>
-      </div>
-    </div>
-
-    {/* BOTTOM BAR - Fixed mobile centering and wrapping */}
-    <div className={`mt-12 md:mt-20 pt-8 border-t ${themeStyles.border} flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left`}>
-      <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
-        <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest opacity-40">
-          © 2026 ToonLord // Created By
-        </p>
-        <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[var(--text-main)]">
-          Jitendra Srivastava
-        </span>
-      </div>
-    </div>
-  </div>
-</footer>
+              <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest opacity-40">
+                  © 2026 ToonLord // Created By
+                </p>
+                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-[var(--text-main)]">
+                  Jitendra Srivastava
+                </span>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
 
       <AnimatePresence>
