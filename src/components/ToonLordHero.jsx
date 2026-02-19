@@ -4,7 +4,7 @@ import { Zap, Play, ChevronRight, ShieldAlert } from 'lucide-react';
 import { AppContext } from "../UserContext"; 
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const ToonLordHero = () => {
   const { isRedMode, currentTheme } = useContext(AppContext);
   const [allHeroes, setAllHeroes] = useState([]); 
@@ -13,7 +13,7 @@ const ToonLordHero = () => {
   useEffect(() => {
     const loadHeroData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/mangas/hero-all');
+        const response = await axios.get(`${API_URL}/api/mangas/hero-all`);
         const data = response.data;
         setAllHeroes(data);
 
