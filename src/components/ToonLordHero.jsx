@@ -48,80 +48,95 @@ const ToonLordHero = () => {
         style={{ backgroundColor: accent }}
       />
 
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-12 grid lg:grid-cols-2 gap-14 items-center relative z-10">
-
-        {/* LEFT */}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
+        
+        {/* LEFT SECTION: Content */}
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="text-center lg:text-left"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center lg:text-left flex flex-col justify-center"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] mb-5">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] mb-6 self-center lg:self-start">
             {isRedMode 
-              ? <ShieldAlert size={13} className="text-red-500" /> 
-              : <Zap size={13} className="text-[var(--accent)]" />
+              ? <ShieldAlert size={14} className="text-red-500" /> 
+              : <Zap size={14} className="text-[var(--accent)]" />
             }
-            <span className="text-xs text-[var(--text-dim)]">
+            <span className="text-xs font-medium text-[var(--text-dim)] uppercase tracking-wider">
               {isRedMode ? "Restricted mode" : "Modern Manga Platform"}
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight text-[var(--text-main)] mb-5">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semisemibold leading-[1.1] text-[var(--text-main)] mb-6">
             Read <span style={{ color: accent }}>
               {isRedMode ? "Uncensored" : "Manga"}
             </span><br />
-            Earn Points<br />
-            Access Premium
+            <span className="opacity-90">Earn Points</span><br />
+            <span className="opacity-80">Access Premium</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-[var(--text-dim)] max-w-xl mx-auto lg:mx-0 mb-7 leading-relaxed">
+          <p className="text-base sm:text-lg text-[var(--text-dim)] max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed">
             {isRedMode
-              ? "Browse adult manhwa with controlled access and premium chapters."
-              : "Explore popular manga titles, collect points as you read, and access premium releases."}
+              ? "Browse adult manhwa with controlled access and premium chapters. Experience high-quality storytelling with no limits."
+              : "Explore popular manga titles, collect points as you read, and access exclusive premium releases from top creators."}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link 
               to="/home" 
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg font-medium text-white transition hover:opacity-90"
-              style={{ backgroundColor: accent }}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semisemibold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{ backgroundColor: accent, boxShadow: `${accent}33 0px 8px 24px` }}
             >
-              <Play size={16} />
+              <Play size={18} fill="currentColor" />
               Start reading
             </Link>
 
             <Link 
               to="/browse" 
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-main)] hover:border-[var(--accent)]/40 transition"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-main)] font-semisemisemibold hover:bg-[var(--bg-tertiary)] hover:border-[var(--accent)] transition-all"
             >
               Browse library
-              <ChevronRight size={16} />
+              <ChevronRight size={18} />
             </Link>
           </div>
         </motion.div>
 
-        {/* RIGHT */}
-        <div className="relative">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-4">
+        {/* RIGHT SECTION: Visual Grid */}
+        <div className="relative w-full max-w-2xl mx-auto lg:mx-0">
+          {/* Decorative background glow */}
+          <div 
+            className="absolute -inset-4 blur-[80px] opacity-20 z-0" 
+            style={{ backgroundColor: accent }}
+          ></div>
+
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             <AnimatePresence mode="popLayout">
-              {displayGrid.map((manga, i) => (
+              {displayGrid.slice(0, 6).map((manga, i) => (
                 <motion.div
                   key={manga._id}
                   layout
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="aspect-[3/4] rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)]"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    delay: i * 0.1,
+                    ease: [0.23, 1, 0.32, 1] 
+                  }}
+                  className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] shadow-2xl"
                 >
-                  <Link to={`/manga/${manga._id}`}>
+                  <Link to={`/manga/${manga._id}`} className="block w-full h-full">
                     <img 
                       src={manga.coverImage} 
                       alt={manga.title} 
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
                       onError={(e) => { e.target.src = '/fallback-cover.jpg'; }}
                     />
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                        <p className="text-white text-[10px] font-medium truncate">{manga.title}</p>
+                    </div>
                   </Link>
                 </motion.div>
               ))}
