@@ -58,6 +58,7 @@ function AppRoutes({ currentTheme, setTheme }) {
       <Route path="/profile/:id" element={<VisitorProfile/>} />
         <Route path='/browse' element={<BrowsePage  />} />
         <Route path='/upload' element={<UploadPage  />} />
+        <Route path='/upload/:mangaId' element={<UploadPage />} />
         <Route path='/manga/:mangaId' element={<AdvancedViewPage  />} />
         
         <Route path='/loginlanding' element={<MangaRealmLanding  />} />

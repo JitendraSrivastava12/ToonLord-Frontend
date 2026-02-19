@@ -165,15 +165,15 @@ const MySeries = () => {
                       <div className="min-w-0 flex-1">
                         <h2 className="text-2xl md:text-3xl font-bold italic uppercase tracking-tighter truncate group-hover:text-[var(--accent)] transition-colors">{series.title}</h2>
                         <div className="flex items-center gap-6 mt-4">
-                           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--text-dim)]"><BookOpen size={14} className={accentText}/> {series.TotalChapter || 0} SEQS</div>
-                           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--text-dim)]"><BarChart size={14} className={accentText}/> {series.views || 0} FLUX</div>
+                           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--text-dim)]"><BookOpen size={14} className={accentText}/> {series.TotalChapter || 0} Chapters</div>
+                           <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-[var(--text-dim)]"><BarChart size={14} className={accentText}/> {series.views || 0} VIEWS</div>
                         </div>
                       </div>
 
                       {/* Status / Actions */}
                       <div className="shrink-0 flex flex-col items-end gap-3">
                         {series.isPremium ? (
-                          <div className="px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-[9px] font-bold uppercase tracking-widest flex items-center gap-2"><ShieldCheck size={14} /> Premium Hub</div>
+                          <div className="px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-500 text-[9px] font-bold uppercase tracking-widest flex items-center gap-2"><ShieldCheck size={14} /> Premium</div>
                         ) : series.premiumRequestStatus === 'contract_offered' ? (
                           <button onClick={() => setContractModal({ isOpen: true, manga: series })} className="px-5 py-2.5 bg-yellow-500 text-black text-[9px] font-bold uppercase rounded-xl animate-bounce shadow-lg shadow-yellow-500/20">Sign Contract</button>
                         ) : (
@@ -212,7 +212,7 @@ const MySeries = () => {
                         className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] transition-all hover:pl-2 ${expandedSeries === series._id ? accentText : 'text-[var(--text-dim)]'}`}
                       >
                         {expandedSeries === series._id ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
-                        {expandedSeries === series._id ? 'Close Sequences' : 'Sequence Manager'}
+                        {expandedSeries === series._id ? 'Close Chapters' : 'CHapter Manager'}
                       </button>
                     </div>
                   </div>
@@ -234,7 +234,7 @@ const MySeries = () => {
                              </div>
                           </div>
                         ))}
-                        <Link to={`/add-chapter/${series._id}`} className="flex items-center justify-center p-4 border border-dashed border-[var(--border)] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-[var(--text-dim)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all">+ Add Sequence</Link>
+                        <Link to={`/upload/${series._id}`} className="flex items-center justify-center p-4 border border-dashed border-[var(--border)] rounded-2xl text-[10px] font-bold uppercase tracking-widest text-[var(--text-dim)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all">+ Add Chapter</Link>
                       </div>
                     </motion.div>
                   )}
@@ -323,7 +323,7 @@ const PremiumRequestModal = ({ isOpen, manga, onConfirm, onCancel, loading }) =>
     <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[2.5rem] p-10 max-w-lg w-full text-center space-y-8">
       <Zap className="mx-auto text-yellow-500" size={48} />
       <div>
-        <h3 className="text-3xl font-bold uppercase italic tracking-tighter">Premium <span className="text-yellow-500">Uplink</span></h3>
+        <h3 className="text-3xl font-bold uppercase italic tracking-tighter">Premium <span className="text-yellow-500">Request</span></h3>
         <p className="text-[10px] opacity-50 uppercase tracking-widest mt-2">{manga?.title}</p>
       </div>
       <p className="text-xs opacity-70 italic">Admin evaluation required for monetization approval.</p>

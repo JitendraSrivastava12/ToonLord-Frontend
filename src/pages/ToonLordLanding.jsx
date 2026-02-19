@@ -20,7 +20,7 @@ const ToonLordLanding = () => {
 
         {/* TRUST STATS */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-          {['10,000+ creators', '2 million readers', '50,000+ comics', 'Daily updates'].map((stat, i) => (
+          {['200+ Creators', '100+ Readers', '500+ Mangas', 'Daily updates'].map((stat, i) => (
             <div
               key={i}
               className="rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5 text-center"

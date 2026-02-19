@@ -6,9 +6,11 @@ import { AppContext } from "../UserContext";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAlert } from "../context/AlertContext";
+import { useParams } from 'react-router-dom';
 const API_URL = import.meta.env.VITE_API_URL;
 const UploadPage = () => {
   const { isRedMode,currentTheme } = useContext(AppContext);
+  const { mangaId } = useParams();
   const navigate = useNavigate();
   const accentColor = isRedMode ? '#ef4444' : 'var(--accent)';
   const accentText = isRedMode ? 'text-red-500' : 'text-[var(--accent)]';
@@ -62,7 +64,11 @@ const UploadPage = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMyMangas(res.data);
-        if (res.data.length > 0) setSelectedManga(res.data[0]._id);
+        if (mangaId) {
+          setSelectedManga(mangaId);
+        } else if (res.data.length > 0) {
+          setSelectedManga(res.data[0]._id);
+        }
       } catch (err) {
         console.error("Failed to load your series", err);
       }

@@ -30,9 +30,9 @@ const MangaGrid = ({ category, className = "", itemClassName = "" }) => {
     if (category === 'premium') {
       filtered = filtered.filter(m => m.isPremium === true);
     } else if (category === 'trending') {
-      filtered = [...filtered].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 12);
+      filtered = [...filtered].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 10);
     } else if (category === 'top-rated') {
-      filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 12);
+      filtered = [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
     }
     return filtered;
   }, [mangas, category, familyMode]);
