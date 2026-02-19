@@ -5,17 +5,18 @@ A premium, full-stack manga & comics ecosystem where users can read free manga, 
 </p>
 
 <p>
-<strong>ToonLord</strong> is a complete digital manga platform featuring:
+<strong>ToonLord</strong> is a complete digital manga platform combining:
 </p>
 
 <ul>
-  <li>Free & premium manga access</li>
-  <li>Coin-based unlocking system</li>
+  <li>Free & premium manga reading</li>
+  <li>Coin-based economy</li>
   <li>VIP ad-free subscription</li>
-  <li>Creator publishing system</li>
+  <li>Creator publishing tools</li>
   <li>Admin management panel</li>
-  <li>Recommendation engine</li>
-  <li>Modern UI & themes</li>
+  <li>Recommendation system</li>
+  <li>Social features (follow system & comments)</li>
+  <li>Modern UI with theme switcher</li>
 </ul>
 
 <p>
@@ -84,6 +85,15 @@ This repository contains the <strong>React frontend client</strong> connected to
   <li>History tracking</li>
 </ul>
 
+<h3>👥 Follow & Following System</h3>
+<ul>
+  <li>Users can follow creators</li>
+  <li>Users can follow other users</li>
+  <li>Followers can see creator’s uploaded manga</li>
+  <li>Following list maintained in user profile</li>
+  <li>Used for personalized recommendations</li>
+</ul>
+
 <hr/>
 
 <h2>✍️ Creator System</h2>
@@ -92,6 +102,7 @@ This repository contains the <strong>React frontend client</strong> connected to
 <ul>
   <li>User must sign a contract to become a creator</li>
   <li>Admin approval required</li>
+  <li>Creator role is activated after approval</li>
 </ul>
 
 <h3>📂 Creator Dashboard</h3>
@@ -104,6 +115,7 @@ This repository contains the <strong>React frontend client</strong> connected to
       <li>Views</li>
       <li>Earnings</li>
       <li>Subscribers</li>
+      <li>Followers</li>
     </ul>
   </li>
   <li>Request manga to be marked as Premium</li>
@@ -159,7 +171,8 @@ This repository contains the <strong>React frontend client</strong> connected to
 <h2>💬 Comment System</h2>
 <ul>
   <li>Users can comment on manga and chapters</li>
-  <li>Reply system for discussions</li>
+  <li>Reply system for threaded discussions</li>
+  <li>Like and interact with comments</li>
   <li>Report inappropriate comments</li>
   <li>Admin moderation panel</li>
 </ul>
@@ -185,7 +198,8 @@ This repository contains the <strong>React frontend client</strong> connected to
     <ul>
       <li>Reading history</li>
       <li>Subscriptions</li>
-      <li>Popularity</li>
+      <li>Followed creators</li>
+      <li>Popular manga</li>
       <li>Premium content</li>
     </ul>
   </li>
@@ -226,6 +240,47 @@ This repository contains the <strong>React frontend client</strong> connected to
 
 <hr/>
 
+<h2>⚙️ How To Run The Project</h2>
+
+<h3>1️⃣ Clone Repository</h3>
+<pre>
+git clone https://github.com/YOUR_USERNAME/ToonLord_Frontend.git
+cd toonlord-frontend
+</pre>
+
+<h3>2️⃣ Install Dependencies</h3>
+<pre>
+npm install
+</pre>
+
+<h3>3️⃣ Create Environment File</h3>
+<p>Create a <code>.env</code> file in the root directory:</p>
+<pre>
+REACT_APP_API_URL=http://localhost:5000
+</pre>
+
+<h3>4️⃣ Start Development Server</h3>
+<pre>
+npm start
+</pre>
+
+<p>Open in browser:</p>
+<pre>
+http://localhost:3000
+</pre>
+
+<h3>5️⃣ Production Build</h3>
+<pre>
+npm run build
+</pre>
+
+<p>Build files will be generated inside:</p>
+<pre>
+/build
+</pre>
+
+<hr/>
+
 <h2>📂 Project Structure</h2>
 
 <pre>
@@ -245,13 +300,10 @@ src/
 
 <h2>👨‍💻 Author</h2>
 <p>
-<strong>Saurabh Sharma</strong><br/>
+<strong>Jitendra Srivastava</strong><br/>
 Full Stack Developer
 </p>
 
-<p>
-Tech Interests:
-</p>
 <ul>
   <li>React</li>
   <li>Node.js</li>
