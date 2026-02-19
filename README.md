@@ -1,4 +1,4 @@
-<h1>📚 ToonLord – Manga Reading Platform (Frontend)</h1>
+<h1>📚 ToonLord – Premium Manga Reading Platform (Frontend)</h1>
 
 <p>
 A premium, full-stack manga & comics ecosystem where users can read free manga, unlock premium content using coins, support creators, and enjoy a modern themed UI — built with React.
@@ -211,7 +211,7 @@ This repository contains the <strong>React frontend client</strong> connected to
 
 <h2>🪙 Economy System</h2>
 <ul>
-  <li>Coin-based chapter unlocking</li>
+  <li>Manga-based chapter unlocking</li>
   <li>Coins earned via ads or purchase</li>
   <li>Transaction history</li>
   <li>Unlock history</li>
@@ -310,7 +310,6 @@ Full Stack Developer
   <li>React</li>
   <li>Node.js</li>
   <li>MongoDB</li>
-  <li>Blockchain</li>
   <li>Recommendation Systems</li>
 </ul>
 
