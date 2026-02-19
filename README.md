@@ -26,7 +26,7 @@ Read free manga • Unlock premium with coins • Support creators • Immersive
 </ul>
 
 <p>
-This repository contains the <b>React frontend</b> connected to a
+This repository contains the <b>Vite + React frontend</b> connected to a
 <b>Node.js + Express + MongoDB (Atlas)</b> backend.
 </p>
 
@@ -225,7 +225,7 @@ This repository contains the <b>React frontend</b> connected to a
 
 <hr/>
 
-<h2>⚙️ How To Run The Project</h2>
+<h2>⚙️ How To Run The Project (Vite)</h2>
 
 <h3>1️⃣ Clone Repository</h3>
 <pre>
@@ -240,20 +240,25 @@ npm install
 
 <h3>3️⃣ Create Environment File</h3>
 <pre>
-REACT_APP_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000
 </pre>
 
 <h3>4️⃣ Start Development Server</h3>
 <pre>
-npm start
+npm run dev
 </pre>
 
 <p>Open in browser:</p>
-<pre>http://localhost:3000</pre>
+<pre>http://localhost:5173</pre>
 
 <h3>5️⃣ Production Build</h3>
 <pre>
 npm run build
+</pre>
+
+<h3>6️⃣ Preview Production Build</h3>
+<pre>
+npm run preview
 </pre>
 
 <hr/>
@@ -268,8 +273,8 @@ src/
  ┣ api/
  ┣ ui/
  ┣ assets/
- ┣ App.js
- ┗ index.js
+ ┣ App.jsx
+ ┗ main.jsx
 </pre>
 
 <hr/>
