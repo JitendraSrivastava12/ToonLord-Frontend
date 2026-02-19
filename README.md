@@ -6,7 +6,7 @@ Read free manga • Unlock premium with coins • Support creators • Immersive
 </p>
 
 <p align="center">
-🌐 Website: <a href="https://toonlord.vercel.app/" target="_blank">https://toonlord.vercel.app/</a>
+🌐 Website: <a href="https://toonlord.vercel.app/" target="_blank">Live Demo</a>
 </p>
 
 <hr/>
@@ -229,7 +229,7 @@ This repository contains the <b>Vite + React frontend</b> connected to a
 
 <h3>1️⃣ Clone Repository</h3>
 <pre>
-git clone https://github.com/YOUR_USERNAME/ToonLord_Frontend.git
+git clone https://github.com/JitendraSrivastava12/ToonLord_Frontend.git
 cd toonlord-frontend
 </pre>
 
