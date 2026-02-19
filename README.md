@@ -110,6 +110,8 @@ This repository contains the <strong>React frontend client</strong> connected to
   <li>My Manga section</li>
   <li>Upload new manga</li>
   <li>Upload chapters</li>
+  <li>While uploading chapters, creator can choose image compression level (quality vs file size)</li>
+  <li>Supports optimized upload for slow networks and mobile users</li>
   <li>View analytics:
     <ul>
       <li>Views</li>
@@ -300,7 +302,7 @@ src/
 
 <h2>👨‍💻 Author</h2>
 <p>
-<strong>Jitendra Srivastava</strong><br/>
+<strong>Saurabh Sharma</strong><br/>
 Full Stack Developer
 </p>
 
@@ -308,7 +310,6 @@ Full Stack Developer
   <li>React</li>
   <li>Node.js</li>
   <li>MongoDB</li>
-  <li>Machine Learning</li>
   <li>Blockchain</li>
   <li>Recommendation Systems</li>
 </ul>
