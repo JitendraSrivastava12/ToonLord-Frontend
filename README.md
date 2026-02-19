@@ -2,7 +2,11 @@
 
 <p align="center">
 <b>A modern, full-stack manga & comics ecosystem</b><br/>
-Read free manga • Unlock premium with coins • Support creators • Enjoy immersive UI
+Read free manga • Unlock premium with coins • Support creators • Immersive UI
+</p>
+
+<p align="center">
+🌐 Website: <a href="https://toonlord.vercel.app/" target="_blank">https://toonlord.vercel.app/</a>
 </p>
 
 <hr/>
@@ -18,7 +22,7 @@ Read free manga • Unlock premium with coins • Support creators • Enjoy imm
   <li>Premium manga can be unlocked using coins</li>
   <li>VIP users enjoy an ad-free experience</li>
   <li>Creators can upload and monetize their content</li>
-  <li>Admins manage revenue, users, and content</li>
+  <li>Admins manage users, revenue, and content</li>
 </ul>
 
 <p>
@@ -51,7 +55,7 @@ This repository contains the <b>React frontend</b> connected to a
 <ul>
   <li>VIP removes all advertisements</li>
   <li>VIP users still use coins for premium chapters</li>
-  <li>Best experience without interruptions</li>
+  <li>Smooth reading without interruptions</li>
 </ul>
 
 <h3>🔍 Discover & Explore</h3>
@@ -84,7 +88,7 @@ This repository contains the <b>React frontend</b> connected to a
   <li>User dashboard & profile</li>
   <li>Theme switcher (multiple themes)</li>
   <li>Follow & following system</li>
-  <li>History tracking</li>
+  <li>Reading history tracking</li>
 </ul>
 
 <h3>👥 Follow System</h3>
@@ -92,7 +96,7 @@ This repository contains the <b>React frontend</b> connected to a
   <li>Users can follow creators</li>
   <li>Users can follow other users</li>
   <li>Followers receive updates on new manga</li>
-  <li>Used in recommendation system</li>
+  <li>Used for personalized recommendations</li>
 </ul>
 
 <hr/>
@@ -113,8 +117,8 @@ This repository contains the <b>React frontend</b> connected to a
   <li>Upload chapters</li>
   <li>Creator can:
     <ul>
-      <li>Choose image compression level (quality vs size)</li>
-      <li>Add external links while uploading chapters or manga</li>
+      <li>Select image compression level (quality vs size)</li>
+      <li>Add external links while uploading manga or chapters</li>
     </ul>
   </li>
   <li>View analytics:
@@ -261,7 +265,6 @@ src/
  ┣ components/
  ┣ pages/
  ┣ context/
- ┣ hooks/
  ┣ api/
  ┣ ui/
  ┣ assets/
@@ -271,21 +274,22 @@ src/
 
 <hr/>
 
-<h2>👨‍💻 Author</h2>
-
-<p>
-<strong>Saurabh Sharma</strong><br/>
-Full Stack Developer
-</p>
-
+<h2>🚀 Future Features</h2>
 <ul>
-  <li>React</li>
-  <li>Node.js</li>
-  <li>MongoDB</li>
-  <li>Machine Learning</li>
-  <li>Blockchain</li>
-  <li>Recommendation Systems</li>
+  <li>🌍 Global & Local dashboards</li>
+  <li>🤖 AI chatbot for help & support</li>
+  <li>🎯 Daily challenges with rewards</li>
+  <li>💬 Real-time chat system</li>
+  <li>📱 Progressive Web App (PWA)</li>
+  <li>🧩 Community forums</li>
 </ul>
+
+<hr/>
+
+<h2>👨‍💻 Author</h2>
+<p>
+<strong>Jitendra Srivastava</strong>
+</p>
 
 <hr/>
 
