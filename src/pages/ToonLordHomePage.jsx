@@ -80,7 +80,7 @@ const ToonLordHome = () => {
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight line-clamp-3">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight line-clamp-2">
                 {processedData.spotlight.title}
               </h1>
 
@@ -149,9 +149,9 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
         </div>
         <h2 className="text-xl sm:text-2xl font-semibold">{title}</h2>
       </div>
-      <button className="text-sm text-[var(--text-dim)] hover:text-[var(--text-main)] transition">
+      <Link to="/browse" className="text-sm text-[var(--text-dim)] hover:text-[var(--text-main)] transition">
         View all
-      </button>
+      </Link>
     </header>
 
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">

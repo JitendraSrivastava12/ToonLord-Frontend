@@ -81,6 +81,16 @@ const MangaDetail = () => {
     },
   });
 
+  // --- NEW: Fetch Related Manga ---
+  const { data: relatedMangas = [] } = useQuery({
+    queryKey: ["relatedManga", mangaId],
+    queryFn: async () => {
+      const res = await axios.get(`${API_URL}/api/mangas/related/${mangaId}`);
+      return res.data;
+    },
+    enabled: !!mangaId,
+  });
+
   // --- NEW: Fetch existing user rating on load ---
   useEffect(() => {
     const fetchUserRating = async () => {
@@ -477,6 +487,57 @@ const MangaDetail = () => {
           <MangaDetailMap manga={manga} />
         </div>
 
+        {/* RECOMMENDATIONS MODULE */}
+        {relatedMangas.length > 0 && (
+          <section className="mt-10 space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <div className="space-y-1">
+                <h2 className="text-xl md:text-2xl font-semibold uppercase tracking-tight">Recommended For You</h2>
+                <p className={`text-[9px] font-bold uppercase tracking-[0.3em] ${themeStyles.text}`}>Similar to {manga.title}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {relatedMangas.map((rec) => (
+                <motion.div
+                  key={rec._id}
+                  whileHover={{ y: -5 }}
+                  className="group relative"
+                >
+                  <Link to={`/manga/${rec._id}`} onClick={() => window.scrollTo(0, 0)}>
+                    <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-lg">
+                      <img 
+                        src={rec.coverImage} 
+                        alt={rec.title} 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      {rec.isPremium && (
+                        <div className="absolute top-2 right-2 bg-yellow-500 text-black text-[7px] font-bold px-2 py-0.5 rounded-full uppercase shadow-xl">
+                          Premium
+                        </div>
+                      )}
+                      <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                         <div className="flex items-center gap-1 text-yellow-400">
+                           <Star size={10} fill="currentColor" />
+                           <span className="text-[10px] font-bold">{rec.rating || "5.0"}</span>
+                         </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 space-y-1 px-1">
+                      <h3 className="text-[11px] font-bold uppercase truncate text-[var(--text-main)] group-hover:text-[var(--accent)] transition-colors">
+                        {rec.title}
+                      </h3>
+                      <p className="text-[8px] font-semibold text-[var(--text-dim)] uppercase tracking-wider">
+                        {rec.author || "Unknown"}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
       </div>
 
       {/* --- PURCHASE MODAL --- */}
@@ -517,31 +578,31 @@ const MangaDetail = () => {
 
                 {/* Financial Summary */}
                 <div className="space-y-3">
-                   <div className="bg-[var(--bg-secondary)]/30 border border-[var(--border)] rounded-2xl p-5 flex justify-between items-center">
-                     <div>
-                       <p className="text-[9px] font-semibold uppercase text-[var(--text-dim)] mb-1">Item Cost</p>
-                       <div className="flex items-center gap-2">
-                         <Coins size={14} className="text-yellow-500" />
-                         <span className="text-xl font-semibold">{manga?.price}</span>
-                       </div>
-                     </div>
-                     <ArrowRight size={20} className="text-[var(--border)]" />
-                     <div className="text-right">
-                       <p className="text-[9px] font-semibold uppercase text-[var(--text-dim)] mb-1">Wallet Balance</p>
-                       <div className="flex items-center gap-2 justify-end">
-                         <span className={`text-xl font-semibold ${toonCoins < manga?.price ? 'text-red-500' : ''}`}>
-                           {toonCoins}
-                         </span>
-                         <Wallet size={14} className="text-[var(--text-dim)]" />
-                       </div>
-                     </div>
-                   </div>
+                    <div className="bg-[var(--bg-secondary)]/30 border border-[var(--border)] rounded-2xl p-5 flex justify-between items-center">
+                      <div>
+                        <p className="text-[9px] font-semibold uppercase text-[var(--text-dim)] mb-1">Item Cost</p>
+                        <div className="flex items-center gap-2">
+                          <Coins size={14} className="text-yellow-500" />
+                          <span className="text-xl font-semibold">{manga?.price}</span>
+                        </div>
+                      </div>
+                      <ArrowRight size={20} className="text-[var(--border)]" />
+                      <div className="text-right">
+                        <p className="text-[9px] font-semibold uppercase text-[var(--text-dim)] mb-1">Wallet Balance</p>
+                        <div className="flex items-center gap-2 justify-end">
+                          <span className={`text-xl font-semibold ${toonCoins < manga?.price ? 'text-red-500' : ''}`}>
+                            {toonCoins}
+                          </span>
+                          <Wallet size={14} className="text-[var(--text-dim)]" />
+                        </div>
+                      </div>
+                    </div>
 
-                   {toonCoins < manga?.price && (
-                     <p className="text-[9px] font-semibold text-red-500 uppercase tracking-widest text-center px-4">
-                       Insufficient balance. Please recharge your wallet.
-                     </p>
-                   )}
+                    {toonCoins < manga?.price && (
+                      <p className="text-[9px] font-semibold text-red-500 uppercase tracking-widest text-center px-4">
+                        Insufficient balance. Please recharge your wallet.
+                      </p>
+                    )}
                 </div>
 
                 {/* Actions */}
