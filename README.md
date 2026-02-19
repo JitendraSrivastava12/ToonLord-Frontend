@@ -1,74 +1,76 @@
-<h1>📚 ToonLord – Premium Manga Reading Platform (Frontend)</h1>
+<h1 align="center">📚 ToonLord – Manga Reading Platform (Frontend)</h1>
 
-<p>
-A premium, full-stack manga & comics ecosystem where users can read free manga, unlock premium content using coins, support creators, and enjoy a modern themed UI — built with React.
+<p align="center">
+<b>A modern, full-stack manga & comics ecosystem</b><br/>
+Read free manga • Unlock premium with coins • Support creators • Enjoy immersive UI
 </p>
 
+<hr/>
+
+<h2>🌟 About ToonLord</h2>
+
 <p>
-<strong>ToonLord</strong> is a complete digital manga platform combining:
+<strong>ToonLord</strong> is a feature-rich digital manga platform where:
 </p>
 
 <ul>
-  <li>Free & premium manga reading</li>
-  <li>Coin-based economy</li>
-  <li>VIP ad-free subscription</li>
-  <li>Creator publishing tools</li>
-  <li>Admin management panel</li>
-  <li>Recommendation system</li>
-  <li>Social features (follow system & comments)</li>
-  <li>Modern UI with theme switcher</li>
+  <li>Readers can enjoy free manga</li>
+  <li>Premium manga can be unlocked using coins</li>
+  <li>VIP users enjoy an ad-free experience</li>
+  <li>Creators can upload and monetize their content</li>
+  <li>Admins manage revenue, users, and content</li>
 </ul>
 
 <p>
-This repository contains the <strong>React frontend client</strong> connected to a
-<strong>Node.js + Express + MongoDB (Atlas)</strong> backend.
+This repository contains the <b>React frontend</b> connected to a
+<b>Node.js + Express + MongoDB (Atlas)</b> backend.
 </p>
 
 <hr/>
 
 <h2>✨ Core Features</h2>
 
-<h3>📖 Reading System</h3>
+<h3>📖 Reading Experience</h3>
 <ul>
   <li>Free manga available for all users</li>
   <li>Premium manga & chapters require unlocking with coins</li>
-  <li>Coins can be obtained by:
+  <li>Coins can be earned by:
     <ul>
       <li>Watching ads</li>
       <li>Purchasing with real money</li>
     </ul>
   </li>
-  <li>Clean distraction-free reader UI</li>
+  <li>Clean & distraction-free reader UI</li>
   <li>High-quality premium manga</li>
   <li>Reading progress tracking</li>
-  <li>Bookmark chapters</li>
-  <li>Personal manga library</li>
+  <li>Bookmarks & personal library</li>
   <li>Subscribe to manga series</li>
 </ul>
 
-<h3>💎 VIP Reader System</h3>
+<h3>💎 VIP Subscription</h3>
 <ul>
-  <li>VIP subscription removes all advertisements</li>
-  <li>VIP users still need coins to unlock premium manga</li>
-  <li>No interruption while reading</li>
+  <li>VIP removes all advertisements</li>
+  <li>VIP users still use coins for premium chapters</li>
+  <li>Best experience without interruptions</li>
 </ul>
 
-<h3>🔍 Discovery & Browsing</h3>
+<h3>🔍 Discover & Explore</h3>
 <ul>
-  <li>Landing page for public users</li>
-  <li>Browse manga by genre, tags, and creators</li>
+  <li>Public landing page for visitors</li>
+  <li>Browse manga by genre, tags & creators</li>
   <li>Live search:
     <ul>
       <li>Manga search</li>
       <li>User search</li>
     </ul>
   </li>
-  <li>Recommendation system for free & premium manga</li>
-  <li>Anyone can view creator profiles</li>
-  <li>View all manga uploaded by any creator</li>
+  <li>Smart recommendation system</li>
+  <li>View creator profiles & their uploaded manga</li>
 </ul>
 
-<h3>👤 User System</h3>
+<hr/>
+
+<h2>👤 User System</h2>
 <ul>
   <li>Signup / Login authentication</li>
   <li>Secure sessions</li>
@@ -79,19 +81,18 @@ This repository contains the <strong>React frontend client</strong> connected to
       <li>Admin</li>
     </ul>
   </li>
-  <li>Personal profile & dashboard</li>
-  <li>User manga library</li>
+  <li>User dashboard & profile</li>
   <li>Theme switcher (multiple themes)</li>
+  <li>Follow & following system</li>
   <li>History tracking</li>
 </ul>
 
-<h3>👥 Follow & Following System</h3>
+<h3>👥 Follow System</h3>
 <ul>
   <li>Users can follow creators</li>
   <li>Users can follow other users</li>
-  <li>Followers can see creator’s uploaded manga</li>
-  <li>Following list maintained in user profile</li>
-  <li>Used for personalized recommendations</li>
+  <li>Followers receive updates on new manga</li>
+  <li>Used in recommendation system</li>
 </ul>
 
 <hr/>
@@ -100,18 +101,22 @@ This repository contains the <strong>React frontend client</strong> connected to
 
 <h3>📝 Become a Creator</h3>
 <ul>
-  <li>User must sign a contract to become a creator</li>
+  <li>User must sign a digital contract</li>
   <li>Admin approval required</li>
-  <li>Creator role is activated after approval</li>
+  <li>Creator role activated after approval</li>
 </ul>
 
 <h3>📂 Creator Dashboard</h3>
 <ul>
-  <li>My Manga section</li>
+  <li>My Manga management panel</li>
   <li>Upload new manga</li>
   <li>Upload chapters</li>
-  <li>While uploading chapters, creator can choose image compression level (quality vs file size)</li>
-  <li>Supports optimized upload for slow networks and mobile users</li>
+  <li>Creator can:
+    <ul>
+      <li>Choose image compression level (quality vs size)</li>
+      <li>Add external links while uploading chapters or manga</li>
+    </ul>
+  </li>
   <li>View analytics:
     <ul>
       <li>Views</li>
@@ -120,15 +125,15 @@ This repository contains the <strong>React frontend client</strong> connected to
       <li>Followers</li>
     </ul>
   </li>
-  <li>Request manga to be marked as Premium</li>
+  <li>Request manga to become Premium</li>
 </ul>
 
-<h3>💰 Premium Manga Approval Flow</h3>
+<h3>💰 Premium Manga Flow</h3>
 <ol>
   <li>Creator requests premium status</li>
   <li>Admin reviews request</li>
   <li>Admin sends contract</li>
-  <li>Profit split is decided</li>
+  <li>Revenue split is decided</li>
   <li>Manga becomes premium</li>
   <li>Creator earns more from premium reads</li>
 </ol>
@@ -142,15 +147,15 @@ This repository contains the <strong>React frontend client</strong> connected to
   <li>Revenue tracking</li>
   <li>User management</li>
   <li>Manga management</li>
+  <li>Creator management</li>
   <li>Premium request management</li>
   <li>Contract management</li>
-  <li>Creator management</li>
   <li>VIP subscription monitoring</li>
 </ul>
 
-<h3>🚨 Report System</h3>
+<h3>🚨 Report & Moderation System</h3>
 <ul>
-  <li>Any user can report:
+  <li>Users can report:
     <ul>
       <li>Manga</li>
       <li>Chapter</li>
@@ -172,11 +177,10 @@ This repository contains the <strong>React frontend client</strong> connected to
 
 <h2>💬 Comment System</h2>
 <ul>
-  <li>Users can comment on manga and chapters</li>
-  <li>Reply system for threaded discussions</li>
-  <li>Like and interact with comments</li>
+  <li>Users can comment on manga & chapters</li>
+  <li>Threaded reply system</li>
+  <li>Like & interact with comments</li>
   <li>Report inappropriate comments</li>
-  <li>Admin moderation panel</li>
 </ul>
 
 <hr/>
@@ -187,7 +191,6 @@ This repository contains the <strong>React frontend client</strong> connected to
   <li>Multiple theme switcher</li>
   <li>Advanced reader UI</li>
   <li>Smooth animations</li>
-  <li>Dynamic content pages</li>
   <li>Mobile-friendly layout</li>
 </ul>
 
@@ -195,14 +198,13 @@ This repository contains the <strong>React frontend client</strong> connected to
 
 <h2>🧠 Recommendation System</h2>
 <ul>
-  <li>Smart manga suggestions</li>
-  <li>Based on:
+  <li>Smart manga suggestions based on:
     <ul>
       <li>Reading history</li>
       <li>Subscriptions</li>
       <li>Followed creators</li>
-      <li>Popular manga</li>
-      <li>Premium content</li>
+      <li>Popular content</li>
+      <li>Premium manga</li>
     </ul>
   </li>
 </ul>
@@ -211,33 +213,10 @@ This repository contains the <strong>React frontend client</strong> connected to
 
 <h2>🪙 Economy System</h2>
 <ul>
-  <li>Manga-based chapter unlocking</li>
+  <li>Coin-based unlocking system</li>
   <li>Coins earned via ads or purchase</li>
-  <li>Transaction history</li>
-  <li>Unlock history</li>
-  <li>VIP ad bypass system</li>
-</ul>
-
-<hr/>
-
-<h2>🛠 Tech Stack</h2>
-
-<h3>Frontend</h3>
-<ul>
-  <li>React</li>
-  <li>React Router</li>
-  <li>Axios</li>
-  <li>Context API</li>
-  <li>Tailwind CSS</li>
-</ul>
-
-<h3>Backend (separate repo)</h3>
-<ul>
-  <li>Node.js</li>
-  <li>Express</li>
-  <li>MongoDB Atlas</li>
-  <li>Cloudinary</li>
-  <li>REST APIs</li>
+  <li>Transaction & unlock history</li>
+  <li>VIP ad bypass logic</li>
 </ul>
 
 <hr/>
@@ -256,7 +235,6 @@ npm install
 </pre>
 
 <h3>3️⃣ Create Environment File</h3>
-<p>Create a <code>.env</code> file in the root directory:</p>
 <pre>
 REACT_APP_API_URL=http://localhost:5000
 </pre>
@@ -267,18 +245,11 @@ npm start
 </pre>
 
 <p>Open in browser:</p>
-<pre>
-http://localhost:3000
-</pre>
+<pre>http://localhost:3000</pre>
 
 <h3>5️⃣ Production Build</h3>
 <pre>
 npm run build
-</pre>
-
-<p>Build files will be generated inside:</p>
-<pre>
-/build
 </pre>
 
 <hr/>
@@ -301,6 +272,7 @@ src/
 <hr/>
 
 <h2>👨‍💻 Author</h2>
+
 <p>
 <strong>Saurabh Sharma</strong><br/>
 Full Stack Developer
@@ -310,6 +282,8 @@ Full Stack Developer
   <li>React</li>
   <li>Node.js</li>
   <li>MongoDB</li>
+  <li>Machine Learning</li>
+  <li>Blockchain</li>
   <li>Recommendation Systems</li>
 </ul>
 
