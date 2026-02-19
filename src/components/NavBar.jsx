@@ -238,7 +238,7 @@ function NavBar({ setIsSidebarOpen }) {
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 z-20 relative">
         {!isRedModeDisabledByAdmin && (
     <button onClick={() => toggleRedMode()}
-      className="hidden lg:flex relative px-6 py-3 rounded-2xl transition-all active:scale-95 shadow-lg group overflow-hidden"
+      className="hidden lg:flex relative px-6 py-3 rounded-2xl transition-all active:scale-95 shadow-lg group overflow-hidden cursor-pointer"
       style={{ backgroundColor: activeAccent }}
     >
       <div className="relative z-10 flex items-center gap-2">
@@ -256,7 +256,7 @@ function NavBar({ setIsSidebarOpen }) {
           
           <div className="relative" ref={bellRef}>
             <button onClick={() => setIsBellOpen(!isBellOpen)}
-              className={`relative p-2 md:p-3 rounded-lg md:rounded-2xl border transition-all ${themeStyles.input}`}
+              className={`relative p-2 md:p-3 rounded-lg md:rounded-2xl border transition-all cursor-pointer ${themeStyles.input}`}
             >
               <Bell size={20} className={unreadCount > 0 ? "" : themeStyles.text} style={{ color: unreadCount > 0 ? activeAccent : 'inherit', fill: unreadCount > 0 ? `${activeAccent}40` : 'none' }} />
               {unreadCount > 0 && (
@@ -327,14 +327,14 @@ function NavBar({ setIsSidebarOpen }) {
 
           <button 
             onClick={() => handleProtectedNavigation("/wallet")} 
-            className={`w-9 h-9 md:w-11 md:h-11 overflow-hidden rounded-xl md:rounded-2xl flex items-center justify-center border transition-all hover:scale-105 active:scale-95 ${themeStyles.input} ${themeStyles.text}`}
+            className={`w-9 h-9 md:w-11 md:h-11 overflow-hidden rounded-xl md:rounded-2xl flex items-center justify-center border transition-all hover:scale-105 active:scale-95 cursor-pointer ${themeStyles.input} ${themeStyles.text}`}
           >
             <Wallet size={22} />
           </button>
 
           <button 
             onClick={() => handleProtectedNavigation("/profile")} 
-            className="relative group flex items-center justify-center"
+            className="relative group flex items-center justify-center cursor-pointer"
           >
             {user?.vipStatus?.isVip ? (
               <div className="p-[2px] rounded-full bg-gradient-to-tr from-amber-400 via-amber-600 to-amber-300 shadow-[0_0_15px_rgba(217,119,6,0.2)]">
@@ -364,7 +364,7 @@ function NavBar({ setIsSidebarOpen }) {
           </button>
 
           <button onClick={() => isLoggedIn ? logout() : navigate("/loginlanding")}
-            className={`hidden md:flex p-3 rounded-2xl transition-all shadow-sm border ${isLoggedIn ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white' : `${themeStyles.input} ${themeStyles.text}`}`}
+            className={`hidden md:flex p-3 rounded-2xl transition-all shadow-sm border cursor-pointer ${isLoggedIn ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white cursor-pointer' : `${themeStyles.input} ${themeStyles.text}`}`}
           >
             {isLoggedIn ? <LogOut size={20} /> : <LogIn size={20} />}
           </button>

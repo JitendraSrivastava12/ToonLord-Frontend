@@ -447,7 +447,7 @@ function Layout() {
       {/* MAIN CONTENT */}
       <div className="flex flex-col min-h-screen">
         <NavBar setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="flex-1 pt-18 md:pt-24 pb-12 px-3 sm:px-6">
+        <main className="flex-1 pt-18 md:pt-24  px-3 sm:px-6">
           <Outlet context={[isRedMode, currentTheme]} key={location.pathname} />
         </main>
 
@@ -457,7 +457,7 @@ function Layout() {
           {/* 1. Added overflow-hidden to the footer to prevent accidental horizontal shifts.
       2. py-12 on mobile, py-24 on desktop for better breathing room.
   */}
-          <div className="w-full max-w-[1440px] mx-auto px-4 md:px-12 py-12 md:py-24">
+          <div className="w-full max-w-[1440px] mx-auto px-4 md:px-12 py-12 ">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-20">
               {/* BRAND SECTION */}
               <div className="col-span-1 md:col-span-2 space-y-6">

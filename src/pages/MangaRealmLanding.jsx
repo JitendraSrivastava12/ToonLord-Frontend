@@ -89,10 +89,10 @@ const MangaRealmLanding = () => {
       {/* STATS */}
       <section className="relative bg-[var(--bg-secondary)]/40 backdrop-blur-xl py-12 md:py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-          <StatItem label="Total Series" value="12k+" icon={<Globe size={14}/>} />
-          <StatItem label="Active Users" value="850k" icon={<Activity size={14}/>}/>
-          <StatItem label="Chapters Read" value="2.4M" icon={<Zap size={14}/>}/>
-          <StatItem label="Creator Earnings" value="$140k+" icon={<Lock size={14}/>}/>
+          <StatItem label="Total Series" value="300+" icon={<Globe size={14}/>} />
+          <StatItem label="Active Users" value="50+" icon={<Activity size={14}/>}/>
+          <StatItem label="Chapters Read" value="500+" icon={<Zap size={14}/>}/>
+          <StatItem label="Creator Earnings" value="₹10k+" icon={<Lock size={14}/>}/>
         </div>
       </section>
 
