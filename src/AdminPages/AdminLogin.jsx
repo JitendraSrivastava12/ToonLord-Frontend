@@ -119,7 +119,7 @@ const AdminLogin = () => {
                 <Loader2 className="animate-spin" size={20} />
               ) : (
                 <>
-                  Establish Secure Connection
+                 Login
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </>
               )}
