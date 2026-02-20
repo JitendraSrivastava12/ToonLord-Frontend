@@ -65,7 +65,7 @@ const MangaRealmLanding = () => {
               "Creator Subscriptions"
             ]}
             link="/Userlogin"
-            btnText="Continue as Reader"
+            btnText="Login as Reader"
             accent={accentColor}
             isPrimary
           />

@@ -6,7 +6,9 @@ import { motion } from "framer-motion";
 import { FireIcon, ClockIcon, StarIcon } from "@heroicons/react/24/solid";
 import { FaCrown } from "react-icons/fa";
 import { AppContext } from "../UserContext";
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 const ToonLordHome = () => {
   const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
 
@@ -54,11 +56,13 @@ const ToonLordHome = () => {
     <div className={`min-h-screen pb-20 theme-${currentTheme}`}>
       {/* HERO FEATURED */}
       {processedData.spotlight && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-1 md:pt-8 pb-16">
+        /* Removed px-4 on mobile, kept sm:px-6 for laptop */
+        <section className="max-w-7xl mx-auto px-0 sm:px-6 pt-0 md:pt-8 pb-12 sm:pb-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative rounded-[2.5rem] bg-[var(--bg-secondary)]/30 backdrop-blur-xl border border-[var(--border)] shadow-lg flex flex-col lg:flex-row items-center overflow-hidden min-h-[360px] sm:min-h-[420px]"
+            /* Changed rounded corners: none on mobile, 2.5rem on sm+ */
+            className="relative rounded-none sm:rounded-[2.5rem] bg-[var(--bg-secondary)]/30 backdrop-blur-xl border-x-0 sm:border border-[var(--border)] shadow-lg flex flex-col lg:flex-row items-center overflow-hidden min-h-[360px] sm:min-h-[420px]"
           >
             {/* BACKGROUND BLUR */}
             <div className="absolute inset-0 opacity-10">
@@ -121,7 +125,8 @@ const ToonLordHome = () => {
       )}
 
       {/* SECTIONS */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-14">
+      {/* Changed px-4 to px-2 on mobile for tighter edge look, kept sm:px-6 */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 space-y-14">
         <ArchiveSection
           title="Recently Updated"
           icon={<ClockIcon className="w-5 h-5" />}
@@ -142,7 +147,8 @@ const ToonLordHome = () => {
 
 const ArchiveSection = ({ title, icon, mangas, badge }) => (
   <section className="space-y-6">
-    <header className="flex items-center justify-between">
+    {/* Added mx-1 to header to keep text from touching screen edge on mobile */}
+    <header className="flex items-center justify-between mx-1">
       <div className="flex items-center gap-3">
         <div className="p-2 rounded-lg bg-[var(--bg-secondary)] text-[var(--accent)]">
           {icon}
@@ -154,7 +160,8 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
       </Link>
     </header>
 
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    {/* Using gap-2 on mobile to fit more content edge-to-edge */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4">
       {mangas.map((manga, i) => (
         <motion.div
           key={manga._id}
@@ -164,7 +171,7 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
           viewport={{ once: true }}
         >
           <Link to={`/manga/${manga._id}`} className="group block">
-            <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] transition group-hover:shadow-md group-hover:-translate-y-0.5">
+            <div className="relative aspect-[3/4] rounded-lg sm:rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] transition group-hover:shadow-md group-hover:-translate-y-0.5">
               <img
                 src={manga.coverImage}
                 alt=""
@@ -172,17 +179,17 @@ const ArchiveSection = ({ title, icon, mangas, badge }) => (
               />
 
               <span
-                className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-medium text-white bg-[var(--accent)]/80"
+                className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium text-white bg-[var(--accent)]/80"
               >
                 {badge}
               </span>
             </div>
 
-            <div className="mt-2 space-y-1">
+            <div className="mt-2 px-1 space-y-1">
               <h3 className="text-sm font-medium line-clamp-1 group-hover:text-[var(--accent)] transition">
                 {manga.title}
               </h3>
-              <div className="flex items-center justify-between text-xs text-[var(--text-dim)]">
+              <div className="flex items-center justify-between text-[10px] sm:text-xs text-[var(--text-dim)]">
                 <div className="flex items-center gap-1">
                   <StarIcon className="w-3 h-3 text-yellow-500" />
                   <span>{manga.rating || "4.8"}</span>

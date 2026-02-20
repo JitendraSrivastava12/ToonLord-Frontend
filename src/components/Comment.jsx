@@ -217,7 +217,7 @@ const CommentSection = ({ targetId, targetType }) => {
             await axios.post(endpoint, { content: text, targetId, targetType }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
             setText(""); setReplyTo(null); setIsFocused(false); fetchComments();
             showAlert("Comment posted", "success");
-        } catch (err) { showAlert("Error", "error"); } finally { setIsLoading(false); }
+        } catch (err) { showAlert(err.response?.data?.message, "error"); } finally { setIsLoading(false); }
     };
 
     const triggerReport = (comment) => {

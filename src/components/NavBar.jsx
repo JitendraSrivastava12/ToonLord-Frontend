@@ -15,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function NavBar({ setIsSidebarOpen }) {
   const navigate = useNavigate();
-  const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user,isRedModeDisabledByAdmin } = useContext(AppContext);
+  const { isLoggedIn, logout, isRedMode, toggleRedMode, currentTheme, user, isRedModeDisabledByAdmin } = useContext(AppContext);
   const { showAlert } = useAlert(); 
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -83,11 +83,19 @@ function NavBar({ setIsSidebarOpen }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  /* ---------------- NOTIFICATION LOGIC (FIXED) ---------------- */
   const allowedCategories = ['creator', 'system']; 
   const filteredNotifications = (user?.activityLog || []).filter(n => allowedCategories.includes(n.category));
+  
+  // Count unread for the badge
   const unreadCount = filteredNotifications.filter(n => !n.isRead).length;
-  const previewNotifications = [...filteredNotifications].reverse().slice(0, 5);
 
+  // DROPDOWN FILTER: Only show unread messages in the bell preview
+  const previewNotifications = [...filteredNotifications]
+    .filter(n => !n.isRead) 
+    // Sort by timestamp descending (Newest first)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) 
+    .slice(0, 5);
   const handleMarkAllRead = async (e) => {
     e.stopPropagation();
     try {
@@ -161,7 +169,7 @@ function NavBar({ setIsSidebarOpen }) {
               <Cpu size={20} style={{ color: activeAccent }} className="relative z-10 md:w-6 md:h-6" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className={`text-base md:text-2xl  font-bold tracking-tighter italic ${themeStyles.text}`}>
+              <span className={`text-base md:text-2xl font-bold tracking-tighter italic ${themeStyles.text}`}>
                 TOON<span style={{ color: activeAccent }}>LORD</span>
               </span>
               <span className={`text-[6px] md:text-[7px] font-bold tracking-[0.2em] uppercase ${themeStyles.subtext}`}>Premium Mangas</span>
@@ -214,7 +222,7 @@ function NavBar({ setIsSidebarOpen }) {
                       </div>
 
                       <div className="flex flex-col flex-1 truncate">
-                        <span className={`text-[12px]  font-bold uppercase italic tracking-wider truncate ${themeStyles.text}`}>
+                        <span className={`text-[12px] font-bold uppercase italic tracking-wider truncate ${themeStyles.text}`}>
                           {isUser ? item.username : item.title}
                         </span>
                         <div className="flex items-center gap-2">
@@ -237,22 +245,22 @@ function NavBar({ setIsSidebarOpen }) {
         {/* RIGHT: ACTIONS */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 z-20 relative">
         {!isRedModeDisabledByAdmin && (
-    <button onClick={() => toggleRedMode()}
-      className="hidden lg:flex relative px-6 py-3 rounded-2xl transition-all active:scale-95 shadow-lg group overflow-hidden cursor-pointer"
-      style={{ backgroundColor: activeAccent }}
-    >
-      <div className="relative z-10 flex items-center gap-2">
-        {isRedMode ? (
-          <ShieldAlert size={16} color="white" className="animate-pulse" />
-        ) : (
-          <Sparkles size={16} className={isLight ? 'text-white' : 'text-black'} />
+          <button onClick={() => toggleRedMode()}
+            className="hidden lg:flex relative px-6 py-3 rounded-2xl transition-all active:scale-95 shadow-lg group overflow-hidden cursor-pointer"
+            style={{ backgroundColor: activeAccent }}
+          >
+            <div className="relative z-10 flex items-center gap-2">
+              {isRedMode ? (
+                <ShieldAlert size={16} color="white" className="animate-pulse" />
+              ) : (
+                <Sparkles size={16} className={isLight ? 'text-white' : 'text-black'} />
+              )}
+              <span className={`text-[11px] font-bold uppercase tracking-tighter ${isLight || isRedMode ? 'text-white' : 'text-black'}`}>
+                {isRedMode ? ' Red Mode' : 'Friendly Mode'}
+              </span>
+            </div>
+          </button>
         )}
-        <span className={`text-[11px] font-bold uppercase tracking-tighter ${isLight || isRedMode ? 'text-white' : 'text-black'}`}>
-          {isRedMode ? ' Red Mode' : 'Friendly Mode'}
-        </span>
-      </div>
-    </button>
-  )}
           
           <div className="relative" ref={bellRef}>
             <button onClick={() => setIsBellOpen(!isBellOpen)}
@@ -270,7 +278,6 @@ function NavBar({ setIsSidebarOpen }) {
             <AnimatePresence>
               {isBellOpen && (
                 <motion.div initial={{ opacity: 0, y: 15, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                  // Fixed Mobile Alignment: Shifted right and narrowed width for mobile
                   className={`absolute right-[-10px] md:right-0 mt-4 w-[260px] md:w-[340px] rounded-[1.5rem] md:rounded-[2.5rem] border overflow-hidden shadow-2xl backdrop-blur-3xl z-50 ${themeStyles.dropdown}`}
                 >
                   <div className="p-4 md:p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
@@ -288,14 +295,14 @@ function NavBar({ setIsSidebarOpen }) {
                     {previewNotifications.length > 0 ? (
                       previewNotifications.map((notif, idx) => (
                         <div key={notif._id || idx} onClick={() => { navigate("/notifications"); setIsBellOpen(false); }}
-                          className={`group p-4 md:p-5 transition-all border-b border-white/[0.02] cursor-pointer flex gap-3 md:gap-4 items-start ${!notif.isRead ? 'bg-white/[0.03]' : 'hover:bg-white/[0.02]'}`}
+                          className={`group p-4 md:p-5 transition-all border-b border-white/[0.02] cursor-pointer flex gap-3 md:gap-4 items-start bg-white/[0.03]`}
                         >
-                          <div className={`shrink-0 p-2 rounded-lg md:rounded-2xl border transition-colors ${!notif.isRead ? 'bg-white/5' : 'bg-white/5 border-white/5'}`}
-                               style={{ borderColor: !notif.isRead ? `${activeAccent}40` : 'transparent' }}>
+                          <div className={`shrink-0 p-2 rounded-lg md:rounded-2xl border transition-colors bg-white/5`}
+                               style={{ borderColor: `${activeAccent}40` }}>
                             {getNotificationIcon(notif.category, notif.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[11px] md:text-[13px] leading-snug mb-1 ${themeStyles.text} ${!notif.isRead ? 'font-medium' : 'opacity-70'}`}>
+                            <p className={`text-[11px] md:text-[13px] leading-snug mb-1 ${themeStyles.text} font-medium`}>
                               <span className="font-bold mr-1" style={{ color: notif.category === 'system' ? '#ef4444' : activeAccent }}>
                                 {notif.category === 'system' ? 'SYSTEM' : (notif.originator?.username || "CREATOR")}
                               </span> 
@@ -318,7 +325,7 @@ function NavBar({ setIsSidebarOpen }) {
                           className={`w-full py-4 md:py-6 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border-t border-white/5 hover:text-white ${themeStyles.text}`}
                           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = activeAccent}
                           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                    View History <ChevronRight size={14} />
+                    {previewNotifications.length > 0 ? "View All Unread" : "Full History"} <ChevronRight size={14} />
                   </button>
                 </motion.div>
               )}

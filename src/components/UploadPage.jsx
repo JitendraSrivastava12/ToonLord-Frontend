@@ -9,7 +9,7 @@ import { useAlert } from "../context/AlertContext";
 import { useParams } from 'react-router-dom';
 const API_URL = import.meta.env.VITE_API_URL;
 const UploadPage = () => {
-  const { isRedMode,currentTheme } = useContext(AppContext);
+  const { isRedMode,currentTheme,user } = useContext(AppContext);
   const { mangaId } = useParams();
   const navigate = useNavigate();
   const accentColor = isRedMode ? '#ef4444' : 'var(--accent)';
@@ -323,6 +323,9 @@ const UploadPage = () => {
 
   // --- DEPLOY LOGIC ---
   const handleDeploy = async () => {
+    if (user?.status === "suspended") {
+    return showAlert("You are suspended. Contact help for inquiry.", "error");
+  }
     if (!selectedManga || !chapterNum || selectedFiles.length === 0) {
       return showAlert("Please select a series, chapter number, and upload pages.","error");
     }
