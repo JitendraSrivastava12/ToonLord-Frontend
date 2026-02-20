@@ -248,46 +248,54 @@ const ProfilePage = () => {
           
           {/* PROFILE IMAGE WITH VIP LOGIC */}
           <div className="relative group flex items-center justify-center">
-            {user?.vipStatus?.isVip ? (
-              /* VIP PREMIUM BORDER */
-              <div className="p-1 rounded-full bg-gradient-to-tr from-amber-400 via-amber-600 to-amber-300 shadow-[0_0_30px_rgba(217,119,6,0.15)]">
-                <div className="bg-[var(--card-bg)] p-1 rounded-full">
-                  <img 
-                    src={form.preview || '/default.png'} 
-                    alt="Profile"
-                    className="w-28 h-28 rounded-full object-cover shadow-2xl transition-all" 
-                  />
-                </div>
-                {/* LARGE VIP CROWN BADGE */}
-                <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-1.5 border-4 border-[var(--card-bg)] z-10 shadow-xl">
-                  <Crown size={16} className="text-white fill-white" />
-                </div>
-              </div>
-            ) : (
-              /* STANDARD BORDER */
-              <>
-                <img 
-                  src={form.preview || '/default.png'} 
-                  alt="Profile"
-                  className={`w-28 h-28 rounded-full border-4 ${isRedMode ? 'border-red-500/20' : 'border-emerald-500/20'} object-cover shadow-2xl transition-all group-hover:${theme.accentBorder}`} 
-                />
-                <button 
-                  onClick={() => fileInputRef.current.click()}
-                  className={`absolute bottom-0 right-0 p-2 bg-[var(--card-bg)] border ${theme.dynamicBorder} rounded-full text-[var(--text-main)] hover:${theme.text} transition-all shadow-lg`}
-                >
-                  <Camera size={14} />
-                </button>
-              </>
-            )}
+  {user?.vipStatus?.isVip ? (
+    /* VIP PREMIUM BORDER */
+    <div className="p-1 rounded-full bg-gradient-to-tr from-amber-400 via-amber-600 to-amber-300 shadow-[0_0_30px_rgba(217,119,6,0.15)] relative">
+      <div className="bg-[var(--card-bg)] p-1 rounded-full">
+        <img 
+          src={form.preview || '/default.png'} 
+          alt="Profile"
+          className="w-28 h-28 rounded-full object-cover shadow-2xl transition-all" 
+        />
+      </div>
+      
+      {/* ADDED CAMERA BUTTON FOR VIPs */}
+      <button 
+        onClick={() => fileInputRef.current.click()}
+        className={`absolute bottom-0 right-0 p-2 bg-[var(--card-bg)] border ${theme.dynamicBorder} rounded-full text-[var(--text-main)] hover:text-amber-500 transition-all shadow-lg z-20`}
+      >
+        <Camera size={14} />
+      </button>
 
-            {/* Hidden Input */}
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              onChange={(e) => setForm({...form, file: e.target.files[0], preview: URL.createObjectURL(e.target.files[0])})} 
-            />
-          </div>
+      {/* VIP CROWN */}
+      <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full p-1.5 border-4 border-[var(--card-bg)] z-10 shadow-xl">
+        <Crown size={16} className="text-white fill-white" />
+      </div>
+    </div>
+  ) : (
+    /* STANDARD BORDER */
+    <>
+      <img 
+        src={form.preview || '/default.png'} 
+        alt="Profile"
+        className={`w-28 h-28 rounded-full border-4 ${isRedMode ? 'border-red-500/20' : 'border-emerald-500/20'} object-cover shadow-2xl transition-all group-hover:${theme.accentBorder}`} 
+      />
+      <button 
+        onClick={() => fileInputRef.current.click()}
+        className={`absolute bottom-0 right-0 p-2 bg-[var(--card-bg)] border ${theme.dynamicBorder} rounded-full text-[var(--text-main)] hover:${theme.text} transition-all shadow-lg`}
+      >
+        <Camera size={14} />
+      </button>
+    </>
+  )}
+
+  <input 
+    type="file" 
+    ref={fileInputRef} 
+    className="hidden" 
+    onChange={(e) => setForm({...form, file: e.target.files[0], preview: URL.createObjectURL(e.target.files[0])})} 
+  />
+</div>
 
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
