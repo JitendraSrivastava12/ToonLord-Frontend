@@ -53,7 +53,7 @@ const ToonLordLanding = () => {
             </div>
           </header>
 
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-2 sm:p-6">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] py-2 sm:p-6">
             <MangaGrid
               category="trending"
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6"
@@ -98,7 +98,7 @@ const ToonLordLanding = () => {
             </p>
           </header>
 
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-2 sm:p-6">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] py-2 sm:p-6">
             <MangaGrid
               category="premium"
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-6"

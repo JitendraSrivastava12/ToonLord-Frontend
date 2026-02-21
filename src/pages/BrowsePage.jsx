@@ -8,7 +8,9 @@ import {
   SlidersHorizontal, X
 } from 'lucide-react';
 import { AppContext } from "../UserContext"; 
+
 const API_URL = import.meta.env.VITE_API_URL;
+
 const BrowsePage = () => {
   const { isRedMode, currentTheme, familyMode } = useContext(AppContext);
   const [activeGenres, setActiveGenres] = useState([]); 
@@ -78,7 +80,7 @@ const BrowsePage = () => {
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            className="lg:hidden fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-[var(--accent)] text-white shadow-lg"
+            className="lg:hidden fixed bottom-6 right-6 z-50 p-4 md:p-4 rounded-2xl bg-[var(--accent)] text-white shadow-lg"
           >
             <SlidersHorizontal size={20}/>
           </motion.button>
@@ -99,12 +101,8 @@ const BrowsePage = () => {
       `}>
         <header className="flex justify-between items-center mb-8">
           <div>
-            <p className="text-xs text-[var(--text-dim)] mb-1">
-              Filters
-            </p>
-            <h2 className="text-lg font-semibold">
-              Browse options
-            </h2>
+            <p className="text-xs text-[var(--text-dim)] mb-1">Filters</p>
+            <h2 className="text-lg font-semibold">Browse options</h2>
           </div>
           <button onClick={() => setFiltersOpen(false)} className="lg:hidden">
             <X size={18}/>
@@ -112,7 +110,6 @@ const BrowsePage = () => {
         </header>
 
         <div className="space-y-7">
-
           {/* SEARCH */}
           <div>
             <p className="text-xs text-[var(--text-dim)] mb-2">Search</p>
@@ -121,7 +118,7 @@ const BrowsePage = () => {
               <input
                 value={searchQuery}
                 onChange={e => {setSearchQuery(e.target.value); setCurrentPage(1);}}
-                placeholder="Search by title or author"
+                placeholder="Search series..."
                 className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
               />
             </div>
@@ -130,14 +127,14 @@ const BrowsePage = () => {
           {/* SORT */}
           <div>
             <p className="text-xs text-[var(--text-dim)] mb-2">Sort by</p>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               {sortOptions.map(opt => (
                 <button key={opt}
                   onClick={()=>setSortBy(opt)}
-                  className={`w-full py-2 rounded-xl text-sm transition ${
+                  className={`py-2 rounded-xl text-xs transition ${
                     sortBy===opt 
                       ? "bg-[var(--accent)] text-white" 
-                      : "bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)]"
+                      : "bg-[var(--bg-primary)] border border-[var(--border)]"
                   }`}>
                   {opt}
                 </button>
@@ -155,7 +152,7 @@ const BrowsePage = () => {
                   className={`px-3 py-1.5 rounded-full text-xs transition ${
                     activeGenres.includes(g) 
                       ? "bg-[var(--accent)] text-white" 
-                      : "bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)]"
+                      : "bg-[var(--bg-primary)] border border-[var(--border)]"
                   }`}>
                   {g}
                 </button>
@@ -166,42 +163,54 @@ const BrowsePage = () => {
       </aside>
 
       {/* MAIN */}
-      <main className="flex-1 px-4 sm:px-6 lg:px-12 py-1 md:py-10">
+      {/* Changed px-4 to px-0 on mobile */}
+      <main className="flex-1 px-0 sm:px-4 lg:px-12 py-4 md:py-10 overflow-x-hidden">
 
-        <header className="mb-12">
-          <p className="text-sm text-[var(--text-dim)] mb-2">
+        {/* Header - Added px-4/6 back specifically for text */}
+        <header className="mb-8 px-4 sm:px-0">
+          <p className="text-xs text-[var(--accent)] font-medium uppercase tracking-wider mb-1">
             Browse library
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold">
             All series
           </h1>
           <p className="text-sm text-[var(--text-dim)] mt-1">
-            {filteredList.length} results
+            {filteredList.length} results found
           </p>
         </header>
 
-        {/* GRID */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+        {/* GRID: gap-1 on mobile for tight edge-to-edge look */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-1 sm:gap-6">
           {currentItems.map((manga) => (
-            <motion.div key={manga._id} initial={{opacity:0,y:15}} animate={{opacity:1,y:0}}>
+            <motion.div key={manga._id} initial={{opacity:0}} animate={{opacity:1}}>
               <Link to={`/manga/${manga._id}`} className="group block">
-                <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)] transition group-hover:-translate-y-0.5 group-hover:shadow-md">
+                {/* Removed rounded-xl on mobile with rounded-none */}
+                <div className="relative aspect-[3/4] overflow-hidden bg-[var(--bg-secondary)] sm:rounded-xl sm:border border-[var(--border)] transition group-hover:shadow-lg">
                   <img 
                     src={manga.coverImage} 
                     alt={manga.title} 
-                    className="w-full h-full object-cover transition-transform group-hover:scale-[1.02]"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute top-2 right-2 bg-black/60 px-2 py-0.5 rounded-full text-xs text-yellow-400 flex items-center gap-1">
-                    <Star size={12} fill="currentColor"/>{manga.rating||"5.0"}
+                  <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-yellow-400 flex items-center gap-1">
+                    <Star size={10} fill="currentColor"/>{manga.rating||"5.0"}
+                  </div>
+                  
+                  {/* Mobile Title Overlay (Optional - since titles are below, but looks better for edge-to-edge) */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <p className="text-white text-xs font-medium line-clamp-1 sm:hidden">
+                       {manga.title}
+                    </p>
                   </div>
                 </div>
-                <div className="mt-2 space-y-1">
-                  <h3 className="text-sm font-medium line-clamp-2 group-hover:text-[var(--accent)] transition">
+                
+                {/* Desktop/Tablet metadata (Hidden on very tight mobile or keep for clarity) */}
+                <div className="mt-2 px-3 pb-4 sm:px-0">
+                  <h3 className="text-sm font-medium line-clamp-1 hidden sm:block group-hover:text-[var(--accent)] transition">
                     {manga.title}
                   </h3>
-                  <div className="text-xs text-[var(--text-dim)] flex justify-between">
+                  <div className="text-[10px] uppercase tracking-tighter text-[var(--text-dim)] flex justify-between">
                     <span>{manga.status}</span>
-                    <span>{manga.TotalChapter||0} ch</span>
+                    <span>{manga.TotalChapter||0} Chapters</span>
                   </div>
                 </div>
               </Link>
@@ -211,23 +220,21 @@ const BrowsePage = () => {
 
         {/* PAGINATION */}
         {totalPages>1 && (
-          <div className="flex justify-center items-center gap-6 mt-14">
+          <div className="flex justify-center items-center gap-6 mt-14 pb-12">
             <button 
               disabled={currentPage===1} 
               onClick={()=>setCurrentPage(p=>p-1)} 
-              className="p-3 rounded-full bg-[var(--bg-secondary)] disabled:opacity-30 hover:bg-[var(--bg-primary)] transition"
+              className="p-3 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] disabled:opacity-30"
             >
               <ChevronLeft size={18}/>
             </button>
-
-            <span className="font-medium">
-              {currentPage} / {totalPages}
+            <span className="text-sm font-medium">
+              Page {currentPage} of {totalPages}
             </span>
-
             <button 
               disabled={currentPage===totalPages} 
               onClick={()=>setCurrentPage(p=>p+1)} 
-              className="p-3 rounded-full bg-[var(--bg-secondary)] disabled:opacity-30 hover:bg-[var(--bg-primary)] transition"
+              className="p-3 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] disabled:opacity-30"
             >
               <ChevronRight size={18}/>
             </button>

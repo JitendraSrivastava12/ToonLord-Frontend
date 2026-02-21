@@ -126,7 +126,7 @@ const ToonLordHome = () => {
 
       {/* SECTIONS */}
       {/* Changed px-4 to px-2 on mobile for tighter edge look, kept sm:px-6 */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 space-y-14">
+      <div className="max-w-7xl mx-auto px-0 sm:px-6 space-y-14">
         <ArchiveSection
           title="Recently Updated"
           icon={<ClockIcon className="w-5 h-5" />}

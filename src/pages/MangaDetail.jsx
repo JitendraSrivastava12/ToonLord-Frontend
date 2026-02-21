@@ -246,7 +246,7 @@ const MangaDetail = () => {
 
   return (
     <div className={`min-h-screen bg-[var(--bg-primary)] text-[var(--text-main)] transition-all duration-700 theme-${currentTheme}`}>
-      <div className="max-w-5xl mx-auto px-4 lg:py-10 relative z-10">
+      <div className="max-w-5xl mx-auto px-2 lg:py-10 relative z-10">
         
         {/* HERO CARD - Responsive Flex logic added */}
         <section className="relative rounded-[2rem] md:rounded-3xl p-5 md:p-8 lg:p-12 bg-[var(--bg-secondary)] backdrop-blur-2xl border border-[var(--border)] shadow-[var(--shadow-aesthetic)] overflow-hidden">
