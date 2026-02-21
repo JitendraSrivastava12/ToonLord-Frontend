@@ -110,7 +110,7 @@ const MangaDetail = () => {
   // --- NEW: Handle Rating Submission ---
   const handleRate = async (score) => {
     const token = localStorage.getItem('token');
-    if (!token) return showAlert("Please Login to Rate", "error");
+    if (!token) return showAlert("Please Login to Rate", "info");
 
     try {
       await axios.post(`${API_URL}/api/ratings/rate`, 
@@ -157,7 +157,7 @@ const MangaDetail = () => {
   const syncLibrary = async (status) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      showAlert("Login for building your library", "error");
+      showAlert("Login for building your library", "info");
       return navigate('/login');
     }
 
