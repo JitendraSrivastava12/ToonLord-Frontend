@@ -158,7 +158,7 @@ const MangaDetail = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       showAlert("Login for building your library", "info");
-      return navigate('/login');
+      return;
     }
 
     setIsSyncing(true);
